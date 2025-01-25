@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cinemate_test
+    username: postgres
+    password: dansob_2004
+    driverClassName: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    user: postgres
+    password: dansob_2004
+    schemas: public
+    url: jdbc:postgresql://localhost:5432/cinemate_test
