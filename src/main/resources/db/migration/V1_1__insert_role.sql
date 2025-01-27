@@ -1,6 +1,7 @@
 INSERT INTO Role(id, name)
 VALUES (1, 'ROLE_ADMIN'),
-       (2, 'ROLE_USER');
+       (2, 'ROLE_USER')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO AppUser(id, username, firstname, surname, email, phone_num, enc_password)
 VALUES (1, 'Admin', 'ADMIN', 'ADMIN', 'Admin@gmail.com', '+380654785412', '$2a$10$e.lC9uZMHSaOBHjgRFMUJen3TBJLrroMIcxpeBQKB6j8dZbDsBIYG'),

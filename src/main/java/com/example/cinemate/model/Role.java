@@ -1,10 +1,13 @@
 package com.example.cinemate.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "Role")
 public class Role {
 

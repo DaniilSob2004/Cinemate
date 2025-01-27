@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ExternalAuth")
+@Table(name = "externalauth")
 public class ExternalAuth {
 
     @Id

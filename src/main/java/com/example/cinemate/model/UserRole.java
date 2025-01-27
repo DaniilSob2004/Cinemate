@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "UserRole")
+@Table(name = "userrole")
 public class UserRole {
 
     @Id

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "AppUser")
+@Table(name = "appuser")
 public class AppUser {
 
     @Id

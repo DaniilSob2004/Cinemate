@@ -2,6 +2,8 @@ package com.example.cinemate.utils;
 
 import lombok.experimental.UtilityClass;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @UtilityClass
 public class GenerateUtil {
@@ -12,7 +14,18 @@ public class GenerateUtil {
     private static final int SIZE_NUM_TEL = 12;
 
     public static String getEmailByName(final String name) {
-        return name + "@gmail.com";
+        int num = getRandomInteger(1000, false);
+        int num2 = getRandomInteger(1000, false);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(name)
+                .append("_")
+                .append(num)
+                .append("_")
+                .append(num2)
+                .append("@gmail.com");
+
+        return sb.toString();
     }
 
     public static String getRandomNumTel() {
@@ -21,6 +34,33 @@ public class GenerateUtil {
             sb.append(getRandomInteger(1, 9));
         }
         return sb.toString();
+    }
+
+    public static String getRandomProvider(final String name) {
+        int num = getRandomInteger(1000, false);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(name)
+                .append("_")
+                .append(num);
+
+        return sb.toString();
+    }
+
+    public static String getRandomNumberString() {
+        int size = 30;
+        return IntStream.range(0, size)
+                .map(i -> getRandomInteger(1, 10))
+                .mapToObj(Integer::toString)
+                .collect(Collectors.joining());
+    }
+
+    public static String getRandomTokenString() {
+        int size = 30;
+        return IntStream.range(0, size)
+                .map(i -> RAND.nextInt(26) + 'a')
+                .mapToObj(c -> String.valueOf((char) c))
+                .collect(Collectors.joining());
     }
 
     public static double getRandomDouble(final double min, final double max) {
