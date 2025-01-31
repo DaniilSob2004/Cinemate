@@ -10,4 +10,6 @@ public interface UserRoleService {
     void delete(UserRole userRole);
     List<UserRole> findAll();
     void deleteAll();
+
+    List<String> getRoleNames(Integer userId);
 }

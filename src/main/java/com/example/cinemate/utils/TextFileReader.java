@@ -8,7 +8,7 @@ import java.util.List;
 
 @UtilityClass
 public class TextFileReader {
-    public static List<String> ReadTextFile(String fileName) {
+    public static List<String> ReadTextFile(final String fileName) {
         try {
             return Files.readAllLines(Paths.get(fileName));
         } catch (IOException e) {

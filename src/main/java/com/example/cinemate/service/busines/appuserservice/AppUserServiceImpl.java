@@ -5,6 +5,7 @@ import com.example.cinemate.model.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AppUserServiceImpl implements AppUserService {
@@ -41,5 +42,10 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public void deleteAll() {
         appUserRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<AppUser> findByEmail(String email) {
+        return appUserRepository.findAppUserByEmail(email);
     }
 }

@@ -42,4 +42,9 @@ public class UserRoleServiceImpl implements UserRoleService {
     public void deleteAll() {
         userRoleRepository.deleteAll();
     }
+
+    @Override
+    public List<String> getRoleNames(Integer userId) {
+        return userRoleRepository.getRoleNames(userId);
+    }
 }

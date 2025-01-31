@@ -9,7 +9,6 @@ import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.TextFileReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
@@ -53,9 +52,6 @@ public class CinemateDbInitializer {
 
     @Autowired
     private UserRoleService userRoleService;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
 
 
     @PostConstruct
@@ -134,7 +130,8 @@ public class CinemateDbInitializer {
                 adminPassword,
                 "",
                 LocalDateTime.now(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null
         );
     }
 
@@ -149,10 +146,11 @@ public class CinemateDbInitializer {
                 randSurname,
                 GenerateUtil.getEmailByName(randUserName),
                 GenerateUtil.getRandomNumTel(),
-                passwordEncoder.encode(userPassword),
+                userPassword,
                 "",
                 LocalDateTime.now(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null
         );
     }
 

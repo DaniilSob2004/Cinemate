@@ -17,7 +17,6 @@ public class AppStarter {
     public ApplicationRunner init() {
         return args -> {
             Logger.info("ApplicationRunner has started!");
-
             cinemateInitializer.autoBaseInitialize();
         };
     }

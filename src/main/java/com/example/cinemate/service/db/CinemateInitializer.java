@@ -10,8 +10,8 @@ public class CinemateInitializer {
     private CinemateDbInitializer cinemateDbInitializer;
 
     public void autoBaseInitialize() {
-        cinemateDbInitializer.deleteAllRowsInDB();
-        cinemateDbInitializer.createAppUsers();
-        cinemateDbInitializer.createExternalAuth();
+        //cinemateDbInitializer.deleteAllRowsInDB();
+        //cinemateDbInitializer.createAppUsers();
+        //cinemateDbInitializer.createExternalAuth();
     }
 }
