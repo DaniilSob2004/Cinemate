@@ -5,6 +5,7 @@ import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.model.AppUser;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
+import com.example.cinemate.utils.BaseAuthUtils;
 import com.example.cinemate.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -26,6 +27,9 @@ public class AuthService {
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
+    BaseAuthUtils baseAuthUtils;
+
+    @Autowired
     @Lazy  // (цикл. зависимость с WebSecurityConfig)
     private AuthenticationManager authenticationManager;
 
@@ -37,6 +41,22 @@ public class AuthService {
 
     @Autowired
     private AppUserConvertDto appUserConvertDto;
+
+    public Optional<LoginRequestDto> getBaseAuthDataFromHeader(final HttpServletRequest request) {
+        String credentials = baseAuthUtils.getCredentialsFromHeader(request).orElse(null);
+        if (credentials == null) {
+            return Optional.empty();
+        }
+
+        String[] loginPassword = baseAuthUtils.getLoginPassword(credentials).orElse(null);
+        if (loginPassword == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+                new LoginRequestDto(loginPassword[0], loginPassword[1])
+        );
+    }
 
     public String loginUser(final LoginRequestDto loginRequestDto) {
         authenticationManager.authenticate(

@@ -17,6 +17,7 @@ security:
   expiration_time: 3600000
   header_auth_name: Authorization
   header_value_auth_prefix: Bearer
+  header_value_basic_auth_prefix: Basic
 
 db_data:
   surname: src/main/resources/data/surname.txt
