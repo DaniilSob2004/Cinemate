@@ -1,8 +1,10 @@
 package com.example.cinemate.utils;
 
+import com.example.cinemate.convert.AppUserConvertDto;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,25 +27,12 @@ public class JwtTokenUtil {
     @Value("${security.header_value_auth_prefix}")
     private String headerValueAuthPrefix;
 
+    @Autowired
+    private AppUserConvertDto appUserConvertDto;
+
     // Генерация токена
-    public String generateToken(final String email) {
-        return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public String generateToken2(final AppUserJwtDto appUserJwtDto) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("username", appUserJwtDto.getUsername());
-        claims.put("firstname", appUserJwtDto.getFirstname());
-        claims.put("surname", appUserJwtDto.getSurname());
-        claims.put("roles", appUserJwtDto.getRoles());
-        claims.put("phoneNum", appUserJwtDto.getPhoneNum());
-        claims.put("avatar", appUserJwtDto.getAvatar());
-
+    public String generateToken(final AppUserJwtDto appUserJwtDto) {
+        Map<String, Object> claims = appUserConvertDto.convertToClaimsJwt(appUserJwtDto);  // получаем данные польз.
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
@@ -53,32 +42,15 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    // Получение имени пользователя из токена
-    public String extractEmail(final String token) {
-        return getClaims(token).getSubject();
-    }
-
     public AppUserJwtDto extractAllUserData(final String token) {
         Claims claims = getClaims(token);
-
-        Object claimRoles = claims.get("roles");
-        List<String> roles = claimRoles != null ? (List<String>) claimRoles : new ArrayList<>();
-
-        return new AppUserJwtDto(
-                claims.get("username", String.class),
-                claims.get("firstname", String.class),
-                claims.get("surname", String.class),
-                roles,
-                claims.getSubject(),  // email
-                claims.get("phoneNum", String.class),
-                claims.get("avatar", String.class)
-        );
+        return appUserConvertDto.convertToAppUserJwtDto(claims);  // получаем данные польз. из claims
     }
 
     // Проверка токена
     public boolean validateToken(final String token) {
         try {
-            var passClaims = getClaims(token);
+            getClaims(token);  // для проверки
             return !isTokenExpired(token);
         } catch (JwtException e) {
             return false;
@@ -94,7 +66,6 @@ public class JwtTokenUtil {
         }
         return Optional.empty();
     }
-
 
     // Получение ключа
     private Key getSigningKey() {

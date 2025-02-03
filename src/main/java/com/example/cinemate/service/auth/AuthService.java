@@ -42,13 +42,13 @@ public class AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword())
         );
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequestDto.getEmail());
+        userDetailsService.loadUserByUsername(loginRequestDto.getEmail());
 
         // получаем пользователя из БД
         AppUser user = appUserService.findByEmail(loginRequestDto.getEmail()).orElse(null);
         AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(user);
 
-        return jwtTokenUtil.generateToken2(appUserJwtDto);
+        return jwtTokenUtil.generateToken(appUserJwtDto);
     }
 
     public void authorizationUserByToken(final String token) {

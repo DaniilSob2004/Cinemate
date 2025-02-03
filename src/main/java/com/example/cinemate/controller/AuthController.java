@@ -1,5 +1,6 @@
 package com.example.cinemate.controller;
 
+import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.auth.AuthResponseDto;
 import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.exception.UserEmailNotFoundException;
@@ -13,13 +14,13 @@ import org.tinylog.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping(value = "/api/v1/auth")
+@RequestMapping(value = Endpoint.API_V1 + Endpoint.AUTH)
 public class AuthController {
 
     @Autowired
     private AuthService authService;
 
-    @PostMapping(value = "/login")
+    @PostMapping(value = Endpoint.LOGIN)
     public ResponseEntity<?> login(HttpServletRequest request, @RequestBody LoginRequestDto loginRequestDto) throws UserEmailNotFoundException {
 
         Logger.info("Email: " + loginRequestDto.getEmail() + ", Password: " + loginRequestDto.getPassword());
