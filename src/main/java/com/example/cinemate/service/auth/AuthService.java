@@ -2,10 +2,8 @@ package com.example.cinemate.service.auth;
 
 import com.example.cinemate.convert.AppUserConvertDto;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
-import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.model.AppUser;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
-import com.example.cinemate.utils.BaseAuthUtils;
 import com.example.cinemate.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -27,9 +25,6 @@ public class AuthService {
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    BaseAuthUtils baseAuthUtils;
-
-    @Autowired
     @Lazy  // (цикл. зависимость с WebSecurityConfig)
     private AuthenticationManager authenticationManager;
 
@@ -42,34 +37,6 @@ public class AuthService {
     @Autowired
     private AppUserConvertDto appUserConvertDto;
 
-    public Optional<LoginRequestDto> getBaseAuthDataFromHeader(final HttpServletRequest request) {
-        String credentials = baseAuthUtils.getCredentialsFromHeader(request).orElse(null);
-        if (credentials == null) {
-            return Optional.empty();
-        }
-
-        String[] loginPassword = baseAuthUtils.getLoginPassword(credentials).orElse(null);
-        if (loginPassword == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(
-                new LoginRequestDto(loginPassword[0], loginPassword[1])
-        );
-    }
-
-    public String loginUser(final LoginRequestDto loginRequestDto) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword())
-        );
-        userDetailsService.loadUserByUsername(loginRequestDto.getEmail());
-
-        // получаем пользователя из БД
-        AppUser user = appUserService.findByEmail(loginRequestDto.getEmail()).orElse(null);
-        AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(user);
-
-        return jwtTokenUtil.generateToken(appUserJwtDto);
-    }
 
     public void authorizationUserByToken(final String token) {
         // извлекаем данные пользователя из токена
@@ -95,5 +62,32 @@ public class AuthService {
             }
         }
         return Optional.empty();
+    }
+
+    public String authenticateAndGenerateToken(final String username, final String password) {
+        // загружает инфу (роли и данные) о польз.
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        // аутентификацию пользователя (логин, пароль, роли)
+        var usernamePasswordAuthenticationToken = this.authenticateUser(userDetails, password)
+                .orElseThrow(() -> new RuntimeException("User not success authentication"));
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+        // загружаем пользователя с ролями
+        AppUser user = appUserService.findByEmailWithRoles(username)
+                .orElseThrow(() -> new RuntimeException("User not found after authentication"));
+
+        // генерация JWT-токена
+        AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(user);
+        return jwtTokenUtil.generateToken(appUserJwtDto);
+    }
+
+    private Optional<UsernamePasswordAuthenticationToken> authenticateUser(final UserDetails userDetails, final String password) {
+        // аутентификацию пользователя (логин, пароль, роли)
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities()
+        );
+        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        return Optional.of(usernamePasswordAuthenticationToken);
     }
 }

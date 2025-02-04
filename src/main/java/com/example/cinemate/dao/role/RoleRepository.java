@@ -7,7 +7,6 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
-@Transactional
 public interface RoleRepository extends JpaRepository<Role, Integer> {
     Optional<Role> findRoleByName(String name);
 }

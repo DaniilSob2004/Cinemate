@@ -12,5 +12,7 @@ public interface AppUserService {
     List<AppUser> findAll();
     void deleteAll();
 
+    Optional<List<AppUser>> findAllWithRoles();
     Optional<AppUser> findByEmail(String email);
+    Optional<AppUser> findByEmailWithRoles(String email);
 }

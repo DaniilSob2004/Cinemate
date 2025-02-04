@@ -3,6 +3,7 @@ package com.example.cinemate.convert;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.model.AppUser;
 import io.jsonwebtoken.Claims;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,15 +18,11 @@ public class AppUserConvertDto {
             return new AppUserJwtDto();
         }
 
-        List<String> roleNames = appUser.getUserRoles().stream()
-                .map(userRole -> userRole.getRole().getName())
-                .toList();
-
         return new AppUserJwtDto(
                 appUser.getUsername(),
                 appUser.getFirstname(),
                 appUser.getSurname(),
-                roleNames,
+                appUser.getUserRoles(),
                 appUser.getEmail(),
                 appUser.getPhoneNum(),
                 appUser.getAvatar()

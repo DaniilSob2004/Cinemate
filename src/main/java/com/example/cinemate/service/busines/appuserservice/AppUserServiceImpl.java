@@ -2,6 +2,7 @@ package com.example.cinemate.service.busines.appuserservice;
 
 import com.example.cinemate.dao.appuser.AppUserRepository;
 import com.example.cinemate.model.AppUser;
+import com.example.cinemate.service.busines.userroleservice.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -12,6 +13,9 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Autowired
     private AppUserRepository appUserRepository;
+
+    @Autowired
+    private UserRoleService userRoleService;
 
     @Override
     public void save(AppUser user) {
@@ -45,7 +49,32 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public Optional<List<AppUser>> findAllWithRoles() {
+        List<AppUser> users = appUserRepository.findAll();
+
+        // загружаем роли пользователя
+        users.forEach(user -> user.setUserRoles(
+                userRoleService.getRoleNames(user.getId()))
+        );
+
+        return Optional.of(users);
+    }
+
+    @Override
     public Optional<AppUser> findByEmail(String email) {
         return appUserRepository.findAppUserByEmail(email);
+    }
+
+    @Override
+    public Optional<AppUser> findByEmailWithRoles(String email) {
+        AppUser user = appUserRepository.findAppUserByEmail(email).orElse(null);
+
+        // загружаем роли пользователя
+        if (user != null) {
+            user.setUserRoles(userRoleService.getRoleNames(user.getId()));
+            return Optional.of(user);
+        }
+
+        return Optional.empty();
     }
 }

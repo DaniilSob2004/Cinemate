@@ -8,7 +8,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-@Transactional
 public interface UserRoleRepository extends JpaRepository<UserRole, Integer> {
     @Query("Select ur.role.name from UserRole ur where ur.user.id = ?1")
     List<String> getRoleNames(Integer userId);

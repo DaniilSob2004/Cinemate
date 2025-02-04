@@ -3,8 +3,11 @@ package com.example.cinemate.controller;
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.auth.AuthResponseDto;
 import com.example.cinemate.dto.auth.LoginRequestDto;
+import com.example.cinemate.dto.auth.RegisterRequestDto;
 import com.example.cinemate.exception.UserEmailNotFoundException;
 import com.example.cinemate.service.auth.AuthService;
+import com.example.cinemate.service.auth.LoginService;
+import com.example.cinemate.service.auth.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +24,15 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private LoginService loginService;
+
+    @Autowired
+    private RegisterService registerService;
+
+
     @PostMapping(value = Endpoint.LOGIN)
     public ResponseEntity<?> login(HttpServletRequest request) throws UserEmailNotFoundException {
-
         // проверяем, есть ли токен в заголовке и валидный ли он
         String token = authService.tokenValidateFromHeader(request).orElse(null);
         if (token != null) {
@@ -31,7 +40,7 @@ public class AuthController {
         }
 
         // Basic authentication (получаем логин и пароль)
-        LoginRequestDto loginRequestDto = authService.getBaseAuthDataFromHeader(request).orElse(null);
+        LoginRequestDto loginRequestDto = loginService.getBaseAuthDataFromHeader(request).orElse(null);
         if (loginRequestDto == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Basic Authentication");
         }
@@ -40,7 +49,7 @@ public class AuthController {
         try {
             Logger.info("(Authentication user) Email: " + loginRequestDto.getEmail() + ", Password: " + loginRequestDto.getPassword());
 
-            token = authService.loginUser(loginRequestDto);
+            token = loginService.loginUser(loginRequestDto);
 
             Logger.info("User authenticated!");
 
@@ -48,6 +57,29 @@ public class AuthController {
 
         } catch (BadCredentialsException | UserEmailNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+    }
+
+    @PostMapping(value = Endpoint.REGISTER)
+    public ResponseEntity<?> register(HttpServletRequest request, @RequestBody RegisterRequestDto registerRequestDto) {
+        // проверяем, есть ли токен в заголовке и валидный ли он
+        String token = authService.tokenValidateFromHeader(request).orElse(null);
+        if (token != null) {
+            return ResponseEntity.badRequest().body("Already authenticated");
+        }
+
+        // регистрация и генерация токена
+        try {
+            Logger.info("Register request: " + registerRequestDto);
+
+            token = registerService.registerUser(registerRequestDto);
+
+            Logger.info("User registered!");
+
+            return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
+
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 }
