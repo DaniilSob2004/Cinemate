@@ -46,12 +46,7 @@ public class RegisterService {
         }
 
         // добавление пользователя в БД
-        AppUser user = new AppUser(
-                null,"", "", "",
-                registerRequestDto.getEmail(), "",
-                bCryptPasswordEncoder.encode(registerRequestDto.getPassword()),
-                "", LocalDateTime.now(), LocalDateTime.now(), null
-        );
+        AppUser user = this.createNewUser(registerRequestDto);
         appUserService.save(user);
 
         // добавление роли пользователя в БД
@@ -76,5 +71,21 @@ public class RegisterService {
         }
 
         return Optional.empty();
+    }
+
+    private AppUser createNewUser(final RegisterRequestDto registerRequestDto) {
+        return new AppUser(
+                null,
+                "",
+                "",
+                "",
+                registerRequestDto.getEmail(),
+                "",
+                bCryptPasswordEncoder.encode(registerRequestDto.getPassword()),
+                "",
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null
+        );
     }
 }

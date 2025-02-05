@@ -9,10 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 public class AppUserJwtDto {
     private String username;
-    private String firstname;
-    private String surname;
     private List<String> roles;
     private String email;
-    private String phoneNum;
-    private String avatar;
 }
