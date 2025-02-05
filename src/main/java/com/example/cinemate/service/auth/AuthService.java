@@ -2,6 +2,7 @@ package com.example.cinemate.service.auth;
 
 import com.example.cinemate.convert.AppUserConvertDto;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
+import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.AppUser;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.utils.JwtTokenUtil;
@@ -69,25 +70,25 @@ public class AuthService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         // аутентификацию пользователя (логин, пароль, роли)
-        var usernamePasswordAuthenticationToken = this.authenticateUser(userDetails, password)
-                .orElseThrow(() -> new RuntimeException("User not success authentication"));
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(
+                this.authenticateUser(userDetails, password)
+        );
 
         // загружаем пользователя с ролями
         AppUser user = appUserService.findByEmailWithRoles(username)
-                .orElseThrow(() -> new RuntimeException("User not found after authentication"));
+                .orElseThrow(() -> new UserNotFoundException("User '" + username + "not found after authentication"));
 
         // генерация JWT-токена
         AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(user);
         return jwtTokenUtil.generateToken(appUserJwtDto);
     }
 
-    private Optional<UsernamePasswordAuthenticationToken> authenticateUser(final UserDetails userDetails, final String password) {
+    private UsernamePasswordAuthenticationToken authenticateUser(final UserDetails userDetails, final String password) {
         // аутентификацию пользователя (логин, пароль, роли)
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities()
         );
         authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-        return Optional.of(usernamePasswordAuthenticationToken);
+        return usernamePasswordAuthenticationToken;
     }
 }

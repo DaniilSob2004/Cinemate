@@ -4,7 +4,8 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.auth.AuthResponseDto;
 import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
-import com.example.cinemate.exception.UserEmailNotFoundException;
+import com.example.cinemate.dto.error.ErrorResponseDto;
+import com.example.cinemate.exception.auth.*;
 import com.example.cinemate.service.auth.AuthService;
 import com.example.cinemate.service.auth.LoginService;
 import com.example.cinemate.service.auth.RegisterService;
@@ -32,22 +33,24 @@ public class AuthController {
 
 
     @PostMapping(value = Endpoint.LOGIN)
-    public ResponseEntity<?> login(HttpServletRequest request) throws UserEmailNotFoundException {
+    public ResponseEntity<?> login(HttpServletRequest request) {
         // проверяем, есть ли токен в заголовке и валидный ли он
         String token = authService.tokenValidateFromHeader(request).orElse(null);
         if (token != null) {
-            return ResponseEntity.badRequest().body("Already authenticated");
+            return ResponseEntity.badRequest()
+                    .body(new ErrorResponseDto("User already authenticated", HttpStatus.BAD_REQUEST.value()));
         }
 
         // Basic authentication (получаем логин и пароль)
         LoginRequestDto loginRequestDto = loginService.getBaseAuthDataFromHeader(request).orElse(null);
         if (loginRequestDto == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Basic Authentication");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponseDto("Invalid Basic Authentication", HttpStatus.BAD_REQUEST.value()));
         }
 
         // аутентификация и генерация токена
         try {
-            Logger.info("(Authentication user) Email: " + loginRequestDto.getEmail() + ", Password: " + loginRequestDto.getPassword());
+            Logger.info("(Authentication user) Email: " + loginRequestDto.getEmail());
 
             token = loginService.loginUser(loginRequestDto);
 
@@ -55,8 +58,12 @@ public class AuthController {
 
             return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
 
-        } catch (BadCredentialsException | UserEmailNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        } catch (BadCredentialsException | UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
 
@@ -78,8 +85,18 @@ public class AuthController {
 
             return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
 
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (UserAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value()));
+        } catch (PasswordMismatchException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+        } catch (BadCredentialsException | UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
 }

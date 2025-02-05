@@ -1,6 +1,8 @@
 package com.example.cinemate.service.auth;
 
 import com.example.cinemate.dto.auth.RegisterRequestDto;
+import com.example.cinemate.exception.auth.PasswordMismatchException;
+import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.model.AppUser;
 import com.example.cinemate.model.Role;
 import com.example.cinemate.model.UserRole;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class RegisterService {
@@ -39,11 +40,8 @@ public class RegisterService {
 
     @Transactional
     public String registerUser(final RegisterRequestDto registerRequestDto) throws Exception {
-        // проверка данных
-        String errorMessage = this.checkRegisterData(registerRequestDto).orElse(null);
-        if (errorMessage != null) {
-            throw new Exception(errorMessage);
-        }
+        // проверка данных (если ошибка, то будет исключение)
+        this.checkRegisterData(registerRequestDto);
 
         // добавление пользователя в БД
         AppUser user = this.createNewUser(registerRequestDto);
@@ -58,19 +56,17 @@ public class RegisterService {
         return authService.authenticateAndGenerateToken(user.getEmail(), registerRequestDto.getPassword());
     }
 
-    private Optional<String> checkRegisterData(final RegisterRequestDto registerRequestDto) {
+    private void checkRegisterData(final RegisterRequestDto registerRequestDto) {
         // есть ли такой пользователь в бд
         AppUser user = appUserService.findByEmail(registerRequestDto.getEmail()).orElse(null);
         if (user != null) {
-            return Optional.of("A user with such an email already exists");
+            throw new UserAlreadyExistsException("User already exists");
         }
 
         // проверяем пароли на совпадение
         if (!registerRequestDto.getPassword().equals(registerRequestDto.getConfirmPassword())) {
-            return Optional.of("Passwords do not match");
+            throw new PasswordMismatchException("Passwords do not match");
         }
-
-        return Optional.empty();
     }
 
     private AppUser createNewUser(final RegisterRequestDto registerRequestDto) {

@@ -1,5 +1,8 @@
 package com.example.cinemate.config;
 
+import com.example.cinemate.filter.JwtFilter;
+import com.example.cinemate.handling.error.JwtAccessDeniedHandler;
+import com.example.cinemate.handling.error.JwtAuthEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +29,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtFilter jwtFilter;
+
+    @Autowired
+    private JwtAuthEntryPoint jwtAuthEntryPoint;
+
+    @Autowired
+    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Autowired
     private UserDetailsService userDetailsService;  // для получения информации о польз. при аутентификации
@@ -71,7 +80,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()  // отключить CSRF
                 .formLogin().disable()  // отключить встроенную форму логина
-                .exceptionHandling().authenticationEntryPoint(new JwtAuthEntryPoint())  // обработка ошибок
+                .exceptionHandling()
+                    .authenticationEntryPoint(jwtAuthEntryPoint)  // обработка неаутентифицированных запросов (401)
+                    .accessDeniedHandler(jwtAccessDeniedHandler)  // обработка запрещенных запросов (forbidden 403)
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);  // добавляем наш фильтр
     }

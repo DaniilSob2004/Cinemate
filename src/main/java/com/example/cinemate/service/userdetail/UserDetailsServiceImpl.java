@@ -1,6 +1,6 @@
 package com.example.cinemate.service.userdetail;
 
-import com.example.cinemate.exception.UserEmailNotFoundException;
+import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.AppUser;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
@@ -31,9 +31,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         // находим пользователя
         AppUser user = appUserService.findByEmail(username).orElse(null);
-
         if (user == null) {
-            throw new UserEmailNotFoundException("User '" + username + "' was not found in the database...");
+            throw new UserNotFoundException("User '" + username + "' was not found...");
         }
 
         // установка ролей для данного пользователя
