@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.tinylog.Logger;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -25,22 +26,30 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserRoleService userRoleService;
 
+    @Autowired
+    private UserDetailsCacheService userDetailsCacheService;
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) {
         // находим пользователя
+        UserDetails userDetailsFromCache = userDetailsCacheService.get(username).orElse(null);
+        if (userDetailsFromCache != null) {
+            Logger.info("UserDetails from Redis cache");
+            return userDetailsFromCache;
+        }
+
         AppUser user = appUserService.findByEmail(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' was not found..."));
 
-        // установка ролей для данного пользователя
-        List<GrantedAuthority> grantList = this.setRolesForUser(user.getId());
-
-        // возвращаем объект внутреннего Spring User
-        return new User(user.getEmail(), user.getEncPassword(), grantList);
+        return this.createUserDetails(user);
     }
 
-    @Transactional
-    public UserDetails loadUserByUser(AppUser user) {
+    public void addUserToCache(final String username, final UserDetails userDetails) {
+        userDetailsCacheService.addToCache(username, userDetails);
+    }
+
+    private UserDetails createUserDetails(final AppUser user) {
         // установка ролей для данного пользователя
         List<GrantedAuthority> grantList = this.setRolesForUser(user.getId());
 

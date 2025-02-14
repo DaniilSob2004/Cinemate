@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -47,25 +48,28 @@ public class AuthService {
         // загружается информация о польз, чтобы установить его права доступа
         UserDetails userDetails = userDetailsService.loadUserByUsername(appUserJwtDto.getEmail());
 
-        // создаем объект аутентификации
-        var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-        // устанавливаем аутентификацию в контекст безопасности Spring
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // аутентификация пользователя (логин, пароль, роли)
+        this.authenticateUserWithoutPassword(userDetails);
     }
 
     public String authenticateAndGenerateToken(final String username, final String password) {
+        // загружает инфу (роли и данные) о польз.
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        // аутентификация пользователя (логин, пароль, роли)
+        if (Objects.equals(password, "")) {  // внешние провайдеры (без пароля)
+            this.authenticateUserWithoutPassword(userDetails);
+        }
+        else {  // с паролем
+            this.authenticateUser(userDetails, password);
+        }
+
+        // после успешной аутентификации добавляем в кэш
+        userDetailsService.addUserToCache(username, userDetails);
+
         // получаем пользователя с ролями
         AppUser user = appUserService.findByEmailWithRoles(username)
-                .orElseThrow(() -> new UserNotFoundException("User '" + username + "not found after authentication"));
-
-        // загружает инфу (роли и данные) о польз.
-        UserDetails userDetails = userDetailsService.loadUserByUser(user);
-
-        // аутентификацию пользователя (логин, пароль, роли)
-        SecurityContextHolder.getContext().setAuthentication(
-                this.authenticateUser(userDetails, password)
-        );
+                .orElseThrow(() -> new UserNotFoundException("User '" + username + " not found after authentication"));
 
         // генерация JWT-токена
         AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(user);
@@ -81,12 +85,24 @@ public class AuthService {
         return jwtTokenUtil.getTokenFromAuthHeaderStr(tokenHeader);
     }
 
-    private UsernamePasswordAuthenticationToken authenticateUser(final UserDetails userDetails, final String password) {
+    private void authenticateUser(final UserDetails userDetails, final String password) {
         // аутентификацию пользователя (логин, пароль, роли)
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+        var usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities()
         );
-        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-        return usernamePasswordAuthenticationToken;
+
+        // устанавливаем аутентификацию в контекст безопасности Spring
+        SecurityContextHolder.getContext().setAuthentication(
+                authenticationManager.authenticate(usernamePasswordAuthenticationToken)
+        );
+    }
+
+    private void authenticateUserWithoutPassword(final UserDetails userDetails) {
+        // создаем объект аутентификации
+        var usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        // устанавливаем аутентификацию в контекст безопасности Spring
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
     }
 }

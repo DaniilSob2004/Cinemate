@@ -44,8 +44,8 @@ public class GenerateUtil {
                 .collect(Collectors.joining());
     }
 
-    public static String getRandomTokenString() {
-        int size = 30;
+    public static String getRandomString() {
+        int size = 20;
         return IntStream.range(0, size)
                 .map(i -> RAND.nextInt(26) + 'a')
                 .mapToObj(c -> String.valueOf((char) c))

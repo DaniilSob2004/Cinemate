@@ -11,8 +11,10 @@ import com.example.cinemate.model.UserRole;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.service.busines.roleservice.RoleService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
+import com.example.cinemate.utils.GenerateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -38,6 +40,9 @@ public class RegisterService {
     @Autowired
     private AppUserConvertDto appUserConvertDto;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Transactional
     public String registerUser(final RegisterRequestDto registerRequestDto) {
         // в нижний регистр
@@ -47,7 +52,8 @@ public class RegisterService {
         this.checkRegisterData(registerRequestDto);
 
         // добавление пользователя в БД
-        AppUser user = appUserConvertDto.convertToAppUser(registerRequestDto);
+        String password = bCryptPasswordEncoder.encode(registerRequestDto.getPassword());
+        AppUser user = appUserConvertDto.convertToAppUser(registerRequestDto, password);
         appUserService.save(user);
 
         // добавление роли пользователя в БД
@@ -63,14 +69,15 @@ public class RegisterService {
         googleUserAuthDto.setEmail(googleUserAuthDto.getEmail().toLowerCase());
 
         // добавление пользователя в БД
-        AppUser user = appUserConvertDto.convertToAppUser(googleUserAuthDto);
+        String encodePassword = bCryptPasswordEncoder.encode(GenerateUtil.getRandomString());
+        AppUser user = appUserConvertDto.convertToAppUser(googleUserAuthDto, encodePassword);
         appUserService.save(user);
 
         // добавление роли пользователя в БД
         this.addUserRole(user);
 
         // авторизация и генерация токена
-        return authService.authenticateAndGenerateToken(user.getEmail(), "");
+        return authService.authenticateAndGenerateToken(user.getEmail(), null);
     }
 
     private void addUserRole(final AppUser user) {
