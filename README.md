@@ -2,7 +2,19 @@
 A service for viewing video content. Thesis on backend.
 
 -------------------------------------------------------
+ - Redis (for blacklist users jwt-token logout)
+ - 
+ - ![Image](https://github.com/user-attachments/assets/ab5a706c-8f60-428e-8186-991fe7cffda1)
+ - ![Image](https://github.com/user-attachments/assets/969de783-f71c-41de-8b4b-de3ba8cbf318)
 
+-------------------------------------------------------
+ - Google authorization
+ - 
+ - ![Image](https://github.com/user-attachments/assets/e6a011ff-4ef6-4eb2-a51c-2a5e967ab347)
+
+-------------------------------------------------------
+ - Login / Register / SecureTestPhoto / UserData (Endpoints)
+ - 
  - ![Image](https://github.com/user-attachments/assets/fea3d451-bda4-4971-94fd-cd8ab44e465e)
  - ![Image](https://github.com/user-attachments/assets/74ffdea5-44eb-44bc-8edd-46ec0a267b29)
  - ![Image](https://github.com/user-attachments/assets/57c20edf-8d38-4916-9ecc-846bedc96973)
