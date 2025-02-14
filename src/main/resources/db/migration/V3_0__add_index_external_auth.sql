@@ -1,0 +1,1 @@
+CREATE INDEX idx_external_auth_provider_external ON public.ExternalAuth (provider_id, external_id);

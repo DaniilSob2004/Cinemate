@@ -1,10 +1,12 @@
 package com.example.cinemate.service.busines.externalauthservice;
 
 import com.example.cinemate.dao.externalauth.ExternalAuthRepository;
+import com.example.cinemate.model.AuthProvider;
 import com.example.cinemate.model.ExternalAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ExternalAuthServiceImpl implements ExternalAuthService {
@@ -41,5 +43,15 @@ public class ExternalAuthServiceImpl implements ExternalAuthService {
     @Override
     public void deleteAll() {
         externalAuthRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<ExternalAuth> findByExternalId(String externalId) {
+        return externalAuthRepository.findExternalAuthByExternalId(externalId);
+    }
+
+    @Override
+    public Optional<ExternalAuth> findByProviderAndExternalId(AuthProvider provider, String externalId) {
+        return externalAuthRepository.findExternalAuthByProviderAndExternalId(provider, externalId);
     }
 }
