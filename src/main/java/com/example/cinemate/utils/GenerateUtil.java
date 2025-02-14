@@ -36,17 +36,6 @@ public class GenerateUtil {
         return sb.toString();
     }
 
-    public static String getRandomProvider(final String name) {
-        int num = getRandomInteger(1000, false);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(name)
-                .append("_")
-                .append(num);
-
-        return sb.toString();
-    }
-
     public static String getRandomNumberString() {
         int size = 30;
         return IntStream.range(0, size)

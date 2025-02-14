@@ -23,14 +23,16 @@ CREATE TABLE IF NOT EXISTS public.UserRole (
     UNIQUE(user_id, role_id)
 );
 
+CREATE TABLE IF NOT EXISTS public.AuthProvider (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS public.ExternalAuth (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES AppUser(id) ON DELETE CASCADE,
-    provider VARCHAR(50) NOT NULL,
-    provider_id VARCHAR(255) NOT NULL,  -- уникальный ID пользователя во внешнем сервисе
-    access_token TEXT,  -- если планируете использ. эти токены для дальнейшего общения с сервисом
-    refresh_token TEXT,
+    provider_id INT NOT NULL REFERENCES AuthProvider(id) ON DELETE CASCADE,
+    external_id VARCHAR(255) NOT NULL,  -- уникальный ID пользователя во внешнем сервисе
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(provider, provider_id)
+    UNIQUE(provider_id, external_id)
 );

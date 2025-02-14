@@ -14,6 +14,7 @@ public class Endpoint {
     // all
     public static final String LOGIN = "/login";
     public static final String REGISTER = "/register";
+    public static final String GOOGLE = "/google";
 
     // auth users
     public static final String GET_USER_INFO = "/user/info";
@@ -25,6 +26,7 @@ public class Endpoint {
         List<String> endpoints = new ArrayList<>();
         endpoints.add(API_V1 + AUTH + LOGIN);
         endpoints.add(API_V1 + AUTH + REGISTER);
+        endpoints.add(API_V1 + AUTH + GOOGLE);
         return endpoints;
     }
 

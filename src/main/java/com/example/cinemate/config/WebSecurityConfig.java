@@ -1,6 +1,7 @@
 package com.example.cinemate.config;
 
 import com.example.cinemate.filter.JwtFilter;
+import com.example.cinemate.handling.auth.OAuth2LoginAuthenticationSuccessHandler;
 import com.example.cinemate.handling.error.JwtAccessDeniedHandler;
 import com.example.cinemate.handling.error.JwtAuthEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +40,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;  // для получения информации о польз. при аутентификации
 
+    // шифратор паролей
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();  // шифратор паролей
+        return new BCryptPasswordEncoder();
+    }
+
+    //
+    @Bean
+    public OAuth2LoginAuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2LoginAuthenticationSuccessHandler();
     }
 
     @Bean
@@ -84,6 +92,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .authenticationEntryPoint(jwtAuthEntryPoint)  // обработка неаутентифицированных запросов (401)
                     .accessDeniedHandler(jwtAccessDeniedHandler)  // обработка запрещенных запросов (forbidden 403)
                 .and()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);  // добавляем наш фильтр
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)  // добавляем наш фильтр
+
+                .oauth2Login()
+                    .successHandler(oAuth2AuthenticationSuccessHandler());  // обработчик успешного входа через Google
+
+                /*.oauth2Login()
+                    .successHandler(new OAuth2LoginAuthenticationSuccessHandler())
+                    //.defaultSuccessUrl("/api/v1/auth/google", true)  // После успешной авторизации перенаправляем сюда
+                    .failureUrl("/login?error")
+                .and()
+                .logout()
+                    .logoutUrl("/api/v1/auth/logout") // URL для выхода
+                    .clearAuthentication(true) // Очистка аутентификации
+                    .invalidateHttpSession(true) // Очистка сессии
+                    .deleteCookies("JSESSIONID", "oauth2_token"); // Удалить cookies
+                 */
     }
 }

@@ -2,6 +2,7 @@ package com.example.cinemate.service.db;
 
 import com.example.cinemate.model.*;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
+import com.example.cinemate.service.busines.authproviderservice.AuthProviderService;
 import com.example.cinemate.service.busines.externalauthservice.ExternalAuthService;
 import com.example.cinemate.service.busines.roleservice.RoleService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
@@ -21,13 +23,17 @@ import java.util.List;
 public class CinemateDbInitializer {
 
     private static List<String> Surnames;
-    private static List<String> UserNames;
+    private static List<String> Usernames;
+    private static List<String> DeleteTablesLines;
 
     @Value("${db_data.surname}")
     private String dataSurname;
 
     @Value("${db_data.username}")
     private String dataUsername;
+
+    @Value("${db_data.delete_tables_sql}")
+    private String deleteTablesSql;
 
     @Value("${admin_data.password}")
     private String adminPassword;
@@ -42,7 +48,13 @@ public class CinemateDbInitializer {
     private String nameUserRole;
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private AppUserService appUserService;
+
+    @Autowired
+    private AuthProviderService authProviderService;
 
     @Autowired
     private ExternalAuthService externalAuthService;
@@ -57,7 +69,23 @@ public class CinemateDbInitializer {
     @PostConstruct
     public void init() {
         Surnames = TextFileReader.ReadTextFile(dataSurname);
-        UserNames = TextFileReader.ReadTextFile(dataUsername);
+        Usernames = TextFileReader.ReadTextFile(dataUsername);
+        DeleteTablesLines = TextFileReader.ReadTextFile(deleteTablesSql);
+    }
+
+
+    public void deleteTables() {
+        StringBuilder deleteTablesQuery = new StringBuilder();
+
+        for (var currString : DeleteTablesLines) {
+            deleteTablesQuery.append(currString);
+            deleteTablesQuery.append("\n");
+        }
+
+        String sqlStr = deleteTablesQuery.toString();
+        jdbcTemplate.execute(sqlStr);
+
+        Logger.info("Delete all tables successfully...");
     }
 
     public void deleteAllRowsInDB() {
@@ -76,15 +104,13 @@ public class CinemateDbInitializer {
         appUserService.save(admin);
 
         // записываем роль для админа
-        Role adminRole = roleService.findRoleByName(nameAdminRole).orElse(null);
-        if (adminRole == null) {
-            throw new RuntimeException(nameAdminRole + " not found...");
-        }
+        Role adminRole = roleService.findRoleByName(nameAdminRole)
+                .orElseThrow(() -> new RuntimeException(nameAdminRole + " not found..."));
         UserRole roleForAdmin = new UserRole(null, admin, adminRole);
         userRoleService.save(roleForAdmin);
 
         // создаём пользователей
-        int countUsers = GenerateUtil.getRandomInteger(5, Math.min(Surnames.size(), UserNames.size()));
+        int countUsers = GenerateUtil.getRandomInteger(5, Math.min(Surnames.size(), Usernames.size()));
         for (int i = 0; i < countUsers; i++) {
             users.add(CreateUser());
         }
@@ -93,10 +119,8 @@ public class CinemateDbInitializer {
         appUserService.saveUsersList(users);
 
         // записываем роли для обычных пользователей
-        Role userRole = roleService.findRoleByName(nameUserRole).orElse(null);
-        if (userRole == null) {
-            throw new RuntimeException(nameUserRole + " not found...");
-        }
+        Role userRole = roleService.findRoleByName(nameUserRole)
+                .orElseThrow(() -> new RuntimeException(nameUserRole + " not found..."));
         List<AppUser> allUsers = appUserService.findAll();
         List<UserRole> userRoles = new ArrayList<>();
         allUsers.forEach(user -> userRoles.add(new UserRole(null, user, userRole)));
@@ -110,8 +134,11 @@ public class CinemateDbInitializer {
         List<AppUser> allUsers = appUserService.findAll();
         int countAuths = GenerateUtil.getRandomInteger(1, 3);
 
+        AuthProvider googleProvider = authProviderService.findByName("google")
+                .orElseThrow(() -> new RuntimeException("Auth provider 'google' not found..."));
+
         for (int i = 0; i < countAuths; i++) {
-            externalAuths.add(CreateExternalAuth(allUsers));
+            externalAuths.add(CreateExternalAuth(allUsers, googleProvider));
         }
         externalAuthService.saveExternalAuthsList(externalAuths);
 
@@ -136,7 +163,7 @@ public class CinemateDbInitializer {
     }
 
     private AppUser CreateUser() {
-        String randUserName = UserNames.get(GenerateUtil.getRandomInteger(0, UserNames.size() - 1));
+        String randUserName = Usernames.get(GenerateUtil.getRandomInteger(0, Usernames.size() - 1));
         String randSurname = Surnames.get(GenerateUtil.getRandomInteger(0, Surnames.size() - 1));
 
         return new AppUser(
@@ -154,15 +181,12 @@ public class CinemateDbInitializer {
         );
     }
 
-    private ExternalAuth CreateExternalAuth(List<AppUser> allUsers) {
+    private ExternalAuth CreateExternalAuth(final List<AppUser> allUsers, final AuthProvider googleProvider) {
         return new ExternalAuth(
                 null,
                 allUsers.get(GenerateUtil.getRandomInteger(0, allUsers.size() - 1)),
-                GenerateUtil.getRandomProvider("google"),
+                googleProvider,
                 GenerateUtil.getRandomNumberString(),
-                GenerateUtil.getRandomTokenString(),
-                GenerateUtil.getRandomTokenString(),
-                LocalDateTime.now(),
                 LocalDateTime.now()
         );
     }

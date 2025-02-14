@@ -19,21 +19,13 @@ public class ExternalAuth {
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
 
-    @Column(name = "provider", nullable = false, length = 50)
-    private String provider;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "provider_id", nullable = false)
+    private AuthProvider provider;
 
-    @Column(name = "provider_id", nullable = false)
-    private String providerId;
-
-    @Column(name = "access_token", columnDefinition = "TEXT")
-    private String accessToken;
-
-    @Column(name = "refresh_token", columnDefinition = "TEXT")
-    private String refreshToken;
+    @Column(name = "external_id", nullable = false)
+    private String externalId;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 }
