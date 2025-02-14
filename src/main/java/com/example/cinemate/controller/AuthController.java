@@ -103,11 +103,14 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.LOGOUT)
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-            Logger.info("Token in logout controller - " + token);
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String tokenHeader) {
+        String token = authService.getTokenFromHeaderStr(tokenHeader).orElse(null);
+        if (token == null) {
+            return ResponseEntity.badRequest()
+                    .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
+
+        Logger.info("Token in logout controller - " + token);
 
         // TODO: Redis добавление токена в blacklist (чтобы до истечение срока нельзя было его использ.)
 

@@ -46,12 +46,10 @@ public class GoogleAuthService {
         var googleUserAuthDto = googleAuthConvertDto.convertToGoogleUserAuthDto(oauthUser, provider);
 
         // есть ли пользователь в БД
-        ExternalAuth externalAuth = externalAuthService
-                .findByProviderAndExternalId(provider, googleUserAuthDto.getExternalId())
-                .orElse(null);
+        AppUser user = appUserService.findByEmail(googleUserAuthDto.getEmail()).orElse(null);
 
         // возвращаем токен
-        return (externalAuth == null)
+        return (user == null)
                 ? this.register(googleUserAuthDto)
                 : this.login(googleUserAuthDto.getEmail());
     }

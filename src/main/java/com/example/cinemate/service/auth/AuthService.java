@@ -5,6 +5,7 @@ import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.AppUser;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
+import com.example.cinemate.service.userdetail.UserDetailsServiceImpl;
 import com.example.cinemate.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -12,12 +13,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -31,7 +30,7 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private AppUserService appUserService;
@@ -55,32 +54,31 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    public Optional<String> tokenValidateFromHeader(final HttpServletRequest request) {
-        String token = jwtTokenUtil.getTokenByAuthHeader(request).orElse(null);
-        if (token != null) {
-            if (jwtTokenUtil.validateToken(token)) {
-                return Optional.of(token);
-            }
-        }
-        return Optional.empty();
-    }
-
     public String authenticateAndGenerateToken(final String username, final String password) {
+        // получаем пользователя с ролями
+        AppUser user = appUserService.findByEmailWithRoles(username)
+                .orElseThrow(() -> new UserNotFoundException("User '" + username + "not found after authentication"));
+
         // загружает инфу (роли и данные) о польз.
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = userDetailsService.loadUserByUser(user);
 
         // аутентификацию пользователя (логин, пароль, роли)
         SecurityContextHolder.getContext().setAuthentication(
                 this.authenticateUser(userDetails, password)
         );
 
-        // загружаем пользователя с ролями
-        AppUser user = appUserService.findByEmailWithRoles(username)
-                .orElseThrow(() -> new UserNotFoundException("User '" + username + "not found after authentication"));
-
         // генерация JWT-токена
         AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(user);
         return jwtTokenUtil.generateToken(appUserJwtDto);
+    }
+
+    public Optional<String> tokenValidateFromHeader(final HttpServletRequest request) {
+        return jwtTokenUtil.getTokenByAuthHeader(request)
+                .filter(jwtTokenUtil::validateToken);
+    }
+
+    public Optional<String> getTokenFromHeaderStr(final String tokenHeader) {
+        return jwtTokenUtil.getTokenFromAuthHeaderStr(tokenHeader);
     }
 
     private UsernamePasswordAuthenticationToken authenticateUser(final UserDetails userDetails, final String password) {

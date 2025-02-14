@@ -61,6 +61,10 @@ public class JwtTokenUtil {
     public Optional<String> getTokenByAuthHeader(final HttpServletRequest request) {
         // извлекаем заголовок 'Authorization' с префиксом Bearer, и извлекаем токен JWT (если есть) и проверяем его валидность
         String authHeader = request.getHeader(headerAuthName);
+        return this.getTokenFromAuthHeaderStr(authHeader);
+    }
+
+    public Optional<String> getTokenFromAuthHeaderStr(final String authHeader) {
         if (authHeader != null && authHeader.startsWith(headerValueAuthPrefix)) {
             return Optional.of(authHeader.substring(headerValueAuthPrefix.length() + 1));
         }
