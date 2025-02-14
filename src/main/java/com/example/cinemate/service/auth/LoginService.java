@@ -18,6 +18,7 @@ public class LoginService {
     private BaseAuthUtils baseAuthUtils;
 
     public String loginUser(final LoginRequestDto loginRequestDto) {
+        loginRequestDto.setEmail(loginRequestDto.getEmail().toLowerCase());
         return authService.authenticateAndGenerateToken(loginRequestDto.getEmail(), loginRequestDto.getPassword());
     }
 

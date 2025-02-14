@@ -46,7 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    //
+    // обработчик при успешной авторизации через провайдеры
     @Bean
     public OAuth2LoginAuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
         return new OAuth2LoginAuthenticationSuccessHandler();
@@ -96,17 +96,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .oauth2Login()
                     .successHandler(oAuth2AuthenticationSuccessHandler());  // обработчик успешного входа через Google
-
-                /*.oauth2Login()
-                    .successHandler(new OAuth2LoginAuthenticationSuccessHandler())
-                    //.defaultSuccessUrl("/api/v1/auth/google", true)  // После успешной авторизации перенаправляем сюда
-                    .failureUrl("/login?error")
-                .and()
-                .logout()
-                    .logoutUrl("/api/v1/auth/logout") // URL для выхода
-                    .clearAuthentication(true) // Очистка аутентификации
-                    .invalidateHttpSession(true) // Очистка сессии
-                    .deleteCookies("JSESSIONID", "oauth2_token"); // Удалить cookies
-                 */
     }
 }

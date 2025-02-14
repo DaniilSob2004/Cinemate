@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class CinemateDbInitializer {
@@ -152,7 +153,7 @@ public class CinemateDbInitializer {
                 "ADMIN",
                 "Admin",
                 "SuperAdmin",
-                GenerateUtil.getEmailByName("Admin"),
+                GenerateUtil.getEmailByName("Admin").toLowerCase(),
                 GenerateUtil.getRandomNumTel(),
                 adminPassword,
                 "",
@@ -171,7 +172,7 @@ public class CinemateDbInitializer {
                 randUserName.toUpperCase(),
                 randUserName,
                 randSurname,
-                GenerateUtil.getEmailByName(randUserName),
+                GenerateUtil.getEmailByName(randUserName).toLowerCase(),
                 GenerateUtil.getRandomNumTel(),
                 userPassword,
                 "",

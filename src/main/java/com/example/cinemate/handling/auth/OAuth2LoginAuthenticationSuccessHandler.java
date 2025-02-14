@@ -1,7 +1,14 @@
 package com.example.cinemate.handling.auth;
 
+import com.example.cinemate.dto.error.ErrorResponseDto;
+import com.example.cinemate.exception.auth.UserAlreadyExistsException;
+import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.service.auth.GoogleAuthService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -20,28 +27,54 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        Logger.info("-------- Google OAuth2 Login Authentication Success --------");
+        ErrorResponseDto errorResponse;
 
         try {
             if (authentication != null) {
+                Logger.info("-------- Google OAuth2 Login Authentication Success --------");
+
                 // получаем данные авторизации google и вход/регистрация
                 OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
                 String token = googleAuthService.processGoogleAuth(oauthUser);
-                Logger.info("Token: " + token);
+                Logger.info("Token - " + token);
 
-                // отправляем JSON-ответ с токеном
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write("{\"token\": \"" + token + "\"}");
-                response.getWriter().flush();
+                // отправляем json ответ с токеном
+                this.sendToken(response, token);
+
+                return;
             }
             else {
-                Logger.error("User authentication google data is NULL");
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Google authentication failed");
+                errorResponse = new ErrorResponseDto("Google authentication failed", HttpServletResponse.SC_UNAUTHORIZED);
             }
+        } catch (UserAlreadyExistsException e) {
+            errorResponse = new ErrorResponseDto(e.getMessage(), HttpServletResponse.SC_CONFLICT);
+        } catch (BadCredentialsException | UserNotFoundException e) {
+            errorResponse = new ErrorResponseDto(e.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
         } catch (Exception e) {
-            Logger.error("Google authentication error: " + e.getMessage());
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error");
+            Logger.error(e.getMessage());
+            errorResponse = new ErrorResponseDto("Something went wrong", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+
+        // отправляем json ответ с ошибкой
+        this.sendError(response, errorResponse);
+    }
+
+    private void sendToken(final HttpServletResponse response, final String token) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"token\": \"" + token + "\"}");
+        response.getWriter().flush();
+    }
+
+    private void sendError(final HttpServletResponse response, final ErrorResponseDto errorResponse) throws IOException {
+        var objectMapper = new ObjectMapper();
+        String jsonResponse = objectMapper.writeValueAsString(errorResponse);
+
+        // устанавливаем заголовки, статус и отправляем
+        response.setStatus(errorResponse.getStatus());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonResponse);
+        response.getWriter().flush();
     }
 }

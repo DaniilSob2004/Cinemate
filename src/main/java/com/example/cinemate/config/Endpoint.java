@@ -18,6 +18,7 @@ public class Endpoint {
 
     // auth users
     public static final String GET_USER_INFO = "/user/info";
+    public static final String LOGOUT = "/logout";
 
     // admin
     public static final String GET_PHOTO = "/secure/photo";
@@ -33,6 +34,7 @@ public class Endpoint {
     static public List<String> getEndpointForAuthUsers() {
         List<String> endpoints = new ArrayList<>();
         endpoints.add(API_V1 + GET_USER_INFO);
+        endpoints.add(API_V1 + AUTH + LOGOUT);
         return endpoints;
     }
 

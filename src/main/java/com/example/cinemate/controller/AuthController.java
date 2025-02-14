@@ -32,7 +32,6 @@ public class AuthController {
     @Autowired
     private RegisterService registerService;
 
-
     @PostMapping(value = Endpoint.LOGIN)
     public ResponseEntity<?> login(HttpServletRequest request) {
         // проверяем, есть ли токен в заголовке и валидный ли он
@@ -63,6 +62,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value()));
         } catch (Exception e) {
+            Logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
@@ -73,7 +73,8 @@ public class AuthController {
         // проверяем, есть ли токен в заголовке и валидный ли он
         String token = authService.tokenValidateFromHeader(request).orElse(null);
         if (token != null) {
-            return ResponseEntity.badRequest().body("Already authenticated");
+            return ResponseEntity.badRequest()
+                    .body(new ErrorResponseDto("User already authenticated", HttpStatus.BAD_REQUEST.value()));
         }
 
         // регистрация и генерация токена
@@ -99,5 +100,17 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
+    }
+
+    @PostMapping(value = Endpoint.LOGOUT)
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+            Logger.info("Token in logout controller - " + token);
+        }
+
+        // TODO: Redis добавление токена в blacklist (чтобы до истечение срока нельзя было его использ.)
+
+        return ResponseEntity.ok("Logout successful");
     }
 }

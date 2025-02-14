@@ -40,6 +40,8 @@ public class RegisterService {
 
     @Transactional
     public String registerUser(final RegisterRequestDto registerRequestDto) {
+        registerRequestDto.setEmail(registerRequestDto.getEmail().toLowerCase());
+
         // проверка данных (если ошибка, то будет исключение)
         this.checkRegisterData(registerRequestDto);
 
@@ -56,6 +58,8 @@ public class RegisterService {
 
     @Transactional
     public String registerUser(final GoogleUserAuthDto googleUserAuthDto) {
+        googleUserAuthDto.setEmail(googleUserAuthDto.getEmail().toLowerCase());
+
         // проверка данных (если ошибка, то будет исключение)
         this.checkUserInAuth(googleUserAuthDto.getEmail());
 

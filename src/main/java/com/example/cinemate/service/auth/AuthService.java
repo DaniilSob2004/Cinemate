@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -37,7 +38,6 @@ public class AuthService {
 
     @Autowired
     private AppUserConvertDto appUserConvertDto;
-
 
     public void authorizationUserByToken(final String token) {
         // извлекаем данные пользователя из токена
