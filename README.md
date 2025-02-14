@@ -3,8 +3,8 @@ A service for viewing video content. Thesis on backend.
 
 -------------------------------------------------------
  - Redis for:
-    1. blacklist users jwt-token logout
-    2. userdetails object
+    - blacklist users jwt-token logout
+    - userdetails object
  - 
  - ![Image](https://github.com/user-attachments/assets/ab5a706c-8f60-428e-8186-991fe7cffda1)
  - ![Image](https://github.com/user-attachments/assets/f5dfa42c-033c-4507-af0a-669e429e56d6)
