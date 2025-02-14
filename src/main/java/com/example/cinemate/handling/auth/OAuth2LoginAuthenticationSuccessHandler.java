@@ -4,7 +4,7 @@ import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.service.auth.GoogleAuthService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.cinemate.utils.SendErrorResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -22,6 +22,9 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
 
     @Autowired
     private GoogleAuthService googleAuthService;
+
+    @Autowired
+    private SendErrorResponseUtil sendErrorResponseUtil;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -54,25 +57,13 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
         }
 
         // отправляем json ответ с ошибкой
-        this.sendError(response, errorResponse);
+        sendErrorResponseUtil.sendError(response, errorResponse);
     }
 
     private void sendToken(final HttpServletResponse response, final String token) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"token\": \"" + token + "\"}");
-        response.getWriter().flush();
-    }
-
-    private void sendError(final HttpServletResponse response, final ErrorResponseDto errorResponse) throws IOException {
-        var objectMapper = new ObjectMapper();
-        String jsonResponse = objectMapper.writeValueAsString(errorResponse);
-
-        // устанавливаем заголовки, статус и отправляем
-        response.setStatus(errorResponse.getStatus());
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(jsonResponse);
         response.getWriter().flush();
     }
 }

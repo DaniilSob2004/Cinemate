@@ -30,6 +30,7 @@ public class JwtTokenUtil {
     @Autowired
     private AppUserConvertDto appUserConvertDto;
 
+
     // Генерация токена
     public String generateToken(final AppUserJwtDto appUserJwtDto) {
         Map<String, Object> claims = appUserConvertDto.convertToClaimsJwt(appUserJwtDto);  // получаем данные польз.
@@ -50,7 +51,6 @@ public class JwtTokenUtil {
     // Проверка токена
     public boolean validateToken(final String token) {
         try {
-            getClaims(token);  // для проверки
             return !isTokenExpired(token);
         } catch (JwtException e) {
             return false;
@@ -71,6 +71,13 @@ public class JwtTokenUtil {
         return Optional.empty();
     }
 
+    // Получение даты истечения токена
+    public Date getExpirationDateFromToken(final String token) {
+        Claims claims = this.getClaims(token);
+        return claims.getExpiration();
+    }
+
+
     // Получение ключа
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
@@ -88,6 +95,6 @@ public class JwtTokenUtil {
 
     // Проверка истечения срока токена
     private boolean isTokenExpired(final String token) {
-        return getClaims(token).getExpiration().before(new Date());
+        return this.getClaims(token).getExpiration().before(new Date());
     }
 }

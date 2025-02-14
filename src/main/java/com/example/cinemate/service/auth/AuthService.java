@@ -5,7 +5,7 @@ import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.AppUser;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
-import com.example.cinemate.service.userdetail.UserDetailsServiceImpl;
+import com.example.cinemate.service.auth.userdetail.UserDetailsServiceImpl;
 import com.example.cinemate.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

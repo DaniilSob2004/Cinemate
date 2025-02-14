@@ -1,8 +1,10 @@
 package com.example.cinemate.filter;
 
+import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.service.auth.AuthService;
+import com.example.cinemate.service.auth.jwtblacklist.JwtBlacklistService;
+import com.example.cinemate.utils.SendErrorResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,19 +20,37 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Value("${security.header_auth_name}")
-    private String headerAuthName;
-
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private JwtBlacklistService jwtBlacklistService;
+
+    @Autowired
+    private SendErrorResponseUtil sendErrorResponseUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         try {
-            Logger.info("JWT auth filter header: " + request.getHeader(headerAuthName));
+            // проверяем, есть ли токен в заголовке, валидный ли он
+            String token = authService.tokenValidateFromHeader(request).orElse(null);
 
-            // проверяем, есть ли токен в заголовке, валидный ли он,и авторизовываем пользователя
-            authService.tokenValidateFromHeader(request).ifPresent(token -> authService.authorizationUserByToken(token));
+            Logger.info("JWT auth filter header token: " + token);
+
+            // проверяем, есть ли токен в blacklist
+            if (token != null) {
+                if (jwtBlacklistService.isBlacklisted(token)) {
+                    Logger.error("JWT auth filter - token is blacklisted");
+
+                    var errorResponseDto = new ErrorResponseDto("Token is blacklisted", HttpServletResponse.SC_UNAUTHORIZED);
+                    sendErrorResponseUtil.sendError(response, errorResponseDto);
+
+                    return;
+                }
+                else {
+                    authService.authorizationUserByToken(token);  // авторизовываем пользователя
+                }
+            }
 
             chain.doFilter(request, response);
         } finally {
