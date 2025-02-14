@@ -1,0 +1,60 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cinemate_test
+    username: postgres
+    password: dansob_2004
+    driverClassName: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    user: postgres
+    password: dansob_2004
+    schemas: public
+    url: jdbc:postgresql://localhost:5432/cinemate_test
+
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 60000  # 60 seconds
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ********************
+            client-secret: ********************
+            scope: profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            authorization-grant-type: authorization_code
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
+security:
+  secret_key: ********************
+  expiration_time: 300000  # 300000 5 min 3600000 60 min
+  header_auth_name: Authorization
+  header_value_auth_prefix: Bearer
+  header_value_basic_auth_prefix: Basic
+
+redis_data:
+  blacklist_token_value: "blacklisted"
+  blacklist_token_key_prefix: "blacklist:token:"
+  user_details_prefix: "user:details:"
+  user_details_expiration_time: 3600  # 3600 60 min
+
+db_data:
+  surname: src/main/resources/data/surname.txt
+  username: src/main/resources/data/username.txt
+  delete_tables_sql: src/main/resources/db_data/delete_tables.sql
+
+admin_data:
+  password: $2a$10$e.lC9uZMHSaOBHjgRFMUJen3TBJLrroMIcxpeBQKB6j8dZbDsBIYG
+  role: ROLE_ADMIN
+
+user_data:
+  password: $2a$10$uHVMb6KYlogP7T4C0UPLZ.mkR2zmh4eM/rxPk82KQ76.3bmV8uYGC
+  role: ROLE_USER
