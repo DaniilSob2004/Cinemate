@@ -43,9 +43,15 @@ public class JwtTokenUtil {
                 .compact();
     }
 
+    // Получение данных
     public AppUserJwtDto extractAllUserData(final String token) {
         Claims claims = getClaims(token);
         return appUserConvertDto.convertToAppUserJwtDto(claims);  // получаем данные польз. из claims
+    }
+
+    public String extractSubject(final String token) {
+        Claims claims = getClaims(token);
+        return claims.getSubject();  // email
     }
 
     // Проверка токена

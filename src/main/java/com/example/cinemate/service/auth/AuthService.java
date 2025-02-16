@@ -81,8 +81,8 @@ public class AuthService {
                 .filter(jwtTokenUtil::validateToken);
     }
 
-    public Optional<String> getTokenFromHeaderStr(final String tokenHeader) {
-        return jwtTokenUtil.getTokenFromAuthHeaderStr(tokenHeader);
+    public Optional<String> getEmailByToken(final String token) {
+        return Optional.ofNullable(token).map(jwtTokenUtil::extractSubject);
     }
 
     private void authenticateUser(final UserDetails userDetails, final String password) {

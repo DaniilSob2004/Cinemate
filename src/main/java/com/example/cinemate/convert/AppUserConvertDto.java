@@ -3,6 +3,7 @@ package com.example.cinemate.convert;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.dto.auth.GoogleUserAuthDto;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
+import com.example.cinemate.dto.auth.UserDto;
 import com.example.cinemate.model.AppUser;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Component;
@@ -84,6 +85,17 @@ public class AppUserConvertDto {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 null
+        );
+    }
+
+    public UserDto convertToUserDto(final AppUser appUser) {
+        return new UserDto(
+                appUser.getUsername(),
+                appUser.getFirstname(),
+                appUser.getSurname(),
+                appUser.getEmail(),
+                appUser.getPhoneNum(),
+                appUser.getAvatar()
         );
     }
 }

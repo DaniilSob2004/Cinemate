@@ -53,6 +53,7 @@ public class AuthController {
         }
 
         // аутентификация и генерация токена
+        ErrorResponseDto errorResponseDto;
         try {
             Logger.info("(Authentication user) Email: " + loginRequestDto.getEmail());
 
@@ -63,13 +64,14 @@ public class AuthController {
             return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
 
         } catch (BadCredentialsException | UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value()));
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (Exception e) {
             Logger.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+
+        // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PostMapping(value = Endpoint.REGISTER)
@@ -82,6 +84,7 @@ public class AuthController {
         }
 
         // регистрация и генерация токена
+        ErrorResponseDto errorResponseDto;
         try {
             Logger.info("Register request: " + registerRequestDto);
 
@@ -92,23 +95,22 @@ public class AuthController {
             return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
 
         } catch (UserAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value()));
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
         } catch (PasswordMismatchException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (BadCredentialsException | UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value()));
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+
+        // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PostMapping(value = Endpoint.LOGOUT)
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String tokenHeader) {
-        String token = authService.getTokenFromHeaderStr(tokenHeader).orElse(null);
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = authService.tokenValidateFromHeader(request).orElse(null);
         if (token == null) {
             return ResponseEntity.badRequest()
                     .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));

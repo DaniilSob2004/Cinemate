@@ -1,16 +1,15 @@
 package com.example.cinemate.dto.auth;
 
-import com.example.cinemate.model.AuthProvider;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GoogleUserAuthDto {
-    private String externalId;
-    private String email;
+public class UserDto {
     private String username;
     private String firstname;
     private String surname;
-    private AuthProvider provider;
+    private String email;
+    private String phoneNum;
+    private String avatar;
 }

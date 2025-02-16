@@ -39,6 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return userDetailsFromCache;
         }
 
+        Logger.info("!!! CREATE UserDetails !!!");
         AppUser user = appUserService.findByEmail(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' was not found..."));
 
