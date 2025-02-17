@@ -3,8 +3,7 @@ package com.example.cinemate.service.auth;
 import com.example.cinemate.convert.AppUserConvertDto;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
-import com.example.cinemate.model.AppUser;
-import com.example.cinemate.service.busines.appuserservice.AppUserService;
+import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.service.auth.userdetail.UserDetailsServiceImpl;
 import com.example.cinemate.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -34,9 +32,6 @@ public class AuthService {
     private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    private AppUserService appUserService;
-
-    @Autowired
     private AppUserConvertDto appUserConvertDto;
 
     public void authorizationUserByToken(final String token) {
@@ -46,18 +41,25 @@ public class AuthService {
         Logger.info("(authorizationUserByToken) AppUserJwtDto: " + appUserJwtDto);
 
         // загружается информация о польз, чтобы установить его права доступа
-        UserDetails userDetails = userDetailsService.loadUserByUsername(appUserJwtDto.getEmail());
+        UserDetails userDetails = userDetailsService.loadUserById(appUserJwtDto.getId());
 
-        // аутентификация пользователя (логин, пароль, роли)
+        // если в кэше нет, то добавляем
+        if (!userDetailsService.checkUserInCache(appUserJwtDto.getId())) {
+            userDetailsService.addUserToCache(appUserJwtDto.getId(), userDetails);
+        }
+
+        // аутентификация пользователя без пароля
         this.authenticateUserWithoutPassword(userDetails);
     }
 
-    public String authenticateAndGenerateToken(final String username, final String password) {
+    public String authenticateAndGenerateToken(final String usernameOrId, final String password, final boolean isId) {
         // загружает инфу (роли и данные) о польз.
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = isId
+                ? userDetailsService.loadUserById(Integer.valueOf(usernameOrId))  // по id
+                : userDetailsService.loadUserByUsername(usernameOrId);  // по username
 
-        // аутентификация пользователя (логин, пароль, роли)
-        if (Objects.equals(password, "")) {  // внешние провайдеры (без пароля)
+        // аутентификация пользователя
+        if (password == null) {  // если не нужно проверять пароль
             this.authenticateUserWithoutPassword(userDetails);
         }
         else {  // с паролем
@@ -65,15 +67,19 @@ public class AuthService {
         }
 
         // после успешной аутентификации добавляем в кэш
-        userDetailsService.addUserToCache(username, userDetails);
+        if (userDetails instanceof CustomUserDetails customUserDetails) {
+            userDetailsService.addUserToCache(customUserDetails.getId(), userDetails);
 
-        // получаем пользователя с ролями
-        AppUser user = appUserService.findByEmailWithRoles(username)
-                .orElseThrow(() -> new UserNotFoundException("User '" + username + " not found after authentication"));
+            // генерация JWT-токена
+            AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(customUserDetails);
+            return jwtTokenUtil.generateToken(appUserJwtDto);
+        }
 
-        // генерация JWT-токена
-        AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(user);
-        return jwtTokenUtil.generateToken(appUserJwtDto);
+        // исключение, если пользователь не найден
+        throw new UserNotFoundException(
+                isId
+                ? "User '" + usernameOrId + "' was not found"
+                : "User with id '" + usernameOrId + "' was not found");
     }
 
     public Optional<String> tokenValidateFromHeader(final HttpServletRequest request) {
@@ -81,7 +87,7 @@ public class AuthService {
                 .filter(jwtTokenUtil::validateToken);
     }
 
-    public Optional<String> getEmailByToken(final String token) {
+    public Optional<Integer> getUserIdByToken(final String token) {
         return Optional.ofNullable(token).map(jwtTokenUtil::extractSubject);
     }
 

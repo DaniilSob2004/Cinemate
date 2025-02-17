@@ -18,23 +18,13 @@ public class LoginService {
     private BaseAuthUtils baseAuthUtils;
 
     public String loginUser(final LoginRequestDto loginRequestDto) {
-        loginRequestDto.setEmail(loginRequestDto.getEmail().toLowerCase());
-        return authService.authenticateAndGenerateToken(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+        loginRequestDto.setEmail(loginRequestDto.getEmail().toLowerCase());  // в нижний регистр
+        return authService.authenticateAndGenerateToken(loginRequestDto.getEmail(), loginRequestDto.getPassword(), false);
     }
 
     public Optional<LoginRequestDto> getBaseAuthDataFromHeader(final HttpServletRequest request) {
-        String credentials = baseAuthUtils.getCredentialsFromHeader(request).orElse(null);
-        if (credentials == null) {
-            return Optional.empty();
-        }
-
-        String[] loginPassword = baseAuthUtils.getLoginPassword(credentials).orElse(null);
-        if (loginPassword == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(
-                new LoginRequestDto(loginPassword[0], loginPassword[1])
-        );
+        return baseAuthUtils.getCredentialsFromHeader(request)
+            .flatMap(baseAuthUtils::getLoginPassword)
+            .map(loginPassword -> new LoginRequestDto(loginPassword[0], loginPassword[1]));
     }
 }

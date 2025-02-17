@@ -1,7 +1,7 @@
 package com.example.cinemate.service.busines.authproviderservice;
 
 import com.example.cinemate.dao.authprovider.AuthProviderRepository;
-import com.example.cinemate.model.AuthProvider;
+import com.example.cinemate.model.db.AuthProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

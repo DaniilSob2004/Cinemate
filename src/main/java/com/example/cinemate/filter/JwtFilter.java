@@ -3,7 +3,7 @@ package com.example.cinemate.filter;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.service.auth.AuthService;
 import com.example.cinemate.service.auth.jwtblacklist.JwtBlacklistService;
-import com.example.cinemate.utils.SendErrorResponseUtil;
+import com.example.cinemate.utils.SendResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,7 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private JwtBlacklistService jwtBlacklistService;
 
     @Autowired
-    private SendErrorResponseUtil sendErrorResponseUtil;
+    private SendResponseUtil sendResponseUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -37,24 +37,24 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Logger.info("JWT auth filter header token: " + token);
 
-            // проверяем, есть ли токен в blacklist
             if (token != null) {
+                // проверяем, есть ли токен в blacklist
                 if (jwtBlacklistService.isBlacklisted(token)) {
                     Logger.error("JWT auth filter - token is blacklisted");
 
                     var errorResponseDto = new ErrorResponseDto("Token is blacklisted", HttpServletResponse.SC_UNAUTHORIZED);
-                    sendErrorResponseUtil.sendError(response, errorResponseDto);
+                    sendResponseUtil.sendError(response, errorResponseDto);
 
                     return;
                 }
                 else {
-                    authService.authorizationUserByToken(token);  // авторизовываем пользователя
+                    authService.authorizationUserByToken(token);  // авторизация пользователя
                 }
             }
 
             chain.doFilter(request, response);
         } finally {
-            // после каждого запроса очищаем контекст, чтобы не запоминался польз. (чтобы вводить всегда токен)
+            // после каждого запроса очищаем контекст, чтобы не запоминался польз. (чтобы отправлять всегда токен)
             SecurityContextHolder.clearContext();
         }
     }

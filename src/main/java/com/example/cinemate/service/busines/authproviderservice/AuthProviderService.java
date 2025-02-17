@@ -1,6 +1,6 @@
 package com.example.cinemate.service.busines.authproviderservice;
 
-import com.example.cinemate.model.AuthProvider;
+import com.example.cinemate.model.db.AuthProvider;
 
 import java.util.List;
 import java.util.Optional;

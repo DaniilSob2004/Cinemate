@@ -1,7 +1,7 @@
 package com.example.cinemate.service.busines.appuserservice;
 
 import com.example.cinemate.dao.appuser.AppUserRepository;
-import com.example.cinemate.model.AppUser;
+import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +48,17 @@ public class AppUserServiceImpl implements AppUserService {
         appUserRepository.deleteAll();
     }
 
+
+    @Override
+    public Optional<AppUser> findByEmail(String email) {
+        return appUserRepository.findAppUserByEmail(email);
+    }
+
+    @Override
+    public Optional<AppUser> findById(Integer id) {
+        return appUserRepository.findAppUserById(id);
+    }
+
     @Override
     public Optional<List<AppUser>> findAllWithRoles() {
         List<AppUser> users = appUserRepository.findAll();
@@ -61,20 +72,23 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public Optional<AppUser> findByEmail(String email) {
-        return appUserRepository.findAppUserByEmail(email);
+    public Optional<AppUser> findByEmailWithRoles(String email) {
+        AppUser user = appUserRepository.findAppUserByEmail(email).orElse(null);
+        return this.setUserRoles(user);  // загружаем роли пользователя
     }
 
     @Override
-    public Optional<AppUser> findByEmailWithRoles(String email) {
-        AppUser user = appUserRepository.findAppUserByEmail(email).orElse(null);
+    public Optional<AppUser> findByIdWithRoles(Integer id) {
+        AppUser user = appUserRepository.findAppUserById(id).orElse(null);
+        return this.setUserRoles(user);  // загружаем роли пользователя
+    }
 
-        // загружаем роли пользователя
+
+    private Optional<AppUser> setUserRoles(AppUser user) {
         if (user != null) {
             user.setUserRoles(userRoleService.getRoleNames(user.getId()));
             return Optional.of(user);
         }
-
         return Optional.empty();
     }
 }

@@ -1,6 +1,6 @@
 package com.example.cinemate.dto.auth;
 
-import com.example.cinemate.model.AuthProvider;
+import com.example.cinemate.model.db.AuthProvider;
 import lombok.*;
 
 @Data

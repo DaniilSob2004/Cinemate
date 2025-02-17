@@ -1,7 +1,7 @@
 package com.example.cinemate.convert;
 
 import com.example.cinemate.dto.auth.GoogleUserAuthDto;
-import com.example.cinemate.model.AuthProvider;
+import com.example.cinemate.model.db.AuthProvider;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 

@@ -5,9 +5,9 @@ import com.example.cinemate.dto.auth.GoogleUserAuthDto;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
 import com.example.cinemate.exception.auth.PasswordMismatchException;
 import com.example.cinemate.exception.auth.UserAlreadyExistsException;
-import com.example.cinemate.model.AppUser;
-import com.example.cinemate.model.Role;
-import com.example.cinemate.model.UserRole;
+import com.example.cinemate.model.db.AppUser;
+import com.example.cinemate.model.db.Role;
+import com.example.cinemate.model.db.UserRole;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.service.busines.roleservice.RoleService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
@@ -51,16 +51,10 @@ public class RegisterService {
         // проверка данных (если ошибка, то будет исключение)
         this.checkRegisterData(registerRequestDto);
 
-        // добавление пользователя в БД
+        // регистрация и генерация токена
         String password = bCryptPasswordEncoder.encode(registerRequestDto.getPassword());
         AppUser user = appUserConvertDto.convertToAppUser(registerRequestDto, password);
-        appUserService.save(user);
-
-        // добавление роли пользователя в БД
-        this.addUserRole(user);
-
-        // авторизация и генерация токена
-        return authService.authenticateAndGenerateToken(user.getEmail(), registerRequestDto.getPassword());
+        return this.registerAndGenerateToken(user);
     }
 
     @Transactional
@@ -68,16 +62,16 @@ public class RegisterService {
         // в нижний регистр
         googleUserAuthDto.setEmail(googleUserAuthDto.getEmail().toLowerCase());
 
-        // добавление пользователя в БД
-        String encodePassword = bCryptPasswordEncoder.encode(GenerateUtil.getRandomString());
-        AppUser user = appUserConvertDto.convertToAppUser(googleUserAuthDto, encodePassword);
-        appUserService.save(user);
+        // регистрация и генерация токена
+        String password = bCryptPasswordEncoder.encode(GenerateUtil.getRandomString());
+        AppUser user = appUserConvertDto.convertToAppUser(googleUserAuthDto, password);
+        return this.registerAndGenerateToken(user);
+    }
 
-        // добавление роли пользователя в БД
-        this.addUserRole(user);
-
-        // авторизация и генерация токена
-        return authService.authenticateAndGenerateToken(user.getEmail(), null);
+    private String registerAndGenerateToken(final AppUser user) {
+        appUserService.save(user);  // добавление пользователя
+        this.addUserRole(user);  // добавление роли пользователя в БД
+        return authService.authenticateAndGenerateToken(user.getId().toString(), null, true);  // авторизация и генерация токена
     }
 
     private void addUserRole(final AppUser user) {

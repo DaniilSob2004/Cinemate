@@ -1,6 +1,6 @@
 package com.example.cinemate.dao.authprovider;
 
-import com.example.cinemate.model.AuthProvider;
+import com.example.cinemate.model.db.AuthProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

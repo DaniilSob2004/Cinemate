@@ -1,6 +1,6 @@
 package com.example.cinemate.dao.userrole;
 
-import com.example.cinemate.model.UserRole;
+import com.example.cinemate.model.db.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

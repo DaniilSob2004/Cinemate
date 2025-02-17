@@ -1,8 +1,8 @@
 package com.example.cinemate.service.busines.externalauthservice;
 
 import com.example.cinemate.dao.externalauth.ExternalAuthRepository;
-import com.example.cinemate.model.AuthProvider;
-import com.example.cinemate.model.ExternalAuth;
+import com.example.cinemate.model.db.AuthProvider;
+import com.example.cinemate.model.db.ExternalAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;

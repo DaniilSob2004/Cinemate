@@ -1,6 +1,6 @@
 package com.example.cinemate.service.db;
 
-import com.example.cinemate.model.*;
+import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.service.busines.authproviderservice.AuthProviderService;
 import com.example.cinemate.service.busines.externalauthservice.ExternalAuthService;

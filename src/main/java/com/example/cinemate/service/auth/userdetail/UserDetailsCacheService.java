@@ -27,31 +27,32 @@ public class UserDetailsCacheService {
     @Autowired
     private UserDetailsConvertDto userDetailsConvertDto;
 
-    public void addToCache(final String username, final UserDetails userDetails) {
-        if (this.isHave(username)) {
+    public void addToCache(final String id, final UserDetails userDetails) {
+        // если объект уже в кэше
+        if (this.isHave(id)) {
             return;
         }
         // преобразовываем в DTO
         var userDetailsDto = userDetailsConvertDto.convertToUserDetailsDto(userDetails);
-        String key = userDetailsPrefix + username;
+        String key = userDetailsPrefix + id;
         redisUserDetailsTemplate.opsForValue().set(key, userDetailsDto, expirationTime, TimeUnit.SECONDS);
     }
 
-    public Optional<UserDetails> get(final String username) {
+    public Optional<UserDetails> get(final String id) {
         // преобразовываем в UserDetails
-        String key = userDetailsPrefix + username;
+        String key = userDetailsPrefix + id;
         var userDetailsDto = redisUserDetailsTemplate.opsForValue().get(key);
         return Optional.ofNullable(userDetailsDto)
                 .map(userDetailsConvertDto::convertToUserDetails);
     }
 
-    public void remove(final String username) {
-        String key = userDetailsPrefix + username;
+    public void remove(final String id) {
+        String key = userDetailsPrefix + id;
         redisUserDetailsTemplate.delete(key);
     }
 
-    public boolean isHave(final String username) {
-        String key = userDetailsPrefix + username;
+    public boolean isHave(final String id) {
+        String key = userDetailsPrefix + id;
         return Boolean.TRUE.equals(redisUserDetailsTemplate.hasKey(key));
     }
 }

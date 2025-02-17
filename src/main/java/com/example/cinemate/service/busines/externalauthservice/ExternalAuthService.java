@@ -1,7 +1,7 @@
 package com.example.cinemate.service.busines.externalauthservice;
 
-import com.example.cinemate.model.AuthProvider;
-import com.example.cinemate.model.ExternalAuth;
+import com.example.cinemate.model.db.AuthProvider;
+import com.example.cinemate.model.db.ExternalAuth;
 import java.util.List;
 import java.util.Optional;
 

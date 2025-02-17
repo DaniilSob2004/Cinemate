@@ -1,7 +1,7 @@
 package com.example.cinemate.service.busines.userroleservice;
 
 import com.example.cinemate.dao.userrole.UserRoleRepository;
-import com.example.cinemate.model.UserRole;
+import com.example.cinemate.model.db.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;

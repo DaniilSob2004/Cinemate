@@ -1,6 +1,6 @@
 package com.example.cinemate.service.busines.userroleservice;
 
-import com.example.cinemate.model.UserRole;
+import com.example.cinemate.model.db.UserRole;
 import java.util.List;
 
 public interface UserRoleService {

@@ -1,6 +1,6 @@
 package com.example.cinemate.service.busines.roleservice;
 
-import com.example.cinemate.model.Role;
+import com.example.cinemate.model.db.Role;
 import java.util.List;
 import java.util.Optional;
 

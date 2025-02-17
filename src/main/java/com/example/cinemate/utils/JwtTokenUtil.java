@@ -37,7 +37,7 @@ public class JwtTokenUtil {
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .setSubject(appUserJwtDto.getEmail())
+                .setSubject(appUserJwtDto.getId().toString())  // id
                 .setIssuedAt(new Date())
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
@@ -49,9 +49,9 @@ public class JwtTokenUtil {
         return appUserConvertDto.convertToAppUserJwtDto(claims);  // получаем данные польз. из claims
     }
 
-    public String extractSubject(final String token) {
+    public Integer extractSubject(final String token) {
         Claims claims = getClaims(token);
-        return claims.getSubject();  // email
+        return Integer.parseInt(claims.getSubject());  // id
     }
 
     // Проверка токена

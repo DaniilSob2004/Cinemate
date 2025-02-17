@@ -4,7 +4,7 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.convert.AppUserConvertDto;
 import com.example.cinemate.dto.auth.UserDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
-import com.example.cinemate.model.AppUser;
+import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.auth.AuthService;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,18 +43,18 @@ public class UserController {
                     .body(new ErrorResponseDto("Invalid or missing token", HttpStatus.UNAUTHORIZED.value()));
         }
 
-        // email из токена
-        String email = authService.getEmailByToken(token).orElse(null);
-        if (email == null) {
+        // id из токена
+        Integer id = authService.getUserIdByToken(token).orElse(null);
+        if (id == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponseDto("Invalid token", HttpStatus.UNAUTHORIZED.value()));
         }
 
         // получаем пользователя
-        AppUser appUser = appUserService.findByEmail(email).orElse(null);
+        AppUser appUser = appUserService.findById(id).orElse(null);
         if (appUser == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponseDto("User '" + email + "' was not found", HttpStatus.NOT_FOUND.value()));
+                    .body(new ErrorResponseDto("User with id '" + id + "' was not found", HttpStatus.NOT_FOUND.value()));
         }
 
         // преобразовываем в DTO

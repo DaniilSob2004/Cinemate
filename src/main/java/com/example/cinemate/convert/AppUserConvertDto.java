@@ -4,8 +4,11 @@ import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.dto.auth.GoogleUserAuthDto;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
 import com.example.cinemate.dto.auth.UserDto;
-import com.example.cinemate.model.AppUser;
+import com.example.cinemate.model.CustomUserDetails;
+import com.example.cinemate.model.db.AppUser;
 import io.jsonwebtoken.Claims;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -17,15 +20,18 @@ import java.util.Map;
 @Component
 public class AppUserConvertDto {
 
-    public AppUserJwtDto convertToAppUserJwtDto(final AppUser appUser) {
-        if (appUser == null) {
-            return new AppUserJwtDto();
+    public AppUserJwtDto convertToAppUserJwtDto(final UserDetails userDetails) {
+        if (userDetails instanceof CustomUserDetails customUserDetails) {
+            List<String> roles = customUserDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+            return new AppUserJwtDto(
+                    customUserDetails.getId(),
+                    customUserDetails.getUsername(),
+                    roles
+            );
         }
-        return new AppUserJwtDto(
-                appUser.getUsername(),
-                appUser.getUserRoles(),
-                appUser.getEmail()
-        );
+        return new AppUserJwtDto();
     }
 
     public Map<String, Object> convertToClaimsJwt(final AppUserJwtDto appUserJwtDto) {
@@ -34,7 +40,7 @@ public class AppUserConvertDto {
         }
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("username", appUserJwtDto.getUsername());
+        claims.put("email", appUserJwtDto.getEmail());
         claims.put("roles", appUserJwtDto.getRoles());
 
         return claims;
@@ -50,9 +56,9 @@ public class AppUserConvertDto {
         List<String> roles = claimRoles != null ? (List<String>) claimRoles : new ArrayList<>();
 
         return new AppUserJwtDto(
-                claims.get("username", String.class),
-                roles,
-                claims.getSubject()  // email
+                Integer.valueOf(claims.getSubject()),  // id
+                claims.get("email", String.class),
+                roles
         );
     }
 

@@ -4,9 +4,9 @@ import com.example.cinemate.convert.GoogleAuthConvertDto;
 import com.example.cinemate.dto.auth.GoogleUserAuthDto;
 import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
-import com.example.cinemate.model.AppUser;
-import com.example.cinemate.model.AuthProvider;
-import com.example.cinemate.model.ExternalAuth;
+import com.example.cinemate.model.db.AppUser;
+import com.example.cinemate.model.db.AuthProvider;
+import com.example.cinemate.model.db.ExternalAuth;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.service.busines.authproviderservice.AuthProviderService;
 import com.example.cinemate.service.busines.externalauthservice.ExternalAuthService;
@@ -72,7 +72,7 @@ public class GoogleAuthService {
     private String login(final String email) {
         Logger.info("User google login");
 
-        var loginRequestDto = new LoginRequestDto(email, "");
+        var loginRequestDto = new LoginRequestDto(email, null);
         return loginService.loginUser(loginRequestDto);
     }
 }

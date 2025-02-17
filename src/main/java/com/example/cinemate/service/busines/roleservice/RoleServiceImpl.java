@@ -1,7 +1,7 @@
 package com.example.cinemate.service.busines.roleservice;
 
 import com.example.cinemate.dao.role.RoleRepository;
-import com.example.cinemate.model.Role;
+import com.example.cinemate.model.db.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;

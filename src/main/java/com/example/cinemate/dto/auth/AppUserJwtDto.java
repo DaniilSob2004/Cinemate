@@ -8,7 +8,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppUserJwtDto {
-    private String username;
-    private List<String> roles;
+    private Integer id;
     private String email;
+    private List<String> roles;
 }

@@ -1,10 +1,11 @@
 package com.example.cinemate.handling.auth;
 
+import com.example.cinemate.dto.auth.AuthResponseDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.service.auth.GoogleAuthService;
-import com.example.cinemate.utils.SendErrorResponseUtil;
+import com.example.cinemate.utils.SendResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,7 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
     private GoogleAuthService googleAuthService;
 
     @Autowired
-    private SendErrorResponseUtil sendErrorResponseUtil;
+    private SendResponseUtil sendResponseUtil;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -37,10 +38,12 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
                 // получаем данные авторизации google и вход/регистрация
                 OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
                 String token = googleAuthService.processGoogleAuth(oauthUser);
-                Logger.info("Token - " + token);
+                AuthResponseDto authResponseDto = new AuthResponseDto(token);
+
+                Logger.info("Token - " + authResponseDto.getToken());
 
                 // отправляем json ответ с токеном
-                this.sendToken(response, token);
+                sendResponseUtil.sendData(response, authResponseDto);
 
                 return;
             }
@@ -57,13 +60,13 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
         }
 
         // отправляем json ответ с ошибкой
-        sendErrorResponseUtil.sendError(response, errorResponse);
+        sendResponseUtil.sendError(response, errorResponse);
     }
 
-    private void sendToken(final HttpServletResponse response, final String token) throws IOException {
+    /*private void sendToken(final HttpServletResponse response, final String token) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"token\": \"" + token + "\"}");
         response.getWriter().flush();
-    }
+    }*/
 }
