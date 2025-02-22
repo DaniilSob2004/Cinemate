@@ -8,6 +8,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.util.List;
+
 @Configuration
 public class RedisConfig {
     @Bean
@@ -30,8 +32,20 @@ public class RedisConfig {
         // устанавливает сериализатор для ключа и значения
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(
-                new Jackson2JsonRedisSerializer<>(UserDetailsDto.class)
+                new Jackson2JsonRedisSerializer<>(UserDetailsDto.class)  // json
         );
+
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, List<String>> redisUserRolesTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, List<String>> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        // устанавливает сериализатор для ключа и значения
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(List.class));
 
         return template;
     }

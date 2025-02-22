@@ -10,7 +10,7 @@ import com.example.cinemate.service.auth.AuthService;
 import com.example.cinemate.service.auth.LoginService;
 import com.example.cinemate.service.auth.RegisterService;
 
-import com.example.cinemate.service.auth.jwtblacklist.JwtBlacklistService;
+import com.example.cinemate.service.redis.BlacklistTokenRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,7 @@ public class AuthController {
     private RegisterService registerService;
 
     @Autowired
-    private JwtBlacklistService jwtBlacklistService;
+    private BlacklistTokenRedisService blacklistTokenRedisService;
 
     @PostMapping(value = Endpoint.LOGIN)
     public ResponseEntity<?> login(HttpServletRequest request) {
@@ -119,7 +119,7 @@ public class AuthController {
         Logger.info("Token in logout controller - " + token);
 
         // добавление токена в 'Redis' blacklist (чтобы до истечение срока нельзя было его использ.)
-        jwtBlacklistService.addToBlacklist(token);
+        blacklistTokenRedisService.addToBlacklist(token);
 
         return ResponseEntity.ok("Logout successful");
     }

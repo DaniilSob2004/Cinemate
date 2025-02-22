@@ -22,8 +22,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ********************
-            client-secret: ********************
+            client-id: "********************"
+            client-secret: "********************"
             scope: profile, email
             redirect-uri: "{baseUrl}/login/oauth2/code/google"
             authorization-grant-type: authorization_code
@@ -34,7 +34,7 @@ spring:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 
 security:
-  secret_key: ********************
+  secret_key: "********************"
   expiration_time: 300000  # 300000 5 min 3600000 60 min
   header_auth_name: Authorization
   header_value_auth_prefix: Bearer
@@ -45,6 +45,8 @@ redis_data:
   blacklist_token_key_prefix: "blacklist:token:"
   user_details_prefix: "user:details:"
   user_details_expiration_time: 3600  # 3600 60 min
+  user_roles_prefix: "user:roles:"
+  user_roles_expiration_time: 3600  # 3600 60 min
 
 db_data:
   surname: src/main/resources/data/surname.txt

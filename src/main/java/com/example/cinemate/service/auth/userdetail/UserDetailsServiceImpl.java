@@ -1,13 +1,15 @@
 package com.example.cinemate.service.auth.userdetail;
 
+import com.example.cinemate.convert.GrantedAuthorityConvert;
 import com.example.cinemate.convert.UserDetailsConvertDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
+import com.example.cinemate.service.redis.UserDetailsCacheService;
+import com.example.cinemate.service.redis.UserRoleCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,6 @@ import org.tinylog.Logger;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -30,7 +31,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserDetailsCacheService userDetailsCacheService;
 
     @Autowired
+    private UserRoleCacheService userRoleCacheService;
+
+    @Autowired
     private UserDetailsConvertDto userDetailsConvertDto;
+
+    @Autowired
+    private GrantedAuthorityConvert grantedAuthorityConvert;
 
     @Override
     @Transactional
@@ -45,17 +52,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(Integer id) {
         // находим пользователя в кэше
-        UserDetails userDetailsFromCache = userDetailsCacheService.get(id.toString()).orElse(null);
-        if (userDetailsFromCache != null) {
-            Logger.info("UserDetails from Redis cache");
-            return userDetailsFromCache;
-        }
-
-        Logger.info("!!! CREATE UserDetails (by ID) !!!");
-        AppUser user = appUserService.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with id '" + id + "' was not found..."));
-
-        return this.createUserDetails(user);
+        return userDetailsCacheService.getUserDetails(id.toString())
+                .map(user -> {
+                    Logger.info("UserDetails from Redis cache");
+                    return user;
+                })
+                .orElseGet(() -> {
+                    Logger.info("!!! CREATE UserDetails (by ID) !!!");
+                    AppUser user = appUserService.findById(id)
+                            .orElseThrow(() -> new UserNotFoundException("User with id '" + id + "' was not found..."));
+                    return createUserDetails(user);
+                });
     }
 
     public void addUserToCache(final Integer id, final UserDetails userDetails) {
@@ -75,12 +82,25 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private List<GrantedAuthority> setRolesForUser(final Integer id) {
-        // TODO: доставать из кэша, если нет, то создать и добавить в кэш
+        String userId = id.toString();
 
-        // установка ролей для пользователя
-        List<String> roleNames = userRoleService.getRoleNames(id);
-        return roleNames.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        // находим роли пользователя в кэше
+        return userRoleCacheService.getRoles(userId)
+                .map(authority -> {
+                    Logger.info("UserRoles from Redis cache");
+                    return grantedAuthorityConvert.convertToGrantedAuthorities(authority);
+                })
+                .orElseGet(() -> {
+                    Logger.info("!!! CREATE UserRoles !!!");
+
+                    // установка ролей для пользователя
+                    List<String> roleNames = userRoleService.getRoleNames(id);
+                    List<GrantedAuthority> authorities = grantedAuthorityConvert.convertToGrantedAuthorities(roleNames);
+
+                    // записываем роли в кэш
+                    userRoleCacheService.addToCache(userId, authorities);
+
+                    return authorities;
+                });
     }
 }

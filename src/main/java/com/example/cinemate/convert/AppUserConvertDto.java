@@ -7,28 +7,25 @@ import com.example.cinemate.dto.auth.UserDto;
 import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.model.db.AppUser;
 import io.jsonwebtoken.Claims;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class AppUserConvertDto {
 
+    @Autowired
+    private GrantedAuthorityConvert grantedAuthorityConvert;
+
     public AppUserJwtDto convertToAppUserJwtDto(final UserDetails userDetails) {
         if (userDetails instanceof CustomUserDetails customUserDetails) {
-            List<String> roles = customUserDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList();
             return new AppUserJwtDto(
                     customUserDetails.getId(),
                     customUserDetails.getUsername(),
-                    roles
+                    grantedAuthorityConvert.convertToStringList(userDetails.getAuthorities())
             );
         }
         return new AppUserJwtDto();

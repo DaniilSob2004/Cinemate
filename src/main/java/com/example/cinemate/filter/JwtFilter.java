@@ -2,7 +2,7 @@ package com.example.cinemate.filter;
 
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.service.auth.AuthService;
-import com.example.cinemate.service.auth.jwtblacklist.JwtBlacklistService;
+import com.example.cinemate.service.redis.BlacklistTokenRedisService;
 import com.example.cinemate.utils.SendResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private AuthService authService;
 
     @Autowired
-    private JwtBlacklistService jwtBlacklistService;
+    private BlacklistTokenRedisService blacklistTokenRedisService;
 
     @Autowired
     private SendResponseUtil sendResponseUtil;
@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if (token != null) {
                 // проверяем, есть ли токен в blacklist
-                if (jwtBlacklistService.isBlacklisted(token)) {
+                if (blacklistTokenRedisService.isBlacklisted(token)) {
                     Logger.error("JWT auth filter - token is blacklisted");
 
                     var errorResponseDto = new ErrorResponseDto("Token is blacklisted", HttpServletResponse.SC_UNAUTHORIZED);

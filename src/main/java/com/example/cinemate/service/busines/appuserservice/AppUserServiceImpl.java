@@ -2,6 +2,7 @@ package com.example.cinemate.service.busines.appuserservice;
 
 import com.example.cinemate.dao.appuser.AppUserRepository;
 import com.example.cinemate.model.db.AppUser;
+import com.example.cinemate.service.redis.UserRoleCacheService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Autowired
     private UserRoleService userRoleService;
+
+    @Autowired
+    private UserRoleCacheService userRoleCacheService;
 
     @Override
     public void save(AppUser user) {
@@ -62,33 +66,33 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public Optional<List<AppUser>> findAllWithRoles() {
         List<AppUser> users = appUserRepository.findAll();
-
-        // загружаем роли пользователя
-        users.forEach(user -> user.setUserRoles(
-                userRoleService.getRoleNames(user.getId()))
-        );
-
-        return Optional.of(users);
+        users.forEach(this::setUserRoles);  // загружаем роли пользователя
+        return users.isEmpty() ? Optional.empty() : Optional.of(users);
     }
 
     @Override
     public Optional<AppUser> findByEmailWithRoles(String email) {
-        AppUser user = appUserRepository.findAppUserByEmail(email).orElse(null);
-        return this.setUserRoles(user);  // загружаем роли пользователя
+        return appUserRepository.findAppUserByEmail(email)
+                .flatMap(this::setUserRoles);  // загружаем роли пользователя
     }
 
     @Override
     public Optional<AppUser> findByIdWithRoles(Integer id) {
-        AppUser user = appUserRepository.findAppUserById(id).orElse(null);
-        return this.setUserRoles(user);  // загружаем роли пользователя
+        return appUserRepository.findAppUserById(id)
+                .flatMap(this::setUserRoles);  // загружаем роли пользователя
     }
 
 
     private Optional<AppUser> setUserRoles(AppUser user) {
-        if (user != null) {
-            user.setUserRoles(userRoleService.getRoleNames(user.getId()));
-            return Optional.of(user);
+        if (user == null) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        // находим роли пользователя в кэше, иначе ищем в БД
+        List<String> roles = userRoleCacheService.getRoles(user.getId().toString())
+                .orElseGet(() -> userRoleService.getRoleNames(user.getId()));
+
+        user.setUserRoles(roles);
+        return Optional.of(user);
     }
 }
