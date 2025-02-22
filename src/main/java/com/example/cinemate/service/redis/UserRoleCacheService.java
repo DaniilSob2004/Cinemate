@@ -1,7 +1,6 @@
 package com.example.cinemate.service.redis;
 
-import com.example.cinemate.convert.GrantedAuthorityConvert;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.cinemate.mapper.GrantedAuthorityMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,11 +19,11 @@ public class UserRoleCacheService extends AbstractRedisRepository<List<String>> 
     @Value("${redis_data.user_roles_expiration_time}")
     private long expirationTime;
 
-    @Autowired
-    private GrantedAuthorityConvert grantedAuthorityConvert;
+    private final GrantedAuthorityMapper grantedAuthorityMapper;
 
-    public UserRoleCacheService(RedisTemplate<String, List<String>> redisUserRolesTemplate) {
+    public UserRoleCacheService(RedisTemplate<String, List<String>> redisUserRolesTemplate, GrantedAuthorityMapper grantedAuthorityMapper) {
         super(redisUserRolesTemplate);
+        this.grantedAuthorityMapper = grantedAuthorityMapper;
     }
 
     public void addToCache(final String id, final List<GrantedAuthority> authorities) {
@@ -33,7 +32,7 @@ public class UserRoleCacheService extends AbstractRedisRepository<List<String>> 
             return;
         }
         String key = userRolesPrefix + id;
-        List<String> strAuthorities = grantedAuthorityConvert.convertToStringList(authorities);
+        List<String> strAuthorities = grantedAuthorityMapper.toStringList(authorities);
         this.save(key, strAuthorities, expirationTime, TimeUnit.SECONDS);
     }
 

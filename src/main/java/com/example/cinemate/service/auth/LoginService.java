@@ -2,7 +2,6 @@ package com.example.cinemate.service.auth;
 
 import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.utils.BaseAuthUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,11 +10,13 @@ import java.util.Optional;
 @Service
 public class LoginService {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final BaseAuthUtils baseAuthUtils;
 
-    @Autowired
-    private BaseAuthUtils baseAuthUtils;
+    public LoginService(AuthService authService, BaseAuthUtils baseAuthUtils) {
+        this.authService = authService;
+        this.baseAuthUtils = baseAuthUtils;
+    }
 
     public String loginUser(final LoginRequestDto loginRequestDto) {
         loginRequestDto.setEmail(loginRequestDto.getEmail().toLowerCase());  // в нижний регистр

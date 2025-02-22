@@ -1,7 +1,6 @@
 package com.example.cinemate;
 
 import com.example.cinemate.service.db.CinemateInitializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.tinylog.Logger;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -10,8 +9,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AppStarter {
 
-    @Autowired
-    private CinemateInitializer cinemateInitializer;
+    private final CinemateInitializer cinemateInitializer;
+
+    public AppStarter(CinemateInitializer cinemateInitializer) {
+        this.cinemateInitializer = cinemateInitializer;
+    }
 
     @Bean
     public ApplicationRunner init() {
@@ -21,9 +23,3 @@ public class AppStarter {
         };
     }
 }
-
-/*
-spring:
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-* */

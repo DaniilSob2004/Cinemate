@@ -17,7 +17,7 @@ public class Endpoint {
     public static final String GOOGLE = "/google";
 
     // auth users
-    public static final String GET_ME = "/me";
+    public static final String USER_ID = "/{id}";
     public static final String LOGOUT = "/logout";
 
     // admin
@@ -33,7 +33,7 @@ public class Endpoint {
 
     static public List<String> getEndpointForAuthUsers() {
         List<String> endpoints = new ArrayList<>();
-        endpoints.add(API_V1 + USERS + GET_ME);
+        endpoints.add(API_V1 + USERS + USER_ID);
         endpoints.add(API_V1 + AUTH + LOGOUT);
         return endpoints;
     }

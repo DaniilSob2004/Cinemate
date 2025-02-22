@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface AuthProviderService {
     void save(AuthProvider authProvider);
-    int[] saveAuthProvidersList(List<AuthProvider> authProviders);
+    void saveAuthProvidersList(List<AuthProvider> authProviders);
     void update(AuthProvider authProvider);
     void delete(AuthProvider authProvider);
     List<AuthProvider> findAll();

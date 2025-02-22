@@ -2,13 +2,10 @@ package com.example.cinemate.config;
 
 import com.example.cinemate.filter.JwtFilter;
 import com.example.cinemate.handling.auth.OAuth2LoginAuthenticationSuccessHandler;
-import com.example.cinemate.handling.error.JwtAccessDeniedHandler;
-import com.example.cinemate.handling.error.JwtAuthEntryPoint;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.cinemate.handling.error.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableAsync
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${user_data.role}")
@@ -28,40 +26,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${admin_data.role}")
     private String adminRole;
 
-    @Autowired
-    private JwtFilter jwtFilter;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtFilter jwtFilter;
+    private final JwtUnauthorizedEntryPoint jwtUnauthorizedEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final OAuth2LoginAuthenticationSuccessHandler oAuth2LoginAuthenticationSuccessHandler;
+    private final UserDetailsService userDetailsService;  // для получения информации о польз. при аутентификации
 
-    @Autowired
-    private JwtAuthEntryPoint jwtAuthEntryPoint;
-
-    @Autowired
-    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
-
-    @Autowired
-    private UserDetailsService userDetailsService;  // для получения информации о польз. при аутентификации
-
-    // шифратор паролей
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    // обработчик при успешной авторизации через провайдеры
-    @Bean
-    public OAuth2LoginAuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-        return new OAuth2LoginAuthenticationSuccessHandler();
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManager();
+    public WebSecurityConfig(
+            BCryptPasswordEncoder passwordEncoder,
+            JwtFilter jwtFilter,
+            JwtUnauthorizedEntryPoint jwtUnauthorizedEntryPoint,
+            JwtAccessDeniedHandler jwtAccessDeniedHandler,
+            OAuth2LoginAuthenticationSuccessHandler oAuth2LoginAuthenticationSuccessHandler,
+            UserDetailsService userDetailsService) {
+        this.passwordEncoder = passwordEncoder;
+        this.jwtFilter = jwtFilter;
+        this.jwtUnauthorizedEntryPoint = jwtUnauthorizedEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+        this.oAuth2LoginAuthenticationSuccessHandler = oAuth2LoginAuthenticationSuccessHandler;
+        this.userDetailsService = userDetailsService;
     }
 
     // настраивает Spring Security для аутентификации через UserDetailsService и шифратор паролей
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Override
@@ -86,15 +76,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // без сессии (только JWT)
                 .and()
-                .csrf().disable()  // отключить CSRF
+                .csrf().disable()  // CSRF не нужен для REST API
                 .formLogin().disable()  // отключить встроенную форму логина
                 .exceptionHandling()
-                    .authenticationEntryPoint(jwtAuthEntryPoint)  // обработка неаутентифицированных запросов (401)
+                    .authenticationEntryPoint(jwtUnauthorizedEntryPoint)  // обработка неаутентифицированных запросов (401)
                     .accessDeniedHandler(jwtAccessDeniedHandler)  // обработка запрещенных запросов (forbidden 403)
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)  // добавляем наш фильтр
-
                 .oauth2Login()
-                    .successHandler(oAuth2AuthenticationSuccessHandler());  // обработчик успешного входа через Google
+                    .successHandler(oAuth2LoginAuthenticationSuccessHandler);  // обработчик успешного входа через Google
     }
 }

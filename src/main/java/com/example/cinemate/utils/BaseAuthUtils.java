@@ -29,12 +29,9 @@ public class BaseAuthUtils {
         return Optional.of(decodedCredentials);
     }
 
-    public Optional<String[]> getLoginPassword(String credentialsStr) {
-        String[] credentials = credentialsStr.split(":", 2);
-        if (credentials.length != 2) {
-            return Optional.empty();
-        }
-        return Optional.of(credentials);
+    public Optional<String[]> getLoginPassword(final String credentialsStr) {
+        return Optional.of(credentialsStr.split(":", 2))
+                .filter(arr -> arr.length == 2);
     }
 
     private String decodeCredentials(final String authHeader) {

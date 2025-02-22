@@ -16,16 +16,7 @@ public class GenerateUtil {
     public static String getEmailByName(final String name) {
         int num = getRandomInteger(1000, false);
         int num2 = getRandomInteger(1000, false);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(name)
-                .append("_")
-                .append(num)
-                .append("_")
-                .append(num2)
-                .append("@gmail.com");
-
-        return sb.toString();
+        return name + "_" + num + "_" + num2 + "@gmail.com";
     }
 
     public static String getRandomNumTel() {
@@ -54,10 +45,6 @@ public class GenerateUtil {
 
     public static double getRandomDouble(final double min, final double max) {
         return RAND.nextDouble(min, max);
-    }
-
-    public static int getRandomInteger() {
-        return getRandomInteger(MIN_INT, MAX_INT);
     }
 
     public static int getRandomInteger(final int value, final boolean isMaxValue) {

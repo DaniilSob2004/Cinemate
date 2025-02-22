@@ -31,9 +31,7 @@ public class RedisConfig {
 
         // устанавливает сериализатор для ключа и значения
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(
-                new Jackson2JsonRedisSerializer<>(UserDetailsDto.class)  // json
-        );
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(UserDetailsDto.class));
 
         return template;
     }

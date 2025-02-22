@@ -1,15 +1,14 @@
 package com.example.cinemate.service.auth;
 
-import com.example.cinemate.convert.AppUserConvertDto;
+import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.service.auth.userdetail.UserDetailsServiceImpl;
 import com.example.cinemate.utils.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,18 +20,21 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final AppUserMapper appUserMapper;
 
-    @Autowired
-    @Lazy  // (цикл. зависимость с WebSecurityConfig)
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private AppUserConvertDto appUserConvertDto;
+    public AuthService(
+            AuthenticationManager authenticationManager,
+            JwtTokenUtil jwtTokenUtil,
+            UserDetailsServiceImpl userDetailsService,
+            AppUserMapper appUserMapper) {
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.userDetailsService = userDetailsService;
+        this.appUserMapper = appUserMapper;
+    }
 
     public void authorizationUserByToken(final String token) {
         // извлекаем данные пользователя из токена
@@ -53,17 +55,18 @@ public class AuthService {
     }
 
     public String authenticateAndGenerateToken(final String usernameOrId, final String password, final boolean isId) {
-        // загружает инфу (роли и данные) о польз.
-        UserDetails userDetails = isId
-                ? userDetailsService.loadUserById(Integer.valueOf(usernameOrId))  // по id
-                : userDetailsService.loadUserByUsername(usernameOrId);  // по username
+        UserDetails userDetails;
 
         // аутентификация пользователя
         if (password == null) {  // если не нужно проверять пароль
+            // загружает инфу (роли и данные) о польз.
+            userDetails = isId
+                    ? userDetailsService.loadUserById(Integer.valueOf(usernameOrId))  // по id
+                    : userDetailsService.loadUserByUsername(usernameOrId);  // по email
             this.authenticateUserWithoutPassword(userDetails);
         }
         else {  // с паролем
-            this.authenticateUser(userDetails, password);
+            userDetails = this.authenticateUser(usernameOrId, password);
         }
 
         // после успешной аутентификации добавляем в кэш
@@ -71,7 +74,7 @@ public class AuthService {
             userDetailsService.addUserToCache(customUserDetails.getId(), userDetails);
 
             // генерация JWT-токена
-            AppUserJwtDto appUserJwtDto = appUserConvertDto.convertToAppUserJwtDto(customUserDetails);
+            AppUserJwtDto appUserJwtDto = appUserMapper.toAppUserJwtDto(customUserDetails);
             return jwtTokenUtil.generateToken(appUserJwtDto);
         }
 
@@ -91,16 +94,17 @@ public class AuthService {
         return Optional.ofNullable(token).map(jwtTokenUtil::extractSubject);
     }
 
-    private void authenticateUser(final UserDetails userDetails, final String password) {
+    private UserDetails authenticateUser(final String username, final String password) {
         // аутентификацию пользователя (логин, пароль, роли)
         var usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities()
+                new UsernamePasswordAuthenticationToken(username, password
         );
 
         // устанавливаем аутентификацию в контекст безопасности Spring
-        SecurityContextHolder.getContext().setAuthentication(
-                authenticationManager.authenticate(usernamePasswordAuthenticationToken)
-        );
+        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return (UserDetails) authentication.getPrincipal();
     }
 
     private void authenticateUserWithoutPassword(final UserDetails userDetails) {

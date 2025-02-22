@@ -2,15 +2,17 @@ package com.example.cinemate.service.busines.userroleservice;
 
 import com.example.cinemate.dao.userrole.UserRoleRepository;
 import com.example.cinemate.model.db.UserRole;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 public class UserRoleServiceImpl implements UserRoleService {
 
-    @Autowired
-    private UserRoleRepository userRoleRepository;
+    private final UserRoleRepository userRoleRepository;
+
+    public UserRoleServiceImpl(UserRoleRepository userRoleRepository) {
+        this.userRoleRepository = userRoleRepository;
+    }
 
     @Override
     public void save(UserRole userRole) {
@@ -18,9 +20,8 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    public int[] saveUserRolesList(List<UserRole> userRoles) {
+    public void saveUserRolesList(List<UserRole> userRoles) {
         userRoleRepository.saveAll(userRoles);
-        return new int[0];
     }
 
     @Override
@@ -42,6 +43,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     public void deleteAll() {
         userRoleRepository.deleteAll();
     }
+
 
     @Override
     public List<String> getRoleNames(Integer userId) {

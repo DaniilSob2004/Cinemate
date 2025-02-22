@@ -5,8 +5,9 @@ A service for viewing video content. Thesis on backend.
  - Redis for:
     - blacklist users jwt-token logout
     - userdetails object
+    - userroles object
  - 
- - ![Image](https://github.com/user-attachments/assets/ab5a706c-8f60-428e-8186-991fe7cffda1)
+ - ![Image](https://github.com/user-attachments/assets/db99a521-8ebb-4abc-8070-4ccbf46cf2c8)
  - ![Image](https://github.com/user-attachments/assets/f5dfa42c-033c-4507-af0a-669e429e56d6)
 
 -------------------------------------------------------
@@ -15,9 +16,9 @@ A service for viewing video content. Thesis on backend.
  - ![Image](https://github.com/user-attachments/assets/e6a011ff-4ef6-4eb2-a51c-2a5e967ab347)
 
 -------------------------------------------------------
- - Login / Register / Logout / SecureTestPhoto / GetCurrentUser (Endpoints)
+ - Login / Register / Logout / GetUser / SecureTestPhoto (Endpoints)
  - 
- - ![Image](https://github.com/user-attachments/assets/23c39e6a-c0bd-4427-a0c3-6d6ed92808e7)
+ - ![Image](https://github.com/user-attachments/assets/0f83b631-c509-40a9-bd05-12af3efefb10)
  - ![Image](https://github.com/user-attachments/assets/74ffdea5-44eb-44bc-8edd-46ec0a267b29)
  - ![Image](https://github.com/user-attachments/assets/57c20edf-8d38-4916-9ecc-846bedc96973)
  - ![Image](https://github.com/user-attachments/assets/52ec5480-3b8f-4a48-9958-de54310973a8)

@@ -1,18 +1,19 @@
 package com.example.cinemate.service.busines.externalauthservice;
 
 import com.example.cinemate.dao.externalauth.ExternalAuthRepository;
-import com.example.cinemate.model.db.AuthProvider;
 import com.example.cinemate.model.db.ExternalAuth;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ExternalAuthServiceImpl implements ExternalAuthService {
 
-    @Autowired
-    private ExternalAuthRepository externalAuthRepository;
+    private final ExternalAuthRepository externalAuthRepository;
+
+    public ExternalAuthServiceImpl(ExternalAuthRepository externalAuthRepository) {
+        this.externalAuthRepository = externalAuthRepository;
+    }
 
     @Override
     public void save(ExternalAuth externalAuth) {
@@ -20,9 +21,8 @@ public class ExternalAuthServiceImpl implements ExternalAuthService {
     }
 
     @Override
-    public int[] saveExternalAuthsList(List<ExternalAuth> externalAuths) {
+    public void saveExternalAuthsList(List<ExternalAuth> externalAuths) {
         externalAuthRepository.saveAll(externalAuths);
-        return new int[0];
     }
 
     @Override
@@ -43,15 +43,5 @@ public class ExternalAuthServiceImpl implements ExternalAuthService {
     @Override
     public void deleteAll() {
         externalAuthRepository.deleteAll();
-    }
-
-    @Override
-    public Optional<ExternalAuth> findByExternalId(String externalId) {
-        return externalAuthRepository.findExternalAuthByExternalId(externalId);
-    }
-
-    @Override
-    public Optional<ExternalAuth> findByProviderAndExternalId(AuthProvider provider, String externalId) {
-        return externalAuthRepository.findExternalAuthByProviderAndExternalId(provider, externalId);
     }
 }

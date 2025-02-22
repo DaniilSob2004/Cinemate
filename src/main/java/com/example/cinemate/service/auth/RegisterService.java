@@ -1,6 +1,6 @@
 package com.example.cinemate.service.auth;
 
-import com.example.cinemate.convert.AppUserConvertDto;
+import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.GoogleUserAuthDto;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
 import com.example.cinemate.exception.auth.PasswordMismatchException;
@@ -12,7 +12,6 @@ import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.service.busines.roleservice.RoleService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
 import com.example.cinemate.utils.GenerateUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,23 +24,21 @@ public class RegisterService {
     @Value("${user_data.role}")
     private String nameUserRole;
 
-    @Autowired
-    private AuthService authService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final AppUserService appUserService;
+    private final RoleService roleService;
+    private final UserRoleService userRoleService;
+    private final AuthService authService;
+    private final AppUserMapper appUserMapper;
 
-    @Autowired
-    private AppUserService appUserService;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private UserRoleService userRoleService;
-
-    @Autowired
-    private AppUserConvertDto appUserConvertDto;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public RegisterService(BCryptPasswordEncoder passwordEncoder, AppUserService appUserService, RoleService roleService, UserRoleService userRoleService, AuthService authService, AppUserMapper appUserMapper) {
+        this.passwordEncoder = passwordEncoder;
+        this.appUserService = appUserService;
+        this.roleService = roleService;
+        this.userRoleService = userRoleService;
+        this.authService = authService;
+        this.appUserMapper = appUserMapper;
+    }
 
     @Transactional
     public String registerUser(final RegisterRequestDto registerRequestDto) {
@@ -52,8 +49,8 @@ public class RegisterService {
         this.checkRegisterData(registerRequestDto);
 
         // регистрация и генерация токена
-        String password = bCryptPasswordEncoder.encode(registerRequestDto.getPassword());
-        AppUser user = appUserConvertDto.convertToAppUser(registerRequestDto, password);
+        String password = passwordEncoder.encode(registerRequestDto.getPassword());
+        AppUser user = appUserMapper.toAppUser(registerRequestDto, password);
         return this.registerAndGenerateToken(user);
     }
 
@@ -63,8 +60,8 @@ public class RegisterService {
         googleUserAuthDto.setEmail(googleUserAuthDto.getEmail().toLowerCase());
 
         // регистрация и генерация токена
-        String password = bCryptPasswordEncoder.encode(GenerateUtil.getRandomString());
-        AppUser user = appUserConvertDto.convertToAppUser(googleUserAuthDto, password);
+        String password = passwordEncoder.encode(GenerateUtil.getRandomString());
+        AppUser user = appUserMapper.toAppUser(googleUserAuthDto, password);
         return this.registerAndGenerateToken(user);
     }
 

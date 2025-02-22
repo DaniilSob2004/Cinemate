@@ -1,10 +1,9 @@
 package com.example.cinemate.utils;
 
-import com.example.cinemate.convert.AppUserConvertDto;
+import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,13 +26,16 @@ public class JwtTokenUtil {
     @Value("${security.header_value_auth_prefix}")
     private String headerValueAuthPrefix;
 
-    @Autowired
-    private AppUserConvertDto appUserConvertDto;
+    private final AppUserMapper appUserMapper;
+
+    public JwtTokenUtil(AppUserMapper appUserMapper) {
+        this.appUserMapper = appUserMapper;
+    }
 
 
     // Генерация токена
     public String generateToken(final AppUserJwtDto appUserJwtDto) {
-        Map<String, Object> claims = appUserConvertDto.convertToClaimsJwt(appUserJwtDto);  // получаем данные польз.
+        Map<String, Object> claims = appUserMapper.toClaimsJwt(appUserJwtDto);  // получаем данные польз.
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
@@ -46,7 +48,7 @@ public class JwtTokenUtil {
     // Получение данных
     public AppUserJwtDto extractAllUserData(final String token) {
         Claims claims = getClaims(token);
-        return appUserConvertDto.convertToAppUserJwtDto(claims);  // получаем данные польз. из claims
+        return appUserMapper.toAppUserJwtDto(claims);  // получаем данные польз. из claims
     }
 
     public Integer extractSubject(final String token) {

@@ -11,10 +11,10 @@ import com.example.cinemate.service.auth.LoginService;
 import com.example.cinemate.service.auth.RegisterService;
 
 import com.example.cinemate.service.redis.BlacklistTokenRedisService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
 
@@ -24,17 +24,17 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.AUTH)
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final LoginService loginService;
+    private final RegisterService registerService;
+    private final BlacklistTokenRedisService blacklistTokenRedisService;
 
-    @Autowired
-    private LoginService loginService;
-
-    @Autowired
-    private RegisterService registerService;
-
-    @Autowired
-    private BlacklistTokenRedisService blacklistTokenRedisService;
+    public AuthController(AuthService authService, LoginService loginService, RegisterService registerService, BlacklistTokenRedisService blacklistTokenRedisService) {
+        this.authService = authService;
+        this.loginService = loginService;
+        this.registerService = registerService;
+        this.blacklistTokenRedisService = blacklistTokenRedisService;
+    }
 
     @PostMapping(value = Endpoint.LOGIN)
     public ResponseEntity<?> login(HttpServletRequest request) {
@@ -55,7 +55,7 @@ public class AuthController {
         // аутентификация и генерация токена
         ErrorResponseDto errorResponseDto;
         try {
-            Logger.info("(Authentication user) Email: " + loginRequestDto.getEmail());
+            Logger.info("-------- User Login (" + loginRequestDto.getEmail() + ") --------");
 
             token = loginService.loginUser(loginRequestDto);
 
@@ -63,7 +63,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
 
-        } catch (BadCredentialsException | UserNotFoundException e) {
+        } catch (BadCredentialsException | InternalAuthenticationServiceException | UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (Exception e) {
             Logger.error(e.getMessage());
@@ -86,7 +86,7 @@ public class AuthController {
         // регистрация и генерация токена
         ErrorResponseDto errorResponseDto;
         try {
-            Logger.info("Register request: " + registerRequestDto);
+            Logger.info("-------- User Register (" + registerRequestDto + ") --------");
 
             token = registerService.registerUser(registerRequestDto);
 
@@ -116,7 +116,7 @@ public class AuthController {
                     .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
 
-        Logger.info("Token in logout controller - " + token);
+        Logger.info("-------- Token in logout controller (" + token + ") --------");
 
         // добавление токена в 'Redis' blacklist (чтобы до истечение срока нельзя было его использ.)
         blacklistTokenRedisService.addToBlacklist(token);

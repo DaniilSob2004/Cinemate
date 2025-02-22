@@ -1,14 +1,13 @@
 package com.example.cinemate.service.auth.userdetail;
 
-import com.example.cinemate.convert.GrantedAuthorityConvert;
-import com.example.cinemate.convert.UserDetailsConvertDto;
+import com.example.cinemate.mapper.GrantedAuthorityMapper;
+import com.example.cinemate.mapper.UserDetailsMapper;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.busines.appuserservice.AppUserService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
 import com.example.cinemate.service.redis.UserRoleCacheService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,23 +20,21 @@ import java.util.List;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    private AppUserService appUserService;
+    private final AppUserService appUserService;
+    private final UserRoleService userRoleService;
+    private final UserDetailsCacheService userDetailsCacheService;
+    private final UserRoleCacheService userRoleCacheService;
+    private final UserDetailsMapper userDetailsMapper;
+    private final GrantedAuthorityMapper grantedAuthorityMapper;
 
-    @Autowired
-    private UserRoleService userRoleService;
-
-    @Autowired
-    private UserDetailsCacheService userDetailsCacheService;
-
-    @Autowired
-    private UserRoleCacheService userRoleCacheService;
-
-    @Autowired
-    private UserDetailsConvertDto userDetailsConvertDto;
-
-    @Autowired
-    private GrantedAuthorityConvert grantedAuthorityConvert;
+    public UserDetailsServiceImpl(AppUserService appUserService, UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, UserRoleCacheService userRoleCacheService, UserDetailsMapper userDetailsMapper, GrantedAuthorityMapper grantedAuthorityMapper) {
+        this.appUserService = appUserService;
+        this.userRoleService = userRoleService;
+        this.userDetailsCacheService = userDetailsCacheService;
+        this.userRoleCacheService = userRoleCacheService;
+        this.userDetailsMapper = userDetailsMapper;
+        this.grantedAuthorityMapper = grantedAuthorityMapper;
+    }
 
     @Override
     @Transactional
@@ -78,7 +75,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<GrantedAuthority> grantList = this.setRolesForUser(user.getId());
 
         // возвращаем объект внутреннего Spring UserDetails
-        return userDetailsConvertDto.convertToCustomUserDetails(user, grantList);
+        return userDetailsMapper.toCustomUserDetails(user, grantList);
     }
 
     private List<GrantedAuthority> setRolesForUser(final Integer id) {
@@ -88,14 +85,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userRoleCacheService.getRoles(userId)
                 .map(authority -> {
                     Logger.info("UserRoles from Redis cache");
-                    return grantedAuthorityConvert.convertToGrantedAuthorities(authority);
+                    return grantedAuthorityMapper.toGrantedAuthorities(authority);
                 })
                 .orElseGet(() -> {
                     Logger.info("!!! CREATE UserRoles !!!");
 
                     // установка ролей для пользователя
                     List<String> roleNames = userRoleService.getRoleNames(id);
-                    List<GrantedAuthority> authorities = grantedAuthorityConvert.convertToGrantedAuthorities(roleNames);
+                    List<GrantedAuthority> authorities = grantedAuthorityMapper.toGrantedAuthorities(roleNames);
 
                     // записываем роли в кэш
                     userRoleCacheService.addToCache(userId, authorities);

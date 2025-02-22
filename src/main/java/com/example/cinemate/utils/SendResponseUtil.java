@@ -10,8 +10,14 @@ import java.io.IOException;
 
 @Component
 public class SendResponseUtil {
+
+    private final ObjectMapper objectMapper;
+
+    public SendResponseUtil(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     public void sendError(final HttpServletResponse response, final ErrorResponseDto errorResponse) throws IOException {
-        var objectMapper = new ObjectMapper();
         String jsonResponse = objectMapper.writeValueAsString(errorResponse);
 
         // устанавливаем заголовки, статус и отправляем
@@ -23,7 +29,6 @@ public class SendResponseUtil {
     }
 
     public void sendData(final HttpServletResponse response, final AuthResponseDto authResponseDto) throws IOException {
-        var objectMapper = new ObjectMapper();
         String jsonResponse = objectMapper.writeValueAsString(authResponseDto);
 
         // устанавливаем заголовки, статус и отправляем

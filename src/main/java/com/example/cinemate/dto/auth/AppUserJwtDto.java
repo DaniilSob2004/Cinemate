@@ -1,7 +1,6 @@
 package com.example.cinemate.dto.auth;
 
 import lombok.*;
-
 import java.util.List;
 
 @Data

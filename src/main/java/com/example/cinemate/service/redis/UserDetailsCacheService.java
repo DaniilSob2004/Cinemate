@@ -1,8 +1,7 @@
 package com.example.cinemate.service.redis;
 
-import com.example.cinemate.convert.UserDetailsConvertDto;
+import com.example.cinemate.mapper.UserDetailsMapper;
 import com.example.cinemate.dto.auth.UserDetailsDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,11 +19,11 @@ public class UserDetailsCacheService extends AbstractRedisRepository<UserDetails
     @Value("${redis_data.user_details_expiration_time}")
     private long expirationTime;
 
-    @Autowired
-    private UserDetailsConvertDto userDetailsConvertDto;
+    private final UserDetailsMapper userDetailsMapper;
 
-    public UserDetailsCacheService(RedisTemplate<String, UserDetailsDto> redisUserDetailsTemplate) {
+    public UserDetailsCacheService(RedisTemplate<String, UserDetailsDto> redisUserDetailsTemplate, UserDetailsMapper userDetailsMapper) {
         super(redisUserDetailsTemplate);
+        this.userDetailsMapper = userDetailsMapper;
     }
 
     public void addToCache(final String id, final UserDetails userDetails) {
@@ -34,16 +33,16 @@ public class UserDetailsCacheService extends AbstractRedisRepository<UserDetails
         }
         // преобразовываем в DTO
         String key = userDetailsPrefix + id;
-        var userDetailsDto = userDetailsConvertDto.convertToUserDetailsDto(userDetails);
+        var userDetailsDto = userDetailsMapper.toUserDetailsDto(userDetails);
         this.save(key, userDetailsDto, expirationTime, TimeUnit.SECONDS);
     }
 
     public Optional<UserDetails> getUserDetails(final String id) {
         // преобразовываем в UserDetails
         String key = userDetailsPrefix + id;
-        var userDetailsDto = super.get(key);
+        var userDetailsDto = this.get(key);
         return Optional.ofNullable(userDetailsDto)
-                .map(userDetailsConvertDto::convertToUserDetails);
+                .map(userDetailsMapper::toUserDetails);
     }
 
     public void remove(final String id) {

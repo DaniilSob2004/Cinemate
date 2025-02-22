@@ -2,7 +2,6 @@ package com.example.cinemate.service.busines.authproviderservice;
 
 import com.example.cinemate.dao.authprovider.AuthProviderRepository;
 import com.example.cinemate.model.db.AuthProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +10,11 @@ import java.util.Optional;
 @Service
 public class AuthProviderServiceImpl implements AuthProviderService {
 
-    @Autowired
-    private AuthProviderRepository authProviderRepository;
+    private final AuthProviderRepository authProviderRepository;
+
+    public AuthProviderServiceImpl(AuthProviderRepository authProviderRepository) {
+        this.authProviderRepository = authProviderRepository;
+    }
 
     @Override
     public void save(AuthProvider authProvider) {
@@ -20,9 +22,8 @@ public class AuthProviderServiceImpl implements AuthProviderService {
     }
 
     @Override
-    public int[] saveAuthProvidersList(List<AuthProvider> authProviders) {
+    public void saveAuthProvidersList(List<AuthProvider> authProviders) {
         authProviderRepository.saveAll(authProviders);
-        return new int[0];
     }
 
     @Override
@@ -44,6 +45,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
     public void deleteAll() {
         authProviderRepository.deleteAll();
     }
+
 
     @Override
     public Optional<AuthProvider> findByName(String name) {

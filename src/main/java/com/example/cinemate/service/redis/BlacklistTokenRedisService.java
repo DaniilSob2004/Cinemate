@@ -1,7 +1,6 @@
 package com.example.cinemate.service.redis;
 
 import com.example.cinemate.utils.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,11 +17,11 @@ public class BlacklistTokenRedisService extends AbstractRedisRepository<String> 
     @Value("${redis_data.blacklist_token_key_prefix}")
     private String blacklistTokenKeyPrefix;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    public BlacklistTokenRedisService(RedisTemplate<String, String> redisBlacklistTokenTemplate) {
+    public BlacklistTokenRedisService(RedisTemplate<String, String> redisBlacklistTokenTemplate, JwtTokenUtil jwtTokenUtil) {
         super(redisBlacklistTokenTemplate);
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     public void addToBlacklist(final String token) {

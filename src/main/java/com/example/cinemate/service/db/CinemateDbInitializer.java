@@ -8,7 +8,6 @@ import com.example.cinemate.service.busines.roleservice.RoleService;
 import com.example.cinemate.service.busines.userroleservice.UserRoleService;
 import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.TextFileReader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
@@ -47,24 +46,21 @@ public class CinemateDbInitializer {
     @Value("${user_data.role}")
     private String nameUserRole;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final AppUserService appUserService;
+    private final AuthProviderService authProviderService;
+    private final ExternalAuthService externalAuthService;
+    private final RoleService roleService;
+    private final UserRoleService userRoleService;
+    private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private AppUserService appUserService;
-
-    @Autowired
-    private AuthProviderService authProviderService;
-
-    @Autowired
-    private ExternalAuthService externalAuthService;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private UserRoleService userRoleService;
-
+    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, JdbcTemplate jdbcTemplate) {
+        this.appUserService = appUserService;
+        this.authProviderService = authProviderService;
+        this.externalAuthService = externalAuthService;
+        this.roleService = roleService;
+        this.userRoleService = userRoleService;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @PostConstruct
     public void init() {
@@ -72,7 +68,6 @@ public class CinemateDbInitializer {
         Usernames = TextFileReader.ReadTextFile(dataUsername);
         DeleteTablesLines = TextFileReader.ReadTextFile(deleteTablesSql);
     }
-
 
     public void deleteTables() {
         StringBuilder deleteTablesQuery = new StringBuilder();
@@ -144,7 +139,6 @@ public class CinemateDbInitializer {
 
         Logger.info("ExternalAuths created successfully...");
     }
-
 
     private AppUser CreateAdmin() {
         return new AppUser(
