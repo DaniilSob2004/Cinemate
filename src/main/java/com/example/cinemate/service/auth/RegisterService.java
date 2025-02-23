@@ -8,10 +8,11 @@ import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.model.db.Role;
 import com.example.cinemate.model.db.UserRole;
-import com.example.cinemate.service.busines.appuserservice.AppUserService;
-import com.example.cinemate.service.busines.roleservice.RoleService;
-import com.example.cinemate.service.busines.userroleservice.UserRoleService;
+import com.example.cinemate.service.business_db.appuserservice.AppUserService;
+import com.example.cinemate.service.business_db.roleservice.RoleService;
+import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.utils.GenerateUtil;
+import com.nimbusds.jose.util.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,14 +56,16 @@ public class RegisterService {
     }
 
     @Transactional
-    public String registerUser(final GoogleUserAuthDto googleUserAuthDto) {
+    public Pair<String, AppUser> registerUser(final GoogleUserAuthDto googleUserAuthDto) {
         // в нижний регистр
         googleUserAuthDto.setEmail(googleUserAuthDto.getEmail().toLowerCase());
 
         // регистрация и генерация токена
         String password = passwordEncoder.encode(GenerateUtil.getRandomString());
         AppUser user = appUserMapper.toAppUser(googleUserAuthDto, password);
-        return this.registerAndGenerateToken(user);
+        String token = this.registerAndGenerateToken(user);
+
+        return Pair.of(token, user);
     }
 
     private String registerAndGenerateToken(final AppUser user) {

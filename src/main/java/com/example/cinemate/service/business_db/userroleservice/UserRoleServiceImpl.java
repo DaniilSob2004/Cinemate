@@ -1,4 +1,4 @@
-package com.example.cinemate.service.busines.userroleservice;
+package com.example.cinemate.service.business_db.userroleservice;
 
 import com.example.cinemate.dao.userrole.UserRoleRepository;
 import com.example.cinemate.model.db.UserRole;

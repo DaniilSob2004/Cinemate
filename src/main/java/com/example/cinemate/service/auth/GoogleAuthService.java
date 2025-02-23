@@ -3,13 +3,13 @@ package com.example.cinemate.service.auth;
 import com.example.cinemate.mapper.GoogleAuthMapper;
 import com.example.cinemate.dto.auth.GoogleUserAuthDto;
 import com.example.cinemate.dto.auth.LoginRequestDto;
-import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.model.db.AuthProvider;
 import com.example.cinemate.model.db.ExternalAuth;
-import com.example.cinemate.service.busines.appuserservice.AppUserService;
-import com.example.cinemate.service.busines.authproviderservice.AuthProviderService;
-import com.example.cinemate.service.busines.externalauthservice.ExternalAuthService;
+import com.example.cinemate.service.business_db.appuserservice.AppUserService;
+import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
+import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
+import com.nimbusds.jose.util.Pair;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
@@ -54,16 +54,14 @@ public class GoogleAuthService {
     private String register(final GoogleUserAuthDto googleUserAuthDto) {
         Logger.info("User google register");
 
-        // добавляем пользователя и роль
-        String token = registerService.registerUser(googleUserAuthDto);
+        // добавляем пользователя и роль (токен, user)
+        Pair<String, AppUser> pair = registerService.registerUser(googleUserAuthDto);
 
         // создаём запись в ExternalAuth
-        AppUser user = appUserService.findByEmail(googleUserAuthDto.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("User after google registration not found"));
-        var newExternalAuth = new ExternalAuth(null, user, googleUserAuthDto.getProvider(), googleUserAuthDto.getExternalId(), LocalDateTime.now());
+        var newExternalAuth = new ExternalAuth(null, pair.getRight(), googleUserAuthDto.getProvider(), googleUserAuthDto.getExternalId(), LocalDateTime.now());
         externalAuthService.save(newExternalAuth);
 
-        return token;
+        return pair.getLeft();
     }
 
     private String login(final String email) {

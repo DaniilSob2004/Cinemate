@@ -47,20 +47,10 @@ public class AppUserMapper {
             return new AppUserJwtDto();
         }
 
-        // список ролей
-        Object claimRoles = claims.get("roles");
-        List<String> roles = new ArrayList<>();
-        if (claimRoles instanceof List<?> listClaimRoles) {
-            roles = listClaimRoles.stream()
-                    .filter(elem -> elem instanceof String)  // фильтруем элементы типа String
-                    .map(String.class::cast)  // безопасное приведение Object к String
-                    .toList();
-        }
-
         return new AppUserJwtDto(
                 Integer.valueOf(claims.getSubject()),  // id
                 claims.get("email", String.class),
-                roles
+                grantedAuthorityMapper.toListRolesString(claims.get("roles"))  // список ролей
         );
     }
 

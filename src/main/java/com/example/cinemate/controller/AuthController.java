@@ -63,15 +63,16 @@ public class AuthController {
 
             return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
 
-        } catch (BadCredentialsException | InternalAuthenticationServiceException | UserNotFoundException e) {
+        } catch (BadCredentialsException | InternalAuthenticationServiceException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-        } catch (Exception e) {
+        } catch (UserNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        }  catch (Exception e) {
             Logger.error(e.getMessage());
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
-        // отправка ошибки
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
     @PostMapping(value = Endpoint.REGISTER)
@@ -98,14 +99,15 @@ public class AuthController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
         } catch (PasswordMismatchException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
-        } catch (BadCredentialsException | UserNotFoundException e) {
+        } catch (UserNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (BadCredentialsException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (Exception e) {
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
-        // отправка ошибки
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
     @PostMapping(value = Endpoint.LOGOUT)

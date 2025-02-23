@@ -1,4 +1,4 @@
-package com.example.cinemate.service.busines.authproviderservice;
+package com.example.cinemate.service.business_db.authproviderservice;
 
 import com.example.cinemate.dao.authprovider.AuthProviderRepository;
 import com.example.cinemate.model.db.AuthProvider;

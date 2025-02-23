@@ -1,4 +1,4 @@
-package com.example.cinemate.service.busines.appuserservice;
+package com.example.cinemate.service.business_db.appuserservice;
 
 import com.example.cinemate.dao.appuser.AppUserRepository;
 import com.example.cinemate.model.db.AppUser;

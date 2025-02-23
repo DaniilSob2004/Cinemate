@@ -1,4 +1,4 @@
-package com.example.cinemate.service.busines.appuserservice;
+package com.example.cinemate.service.business_db.appuserservice;
 
 import com.example.cinemate.model.db.AppUser;
 import java.util.List;

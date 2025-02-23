@@ -1,11 +1,11 @@
 package com.example.cinemate.service.db;
 
 import com.example.cinemate.model.db.*;
-import com.example.cinemate.service.busines.appuserservice.AppUserService;
-import com.example.cinemate.service.busines.authproviderservice.AuthProviderService;
-import com.example.cinemate.service.busines.externalauthservice.ExternalAuthService;
-import com.example.cinemate.service.busines.roleservice.RoleService;
-import com.example.cinemate.service.busines.userroleservice.UserRoleService;
+import com.example.cinemate.service.business_db.appuserservice.AppUserService;
+import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
+import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
+import com.example.cinemate.service.business_db.roleservice.RoleService;
+import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.TextFileReader;
 import org.springframework.beans.factory.annotation.Value;
