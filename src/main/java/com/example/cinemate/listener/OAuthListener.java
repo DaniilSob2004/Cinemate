@@ -1,8 +1,8 @@
 package com.example.cinemate.listener;
 
 import com.example.cinemate.dto.auth.AuthResponseDto;
-import com.example.cinemate.event.StartGoogleAuthEvent;
-import com.example.cinemate.service.auth.GoogleAuthService;
+import com.example.cinemate.event.StartOAuthEvent;
+import com.example.cinemate.service.auth.external.BaseOAuthService;
 import com.example.cinemate.utils.SendResponseUtil;
 import lombok.NonNull;
 import org.springframework.context.event.EventListener;
@@ -13,22 +13,22 @@ import org.tinylog.Logger;
 import java.io.IOException;
 
 @Component
-public class GoogleAuthListener {
+public class OAuthListener {
 
-    private final GoogleAuthService googleAuthService;
+    private final BaseOAuthService baseOAuthService;
     private final SendResponseUtil sendResponseUtil;
 
-    public GoogleAuthListener(GoogleAuthService googleAuthService, SendResponseUtil sendResponseUtil) {
-        this.googleAuthService = googleAuthService;
+    public OAuthListener(BaseOAuthService baseOAuthService, SendResponseUtil sendResponseUtil) {
+        this.baseOAuthService = baseOAuthService;
         this.sendResponseUtil = sendResponseUtil;
     }
 
     @EventListener
-    public void handleGoogleAuthEvent(@NonNull final StartGoogleAuthEvent event) {
+    public void handleOAuthEvent(@NonNull final StartOAuthEvent event) {
         OAuth2User user = event.getOauthUser();  // получаем данные авторизации google
         if (user != null) {
             // вход/регистрация
-            String token = googleAuthService.processGoogleAuth(user);
+            String token = baseOAuthService.processOAuth(event.getProvider(), user);
             AuthResponseDto authResponseDto = new AuthResponseDto(token);
 
             Logger.info("Token - " + authResponseDto.getToken());

@@ -1,11 +1,13 @@
-package com.example.cinemate.service.auth;
+package com.example.cinemate.service.auth.external;
 
-import com.example.cinemate.mapper.GoogleAuthMapper;
 import com.example.cinemate.dto.auth.GoogleUserAuthDto;
 import com.example.cinemate.dto.auth.LoginRequestDto;
+import com.example.cinemate.mapper.GoogleAuthMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.model.db.AuthProvider;
 import com.example.cinemate.model.db.ExternalAuth;
+import com.example.cinemate.service.auth.LoginService;
+import com.example.cinemate.service.auth.RegisterService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
@@ -17,7 +19,7 @@ import org.tinylog.Logger;
 import java.time.LocalDateTime;
 
 @Service
-public class GoogleAuthService {
+public class GoogleAuthService implements OAuthService {
 
     private final ExternalAuthService externalAuthService;
     private final AuthProviderService authProviderService;
@@ -35,7 +37,8 @@ public class GoogleAuthService {
         this.googleAuthMapper = googleAuthMapper;
     }
 
-    public String processGoogleAuth(final OAuth2User oauthUser) {
+    @Override
+    public String processAuth(OAuth2User oauthUser) {
         // получаем данные
         AuthProvider provider = authProviderService.findByName("google")
                 .orElseThrow(() -> new RuntimeException("Google provider not found"));

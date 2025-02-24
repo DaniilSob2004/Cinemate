@@ -1,15 +1,17 @@
 package com.example.cinemate.handling.auth;
 
 import com.example.cinemate.dto.error.ErrorResponseDto;
-import com.example.cinemate.event.StartGoogleAuthEvent;
+import com.example.cinemate.event.StartOAuthEvent;
 import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.utils.SendResponseUtil;
+import com.example.cinemate.utils.StringUtils;
 import lombok.NonNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -33,24 +35,30 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         ErrorResponseDto errorResponse;
+        String provider = "-";
 
         try {
             if (authentication != null) {
-                Logger.info("-------- Google OAuth2 Login Authentication Success --------");
+                if (authentication instanceof OAuth2AuthenticationToken oauthToken) {
+                    Logger.info("-------- OAuth2 Login Authentication Success --------");
 
-                // получаем данные авторизации google
-                OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+                    // получаем данные авторизации google
+                    OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+                    provider = StringUtils.capitalizeFirstLetter(oauthToken.getAuthorizedClientRegistrationId());
 
-                // вызываем событие (в publisher отправляется токен)
-                var startGoogleAuthEvent = new StartGoogleAuthEvent(this, oauthUser, response);
-                eventPublisher.publishEvent(startGoogleAuthEvent);
+                    Logger.info("Provider auth: " + provider);
 
-                // если ответ был отправлен
-                if (startGoogleAuthEvent.isResponseHandled()) {
-                    return;
+                    // вызываем событие (в publisher отправляется токен)
+                    var startOAuthEvent = new StartOAuthEvent(this, oauthUser, provider, response);
+                    eventPublisher.publishEvent(startOAuthEvent);
+
+                    // если ответ был отправлен
+                    if (startOAuthEvent.isResponseHandled()) {
+                        return;
+                    }
                 }
             }
-            errorResponse = new ErrorResponseDto("Google authentication failed", HttpServletResponse.SC_UNAUTHORIZED);
+            errorResponse = new ErrorResponseDto(provider + " authentication failed", HttpServletResponse.SC_UNAUTHORIZED);
 
         } catch (UserAlreadyExistsException e) {
             errorResponse = new ErrorResponseDto(e.getMessage(), HttpServletResponse.SC_CONFLICT);

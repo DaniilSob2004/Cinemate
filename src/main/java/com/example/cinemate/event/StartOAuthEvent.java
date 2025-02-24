@@ -8,15 +8,18 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import javax.servlet.http.HttpServletResponse;
 
 @Getter
-public class StartGoogleAuthEvent extends ApplicationEvent {
+public class StartOAuthEvent extends ApplicationEvent {
 
     private final OAuth2User oauthUser;
+    private final String provider;
     private final HttpServletResponse response;
-    @Setter private boolean responseHandled = false;
+    @Setter private boolean responseHandled;
 
-    public StartGoogleAuthEvent(Object source, OAuth2User oauthUser, HttpServletResponse response) {
+    public StartOAuthEvent(Object source, OAuth2User oauthUser, String provider, HttpServletResponse response) {
         super(source);
         this.oauthUser = oauthUser;
+        this.provider = provider;
         this.response = response;
+        this.responseHandled = false;
     }
 }
