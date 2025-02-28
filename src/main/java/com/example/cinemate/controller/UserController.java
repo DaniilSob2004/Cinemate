@@ -3,12 +3,10 @@ package com.example.cinemate.controller;
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.exception.auth.UnauthorizedException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
-import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.UserDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
-import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business.userservice.CurrentUserService;
-import com.example.cinemate.service.business_db.appuserservice.AppUserService;
+import com.example.cinemate.service.business.userservice.UserCrudService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.USERS)
 public class UserController {
 
-    private final AppUserService appUserService;
     private final CurrentUserService currentUserService;
-    private final AppUserMapper appUserMapper;
+    private final UserCrudService userCrudService;
 
-    public UserController(AppUserService appUserService, CurrentUserService currentUserService, AppUserMapper appUserMapper) {
-        this.appUserService = appUserService;
+    public UserController(CurrentUserService currentUserService, UserCrudService userCrudService) {
         this.currentUserService = currentUserService;
-        this.appUserMapper = appUserMapper;
+        this.userCrudService = userCrudService;
     }
 
     // Для теста админа
@@ -38,17 +34,17 @@ public class UserController {
 
     @GetMapping(value = Endpoint.USER_ID)
     public ResponseEntity<?> getUserById(@PathVariable Integer id) {
-        // получаем пользователя по id
-        AppUser appUser = appUserService.findById(id).orElse(null);
-        if (appUser == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponseDto("User with id '" + id + "' was not found", HttpStatus.NOT_FOUND.value()));
+        ErrorResponseDto errorResponseDto;
+        try {
+            UserDto userDto =  userCrudService.getUserById(id);
+            return ResponseEntity.ok(userDto);
+        } catch (UserNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-
-        // преобразовываем в DTO
-        UserDto userDto = appUserMapper.toUserDto(appUser);
-
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
     @GetMapping(value = Endpoint.ME)

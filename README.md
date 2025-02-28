@@ -6,7 +6,6 @@ A service for viewing video content. Thesis on backend.
     - data from db: Role, UserRole, AuthProvider
     - blacklist users jwt-token logout
     - userdetails object
-    - userroles object
  - 
  - ![Image](https://github.com/user-attachments/assets/db99a521-8ebb-4abc-8070-4ccbf46cf2c8)
  - ![Image](https://github.com/user-attachments/assets/f5dfa42c-033c-4507-af0a-669e429e56d6)

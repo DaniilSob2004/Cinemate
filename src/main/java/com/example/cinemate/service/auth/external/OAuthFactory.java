@@ -24,7 +24,7 @@ public class OAuthFactory {
     public OAuthService getAuthService(final String provider) {
         return authServices.getOrDefault(
                 provider + "AuthService",
-                oauthUser -> { throw new RuntimeException("Unsupported provider: " + provider); }
+                (oauthUser, accessToken) -> { throw new RuntimeException("Unsupported provider: " + provider); }
         );
     }
 }

@@ -15,13 +15,13 @@ public class FacebookAuthService extends BaseOAuthService {
     }
 
     @Override
-    public String processAuth(OAuth2User oauthUser) {
+    public String processAuth(OAuth2User oauthUser, String accessToken) {
         Logger.info("Facebook auth");
 
         // получаем данные
         AuthProvider provider = authProviderService.findByName("facebook")  // используется кеш
                 .orElseThrow(() -> new RuntimeException("Facebook provider not found"));
-        var facebookUserAuthDto = oAuthUserMapper.toOAuthFacebookUserDto(oauthUser, provider);
+        var facebookUserAuthDto = oAuthUserMapper.toOAuthFacebookUserDto(oauthUser, provider, accessToken);
         return registerOAuthService.registerUser(facebookUserAuthDto);
     }
 }

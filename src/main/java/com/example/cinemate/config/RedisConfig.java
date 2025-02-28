@@ -33,7 +33,7 @@ public class RedisConfig {
                         RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
-                .entryTtl(Duration.ofMinutes(expirationTime));
+                .entryTtl(Duration.ofSeconds(expirationTime));
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(config)

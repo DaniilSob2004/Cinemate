@@ -3,9 +3,12 @@ package com.example.cinemate.service.auth;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
+import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.service.auth.userdetail.UserDetailsServiceImpl;
 import com.example.cinemate.utils.JwtTokenUtil;
+import lombok.NonNull;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,7 +29,7 @@ public class AuthService {
     private final AppUserMapper appUserMapper;
 
     public AuthService(
-            AuthenticationManager authenticationManager,
+            @Lazy AuthenticationManager authenticationManager,
             JwtTokenUtil jwtTokenUtil,
             UserDetailsServiceImpl userDetailsService,
             AppUserMapper appUserMapper) {
@@ -45,44 +48,30 @@ public class AuthService {
         // загружается информация о польз, чтобы установить его права доступа
         UserDetails userDetails = userDetailsService.loadUserById(appUserJwtDto.getId());
 
-        // если в кэше нет, то добавляем
-        if (!userDetailsService.checkUserInCache(appUserJwtDto.getId())) {
-            userDetailsService.addUserToCache(appUserJwtDto.getId(), userDetails);
+        if (this.addUserDetailsToCache(userDetails)) {
+            this.authenticateUserWithoutPassword(userDetails);  // аутентификация пользователя без пароля
+            return;
         }
 
-        // аутентификация пользователя без пароля
-        this.authenticateUserWithoutPassword(userDetails);
+        // исключение, если пользователь не найден
+        throw new UserNotFoundException("User '" + appUserJwtDto.getEmail() + "' was not found");
     }
 
-    public String authenticateAndGenerateToken(final String usernameOrId, final String password, final boolean isId) {
-        UserDetails userDetails;
-
+    public String authenticateAndGenerateToken(@NonNull final AuthenticationRequest authRequest) {
         // аутентификация пользователя
-        if (password == null) {  // если не нужно проверять пароль
-            // загружает инфу (роли и данные) о польз.
-            userDetails = isId
-                    ? userDetailsService.loadUserById(Integer.valueOf(usernameOrId))  // по id
-                    : userDetailsService.loadUserByUsername(usernameOrId);  // по email
-            this.authenticateUserWithoutPassword(userDetails);
-        }
-        else {  // с паролем
-            userDetails = this.authenticateUser(usernameOrId, password);
-        }
+        UserDetails userDetails = this.getAuthenticatedUserDetails(authRequest);
 
-        // после успешной аутентификации добавляем в кэш
-        if (userDetails instanceof CustomUserDetails customUserDetails) {
-            userDetailsService.addUserToCache(customUserDetails.getId(), userDetails);
-
-            // генерация JWT-токена
-            AppUserJwtDto appUserJwtDto = appUserMapper.toAppUserJwtDto(customUserDetails);
+        // после успешной аутентификации добавляем в кэш и генерация токена
+        if (this.addUserDetailsToCache(userDetails)) {
+            AppUserJwtDto appUserJwtDto = appUserMapper.toAppUserJwtDto(userDetails, authRequest.getProvider());
             return jwtTokenUtil.generateToken(appUserJwtDto);
         }
 
         // исключение, если пользователь не найден
         throw new UserNotFoundException(
-                isId
-                ? "User '" + usernameOrId + "' was not found"
-                : "User with id '" + usernameOrId + "' was not found");
+                authRequest.isId()
+                ? "User '" + authRequest.getUsernameOrId() + "' was not found"
+                : "User with id '" + authRequest.getUsernameOrId() + "' was not found");
     }
 
     public Optional<String> tokenValidateFromHeader(final HttpServletRequest request) {
@@ -90,8 +79,31 @@ public class AuthService {
                 .filter(jwtTokenUtil::validateToken);
     }
 
-    public Optional<Integer> getUserIdByToken(final String token) {
-        return Optional.ofNullable(token).map(jwtTokenUtil::extractSubject);
+    public Optional<AppUserJwtDto> getUserDataByToken(final String token) {
+        return Optional.ofNullable(token).map(jwtTokenUtil::extractAllUserData);
+    }
+
+    private boolean addUserDetailsToCache(final UserDetails userDetails) {
+        if (userDetails instanceof CustomUserDetails customUserDetails) {
+            userDetailsService.addUserToCache(customUserDetails.getId(), customUserDetails);
+            return true;
+        }
+        return false;
+    }
+
+    private UserDetails getAuthenticatedUserDetails(final AuthenticationRequest authRequest) {
+        UserDetails userDetails;
+        if (authRequest.getPassword() == null) {  // если не нужно проверять пароль
+            // загружает инфу (роли и данные) о польз.
+            userDetails = authRequest.isId()
+                    ? userDetailsService.loadUserById(Integer.valueOf(authRequest.getUsernameOrId()))  // по id
+                    : userDetailsService.loadUserByUsername(authRequest.getUsernameOrId());  // по email
+            this.authenticateUserWithoutPassword(userDetails);
+        }
+        else {  // с паролем
+            userDetails = this.authenticateUser(authRequest.getUsernameOrId(), authRequest.getPassword());
+        }
+        return userDetails;
     }
 
     private UserDetails authenticateUser(final String username, final String password) {

@@ -44,7 +44,7 @@ security:
 redis_data:
   blacklist_token_value: "blacklisted"
   blacklist_token_key_prefix: "blacklist::token::"
-  user_details_prefix: "user::detail::"
+  user_details_prefix: "user::details::"
   user_details_expiration_time: 3600  # 3600 60 min
   base_redis_expiration_time: 3600  # 3600 60 min
 

@@ -2,7 +2,8 @@ package com.example.cinemate.listener;
 
 import com.example.cinemate.dto.auth.AuthResponseDto;
 import com.example.cinemate.event.StartOAuthEvent;
-import com.example.cinemate.service.auth.external.StartOAuthService;
+import com.example.cinemate.service.auth.external.OAuthFactory;
+import com.example.cinemate.service.auth.external.OAuthService;
 import com.example.cinemate.utils.SendResponseUtil;
 import lombok.NonNull;
 import org.springframework.context.event.EventListener;
@@ -15,11 +16,11 @@ import java.io.IOException;
 @Component
 public class OAuthListener {
 
-    private final StartOAuthService startOAuthService;
+    private final OAuthFactory authFactory;
     private final SendResponseUtil sendResponseUtil;
 
-    public OAuthListener(StartOAuthService startOAuthService, SendResponseUtil sendResponseUtil) {
-        this.startOAuthService = startOAuthService;
+    public OAuthListener(OAuthFactory authFactory, SendResponseUtil sendResponseUtil) {
+        this.authFactory = authFactory;
         this.sendResponseUtil = sendResponseUtil;
     }
 
@@ -28,7 +29,8 @@ public class OAuthListener {
         OAuth2User oauthUser = event.getOauthUser();  // получаем данные авторизации google
         if (oauthUser != null) {
             // вход/регистрация
-            String token = startOAuthService.processOAuth(event.getProvider(), oauthUser);
+            OAuthService authService = authFactory.getAuthService(event.getProvider());  // получение сервиса по названию провайдера
+            String token = authService.processAuth(oauthUser, event.getAccessToken());  // запуск авторизации
 
             // отправляем json ответ с токеном
             this.sendAuthResponse(event, token);

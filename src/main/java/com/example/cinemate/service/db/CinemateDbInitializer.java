@@ -146,7 +146,7 @@ public class CinemateDbInitializer {
                 "ADMIN",
                 "Admin",
                 "SuperAdmin",
-                GenerateUtil.getEmailByName("Admin").toLowerCase(),
+                "admin@gmail.com",
                 GenerateUtil.getRandomNumTel(),
                 adminPassword,
                 "",
@@ -181,7 +181,8 @@ public class CinemateDbInitializer {
                 allUsers.get(GenerateUtil.getRandomInteger(0, allUsers.size() - 1)),
                 googleProvider,
                 GenerateUtil.getRandomNumberString(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                GenerateUtil.getRandomString()
         );
     }
 }

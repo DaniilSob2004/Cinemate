@@ -12,4 +12,5 @@ public class UserDto {
     private String email;
     private String phoneNum;
     private String avatar;
+    private String provider;
 }

@@ -2,6 +2,7 @@ package com.example.cinemate.service.auth;
 
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
+import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.model.db.Role;
 import com.example.cinemate.model.db.UserRole;
@@ -51,11 +52,16 @@ public class RegisterService {
         AppUser user = appUserMapper.toAppUser(registerRequestDto, password);
         this.createUser(user);
 
-        return this.authenticateAndGenerateToken(user.getId());  // авторизация и генерация токена
+        return this.authenticateAndGenerateToken(user.getId(), "");  // авторизация и генерация токена
     }
 
-    public String authenticateAndGenerateToken(final Integer id) {
-        return authService.authenticateAndGenerateToken(id.toString(), null, true);
+    public String authenticateAndGenerateToken(final Integer id, final String provider) {
+        var authRequest = new AuthenticationRequest(
+                id.toString(),
+                null,
+                true,
+                provider);
+        return authService.authenticateAndGenerateToken(authRequest);
     }
 
     public void createUser(final AppUser user) {

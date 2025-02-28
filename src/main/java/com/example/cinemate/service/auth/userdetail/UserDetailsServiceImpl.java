@@ -63,10 +63,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userDetailsCacheService.addToCache(id.toString(), userDetails);
     }
 
-    public boolean checkUserInCache(final Integer id) {
-        return userDetailsCacheService.isHave(id.toString());
-    }
-
     private UserDetails createUserDetails(final AppUser user) {
         // установка ролей для данного пользователя
         List<GrantedAuthority> grantList = this.getRolesForUser(user.getId());

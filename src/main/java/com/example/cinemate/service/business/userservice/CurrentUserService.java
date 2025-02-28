@@ -28,12 +28,12 @@ public class CurrentUserService {
         String token = authService.tokenValidateFromHeader(request)
                 .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));
 
-        Integer id = authService.getUserIdByToken(token)
+        var appUserJwtDto = authService.getUserDataByToken(token)
                 .orElseThrow(() -> new UnauthorizedException("Invalid token"));
 
-        AppUser appUser = appUserService.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with id '" + id + "' was not found..."));
+        AppUser appUser = appUserService.findById(appUserJwtDto.getId())
+                .orElseThrow(() -> new UserNotFoundException("User with id '" + appUserJwtDto.getId() + "' was not found..."));
 
-        return appUserMapper.toUserDto(appUser);
+        return appUserMapper.toUserDto(appUser, appUserJwtDto.getProvider());
     }
 }

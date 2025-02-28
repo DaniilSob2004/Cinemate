@@ -9,7 +9,6 @@ import com.example.cinemate.exception.auth.*;
 import com.example.cinemate.service.auth.AuthService;
 import com.example.cinemate.service.auth.LoginService;
 import com.example.cinemate.service.auth.RegisterService;
-
 import com.example.cinemate.service.redis.BlacklistTokenRedisService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +47,7 @@ public class AuthController {
         // Basic authentication (получаем логин и пароль)
         LoginRequestDto loginRequestDto = loginService.getBaseAuthDataFromHeader(request).orElse(null);
         if (loginRequestDto == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponseDto("Invalid Basic Authentication", HttpStatus.BAD_REQUEST.value()));
         }
 

@@ -6,8 +6,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDetailsDto {  // DTO для сериализации UserDetails в кэш Redis
-    private Integer id;
+public class UserDetailsDto {  // DTO для сериализации CustomUserDetails в кэш Redis
+    private Integer id;  // добавили
     private String username;
     private String password;
     private boolean enabled;

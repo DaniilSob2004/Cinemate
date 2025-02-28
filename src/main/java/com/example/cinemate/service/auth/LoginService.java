@@ -1,6 +1,7 @@
 package com.example.cinemate.service.auth;
 
 import com.example.cinemate.dto.auth.LoginRequestDto;
+import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.utils.BaseAuthUtil;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,13 @@ public class LoginService {
     }
 
     public String loginUser(final LoginRequestDto loginRequestDto) {
-        loginRequestDto.setEmail(loginRequestDto.getEmail().toLowerCase());  // в нижний регистр
-        return authService.authenticateAndGenerateToken(loginRequestDto.getEmail(), loginRequestDto.getPassword(), false);
+        var authRequest = new AuthenticationRequest(
+                loginRequestDto.getEmail().toLowerCase(),
+                loginRequestDto.getPassword(),
+                false,
+                ""
+        );
+        return authService.authenticateAndGenerateToken(authRequest);
     }
 
     public Optional<LoginRequestDto> getBaseAuthDataFromHeader(final HttpServletRequest request) {

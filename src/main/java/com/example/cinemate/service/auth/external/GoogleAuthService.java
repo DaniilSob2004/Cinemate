@@ -15,13 +15,13 @@ public class GoogleAuthService extends BaseOAuthService {
     }
 
     @Override
-    public String processAuth(OAuth2User oauthUser) {
+    public String processAuth(OAuth2User oauthUser, String accessToken) {
         Logger.info("Google auth");
 
         // получаем данные
         AuthProvider provider = authProviderService.findByName("google")  // используется кеш
                 .orElseThrow(() -> new RuntimeException("Google provider not found"));
-        var googleUserAuthDto = oAuthUserMapper.toOAuthGoogleUserDto(oauthUser, provider);
+        var googleUserAuthDto = oAuthUserMapper.toOAuthGoogleUserDto(oauthUser, provider, accessToken);
         return registerOAuthService.registerUser(googleUserAuthDto);
     }
 }

@@ -19,12 +19,13 @@ public class AppUserMapper {
         this.grantedAuthorityMapper = grantedAuthorityMapper;
     }
 
-    public AppUserJwtDto toAppUserJwtDto(final UserDetails userDetails) {
+    public AppUserJwtDto toAppUserJwtDto(final UserDetails userDetails, final String provider) {
         if (userDetails instanceof CustomUserDetails customUserDetails) {
             return new AppUserJwtDto(
                     customUserDetails.getId(),
                     customUserDetails.getUsername(),
-                    grantedAuthorityMapper.toStringList(userDetails.getAuthorities())
+                    grantedAuthorityMapper.toStringList(userDetails.getAuthorities()),
+                    provider
             );
         }
         return new AppUserJwtDto();
@@ -38,6 +39,7 @@ public class AppUserMapper {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", appUserJwtDto.getEmail());
         claims.put("roles", appUserJwtDto.getRoles());
+        claims.put("provider", appUserJwtDto.getProvider());
 
         return claims;
     }
@@ -50,7 +52,8 @@ public class AppUserMapper {
         return new AppUserJwtDto(
                 Integer.valueOf(claims.getSubject()),  // id
                 claims.get("email", String.class),
-                grantedAuthorityMapper.toListRolesString(claims.get("roles"))  // список ролей
+                grantedAuthorityMapper.toListRolesString(claims.get("roles")),  // список ролей
+                claims.get("provider", String.class)
         );
     }
 
@@ -86,14 +89,15 @@ public class AppUserMapper {
         );
     }
 
-    public UserDto toUserDto(final AppUser appUser) {
+    public UserDto toUserDto(final AppUser appUser, final String provider) {
         return new UserDto(
                 appUser.getUsername(),
                 appUser.getFirstname(),
                 appUser.getSurname(),
                 appUser.getEmail(),
                 appUser.getPhoneNum(),
-                appUser.getAvatar()
+                appUser.getAvatar(),
+                provider
         );
     }
 }

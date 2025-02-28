@@ -11,13 +11,15 @@ import javax.servlet.http.HttpServletResponse;
 public class StartOAuthEvent extends ApplicationEvent {
 
     private final OAuth2User oauthUser;
+    private final String accessToken;
     private final String provider;
     private final HttpServletResponse response;
     @Setter private boolean responseHandled;
 
-    public StartOAuthEvent(Object source, OAuth2User oauthUser, String provider, HttpServletResponse response) {
+    public StartOAuthEvent(Object source, OAuth2User oauthUser, String accessToken, String provider, HttpServletResponse response) {
         super(source);
         this.oauthUser = oauthUser;
+        this.accessToken = accessToken;
         this.provider = provider;
         this.response = response;
         this.responseHandled = false;

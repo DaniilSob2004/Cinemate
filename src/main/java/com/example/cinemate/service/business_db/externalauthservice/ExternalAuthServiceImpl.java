@@ -5,6 +5,7 @@ import com.example.cinemate.model.db.ExternalAuth;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ExternalAuthServiceImpl implements ExternalAuthService {
@@ -43,6 +44,11 @@ public class ExternalAuthServiceImpl implements ExternalAuthService {
     @Override
     public void deleteAll() {
         externalAuthRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<ExternalAuth> findByUserId(Integer userId) {
+        return externalAuthRepository.findExternalAuthByUserId(userId);
     }
 
     @Override

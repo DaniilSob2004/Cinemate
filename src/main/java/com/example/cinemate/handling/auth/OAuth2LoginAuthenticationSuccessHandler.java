@@ -12,6 +12,8 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -26,11 +28,13 @@ import java.io.IOException;
 @Component
 public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler, ApplicationEventPublisherAware {
 
+    private final OAuth2AuthorizedClientService authorizedClientService;
     private final SendResponseUtil sendResponseUtil;
     private final RegisterValidate registerValidate;
     private ApplicationEventPublisher eventPublisher;
 
-    public OAuth2LoginAuthenticationSuccessHandler(SendResponseUtil sendResponseUtil, RegisterValidate registerValidate) {
+    public OAuth2LoginAuthenticationSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, SendResponseUtil sendResponseUtil, RegisterValidate registerValidate) {
+        this.authorizedClientService = authorizedClientService;
         this.sendResponseUtil = sendResponseUtil;
         this.registerValidate = registerValidate;
     }
@@ -51,11 +55,19 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
                     // валидация email (если ошибка, то исключение)
                     registerValidate.validateEmail(oauthUser.getAttribute("email"));
 
+                    // получаем провайдера
                     provider = StringUtil.capitalizeFirstLetter(oauthToken.getAuthorizedClientRegistrationId());
-                    Logger.info("Provider auth: " + provider);
 
-                    // вызываем событие (в publisher отправляется токен)
-                    var startOAuthEvent = new StartOAuthEvent(this, oauthUser, provider, response);
+                    // получаем Access Token
+                    OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                            oauthToken.getAuthorizedClientRegistrationId(),
+                            oauthToken.getName()
+                    );
+                    String accessToken = (authorizedClient != null)
+                            ? authorizedClient.getAccessToken().getTokenValue() : "";
+
+                    // вызываем событие (в publisher отправляется ответ токен)
+                    var startOAuthEvent = new StartOAuthEvent(this, oauthUser, accessToken, provider, response);
                     eventPublisher.publishEvent(startOAuthEvent);
                     if (startOAuthEvent.isResponseHandled()) {  // если ответ был отправлен
                         return;

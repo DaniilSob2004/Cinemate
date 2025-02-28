@@ -28,4 +28,7 @@ public class ExternalAuth {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "access_token")
+    private String accessToken;
 }
