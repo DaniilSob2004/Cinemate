@@ -2,10 +2,16 @@ package com.example.cinemate.service.business_db.userroleservice;
 
 import com.example.cinemate.dao.userrole.UserRoleRepository;
 import com.example.cinemate.model.db.UserRole;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
+@CacheConfig(cacheNames = "user::role")
 public class UserRoleServiceImpl implements UserRoleService {
 
     private final UserRoleRepository userRoleRepository;
@@ -25,11 +31,13 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
+    @CachePut(key = "#userRole.user.id")
     public void update(UserRole userRole) {
         userRoleRepository.save(userRole);
     }
 
     @Override
+    @CacheEvict(key = "#userRole.user.id")
     public void delete(UserRole userRole) {
         userRoleRepository.delete(userRole);
     }
@@ -44,8 +52,8 @@ public class UserRoleServiceImpl implements UserRoleService {
         userRoleRepository.deleteAll();
     }
 
-
     @Override
+    @Cacheable(key = "#userId")
     public List<String> getRoleNames(Integer userId) {
         return userRoleRepository.getRoleNames(userId);
     }

@@ -7,7 +7,6 @@ import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
-import com.example.cinemate.service.redis.UserRoleCacheService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,15 +22,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final AppUserService appUserService;
     private final UserRoleService userRoleService;
     private final UserDetailsCacheService userDetailsCacheService;
-    private final UserRoleCacheService userRoleCacheService;
     private final UserDetailsMapper userDetailsMapper;
     private final GrantedAuthorityMapper grantedAuthorityMapper;
 
-    public UserDetailsServiceImpl(AppUserService appUserService, UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, UserRoleCacheService userRoleCacheService, UserDetailsMapper userDetailsMapper, GrantedAuthorityMapper grantedAuthorityMapper) {
+    public UserDetailsServiceImpl(AppUserService appUserService, UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, UserDetailsMapper userDetailsMapper, GrantedAuthorityMapper grantedAuthorityMapper) {
         this.appUserService = appUserService;
         this.userRoleService = userRoleService;
         this.userDetailsCacheService = userDetailsCacheService;
-        this.userRoleCacheService = userRoleCacheService;
         this.userDetailsMapper = userDetailsMapper;
         this.grantedAuthorityMapper = grantedAuthorityMapper;
     }
@@ -72,32 +69,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private UserDetails createUserDetails(final AppUser user) {
         // установка ролей для данного пользователя
-        List<GrantedAuthority> grantList = this.setRolesForUser(user.getId());
+        List<GrantedAuthority> grantList = this.getRolesForUser(user.getId());
 
         // возвращаем объект внутреннего Spring UserDetails
         return userDetailsMapper.toCustomUserDetails(user, grantList);
     }
 
-    private List<GrantedAuthority> setRolesForUser(final Integer id) {
-        String userId = id.toString();
-
-        // находим роли пользователя в кэше
-        return userRoleCacheService.getRoles(userId)
-                .map(authority -> {
-                    Logger.info("UserRoles from Redis cache");
-                    return grantedAuthorityMapper.toGrantedAuthorities(authority);
-                })
-                .orElseGet(() -> {
-                    Logger.info("!!! CREATE UserRoles !!!");
-
-                    // установка ролей для пользователя
-                    List<String> roleNames = userRoleService.getRoleNames(id);
-                    List<GrantedAuthority> authorities = grantedAuthorityMapper.toGrantedAuthorities(roleNames);
-
-                    // записываем роли в кэш
-                    userRoleCacheService.addToCache(userId, authorities);
-
-                    return authorities;
-                });
+    private List<GrantedAuthority> getRolesForUser(final Integer id) {
+        List<String> roleNames = userRoleService.getRoleNames(id);  // используется кеш
+        return grantedAuthorityMapper.toGrantedAuthorities(roleNames);
     }
 }

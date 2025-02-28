@@ -2,31 +2,26 @@ package com.example.cinemate.service.auth.external;
 
 import com.example.cinemate.mapper.OAuthUserMapper;
 import com.example.cinemate.model.db.AuthProvider;
-import com.example.cinemate.service.auth.RegisterService;
 import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.tinylog.Logger;
 
 @Service
-public class GoogleAuthService implements OAuthService {
+public class GoogleAuthService extends BaseOAuthService {
 
-    private final AuthProviderService authProviderService;
-    private final RegisterService registerService;
-    private final OAuthUserMapper oAuthUserMapper;
-
-    public GoogleAuthService(AuthProviderService authProviderService, RegisterService registerService, OAuthUserMapper oAuthUserMapper) {
-        this.authProviderService = authProviderService;
-        this.registerService = registerService;
-        this.oAuthUserMapper = oAuthUserMapper;
+    public GoogleAuthService(AuthProviderService authProviderService, RegisterOAuthService registerOAuthService, OAuthUserMapper oAuthUserMapper) {
+        super(authProviderService, registerOAuthService, oAuthUserMapper);
     }
 
     @Override
     public String processAuth(OAuth2User oauthUser) {
-        // получаем данные
-        AuthProvider provider = authProviderService.findByName("google")
-                .orElseThrow(() -> new RuntimeException("Google provider not found"));
+        Logger.info("Google auth");
 
+        // получаем данные
+        AuthProvider provider = authProviderService.findByName("google")  // используется кеш
+                .orElseThrow(() -> new RuntimeException("Google provider not found"));
         var googleUserAuthDto = oAuthUserMapper.toOAuthGoogleUserDto(oauthUser, provider);
-        return registerService.registerUserWithOAuth(googleUserAuthDto);
+        return registerOAuthService.registerUser(googleUserAuthDto);
     }
 }

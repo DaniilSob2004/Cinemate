@@ -70,7 +70,7 @@ public class AppUserMapper {
         );
     }
 
-    public AppUser toAppUser(final OAuthUserDto oAuthUserDto, final String password) {
+    public AppUser toAppUser(final OAuthUserDto oAuthUserDto) {
         return new AppUser(
                 null,
                 oAuthUserDto.getUsername(),
@@ -78,7 +78,7 @@ public class AppUserMapper {
                 oAuthUserDto.getSurname(),
                 oAuthUserDto.getEmail(),
                 "",
-                password,
+                null,
                 "",
                 LocalDateTime.now(),
                 LocalDateTime.now(),

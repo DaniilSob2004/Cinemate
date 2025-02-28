@@ -47,7 +47,7 @@ public class UserDetailsMapper {
         );
     }
 
-    public CustomUserDetails toCustomUserDetails(final AppUser user, final List<GrantedAuthority> grantList) {
+    public UserDetails toCustomUserDetails(final AppUser user, final List<GrantedAuthority> grantList) {
         return new CustomUserDetails(
                 user.getId(),
                 user.getEmail(),

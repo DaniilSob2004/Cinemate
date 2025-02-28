@@ -3,6 +3,7 @@ A service for viewing video content. Thesis on backend.
 
 -------------------------------------------------------
  - Redis for:
+    - data from db: Role, UserRole, AuthProvider
     - blacklist users jwt-token logout
     - userdetails object
     - userroles object

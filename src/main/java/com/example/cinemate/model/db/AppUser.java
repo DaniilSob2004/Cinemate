@@ -32,7 +32,7 @@ public class AppUser {
     @Column(name = "phone_num")
     private String phoneNum;
 
-    @Column(name = "enc_password", nullable = false)
+    @Column(name = "enc_password")
     private String encPassword;
 
     @Column(name = "avatar")

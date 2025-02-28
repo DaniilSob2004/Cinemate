@@ -1,19 +1,21 @@
 package com.example.cinemate.service.auth.external;
 
+import com.example.cinemate.mapper.OAuthUserMapper;
+import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Service;
 
-@Service
-public class BaseOAuthService {
+public class BaseOAuthService implements OAuthService {
 
-    private final OAuthFactory authFactory;
+    protected final AuthProviderService authProviderService;
+    protected final RegisterOAuthService registerOAuthService;
+    protected final OAuthUserMapper oAuthUserMapper;
 
-    public BaseOAuthService(OAuthFactory authFactory) {
-        this.authFactory = authFactory;
+    public BaseOAuthService(AuthProviderService authProviderService, RegisterOAuthService registerOAuthService, OAuthUserMapper oAuthUserMapper) {
+        this.authProviderService = authProviderService;
+        this.registerOAuthService = registerOAuthService;
+        this.oAuthUserMapper = oAuthUserMapper;
     }
 
-    public String processOAuth(String provider, OAuth2User oauthUser) {
-        OAuthService authService = authFactory.getAuthService(provider);  // получение сервиса по названию провайдера
-        return authService.processAuth(oauthUser);  // запуск авторизации
-    }
+    @Override
+    public String processAuth(OAuth2User oauthUser) { return ""; }
 }
