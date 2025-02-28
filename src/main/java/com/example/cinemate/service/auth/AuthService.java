@@ -1,12 +1,14 @@
 package com.example.cinemate.service.auth;
 
+import com.example.cinemate.dto.auth.ResponseAuthDto;
+import com.example.cinemate.dto.auth.RefreshTokenDto;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.model.CustomUserDetails;
+import com.example.cinemate.service.auth.jwt.*;
 import com.example.cinemate.service.auth.userdetail.UserDetailsServiceImpl;
-import com.example.cinemate.utils.JwtTokenUtil;
 import lombok.NonNull;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,31 +19,31 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
-
 @Service
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final AccessJwtTokenService accessJwtTokenService;
+    private final RefreshJwtTokenService refreshJwtTokenService;
     private final UserDetailsServiceImpl userDetailsService;
     private final AppUserMapper appUserMapper;
 
     public AuthService(
             @Lazy AuthenticationManager authenticationManager,
-            JwtTokenUtil jwtTokenUtil,
+            AccessJwtTokenService accessJwtTokenService,
+            RefreshJwtTokenService refreshJwtTokenService,
             UserDetailsServiceImpl userDetailsService,
             AppUserMapper appUserMapper) {
         this.authenticationManager = authenticationManager;
-        this.jwtTokenUtil = jwtTokenUtil;
+        this.accessJwtTokenService = accessJwtTokenService;
+        this.refreshJwtTokenService = refreshJwtTokenService;
         this.userDetailsService = userDetailsService;
         this.appUserMapper = appUserMapper;
     }
 
     public void authorizationUserByToken(final String token) {
         // извлекаем данные пользователя из токена
-        AppUserJwtDto appUserJwtDto = jwtTokenUtil.extractAllUserData(token);
+        AppUserJwtDto appUserJwtDto = accessJwtTokenService.extractAllData(token);
 
         Logger.info("(authorizationUserByToken) AppUserJwtDto: " + appUserJwtDto);
 
@@ -57,14 +59,18 @@ public class AuthService {
         throw new UserNotFoundException("User '" + appUserJwtDto.getEmail() + "' was not found");
     }
 
-    public String authenticateAndGenerateToken(@NonNull final AuthenticationRequest authRequest) {
+    public ResponseAuthDto authenticateAndGenerateToken(@NonNull final AuthenticationRequest authRequest) {
         // аутентификация пользователя
         UserDetails userDetails = this.getAuthenticatedUserDetails(authRequest);
 
-        // после успешной аутентификации добавляем в кэш и генерация токена
+        // после успешной аутентификации добавляем в кэш и генерируем два токена
         if (this.addUserDetailsToCache(userDetails)) {
-            AppUserJwtDto appUserJwtDto = appUserMapper.toAppUserJwtDto(userDetails, authRequest.getProvider());
-            return jwtTokenUtil.generateToken(appUserJwtDto);
+            var appUserJwtDto = appUserMapper.toAppUserJwtDto(userDetails, authRequest.getProvider());
+            var refreshTokenDto = new RefreshTokenDto(appUserJwtDto.getId());
+            return new ResponseAuthDto(
+                    accessJwtTokenService.generateToken(appUserJwtDto),
+                    refreshJwtTokenService.generateAndSaveToken(refreshTokenDto)
+            );
         }
 
         // исключение, если пользователь не найден
@@ -72,15 +78,6 @@ public class AuthService {
                 authRequest.isId()
                 ? "User '" + authRequest.getUsernameOrId() + "' was not found"
                 : "User with id '" + authRequest.getUsernameOrId() + "' was not found");
-    }
-
-    public Optional<String> tokenValidateFromHeader(final HttpServletRequest request) {
-        return jwtTokenUtil.getTokenByAuthHeader(request)
-                .filter(jwtTokenUtil::validateToken);
-    }
-
-    public Optional<AppUserJwtDto> getUserDataByToken(final String token) {
-        return Optional.ofNullable(token).map(jwtTokenUtil::extractAllUserData);
     }
 
     private boolean addUserDetailsToCache(final UserDetails userDetails) {

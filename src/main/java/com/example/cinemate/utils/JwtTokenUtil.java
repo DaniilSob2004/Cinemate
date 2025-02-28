@@ -1,15 +1,13 @@
 package com.example.cinemate.utils;
 
-import com.example.cinemate.mapper.AppUserMapper;
-import com.example.cinemate.dto.auth.AppUserJwtDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtTokenUtil {
@@ -17,47 +15,22 @@ public class JwtTokenUtil {
     @Value("${security.secret_key}")
     private String secretKey;
 
-    @Value("${security.expiration_time}")
-    private Long expirationTime;
-
-    @Value("${security.header_auth_name}")
-    private String headerAuthName;
-
-    @Value("${security.header_value_auth_prefix}")
-    private String headerValueAuthPrefix;
-
-    private final AppUserMapper appUserMapper;
-
-    public JwtTokenUtil(AppUserMapper appUserMapper) {
-        this.appUserMapper = appUserMapper;
-    }
-
-
     // Генерация токена
-    public String generateToken(final AppUserJwtDto appUserJwtDto) {
-        Map<String, Object> claims = appUserMapper.toClaimsJwt(appUserJwtDto);  // получаем данные польз.
+    public String generateToken(final Map<String, Object> claims, final String subject, final long expirationTimeMin) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .setSubject(appUserJwtDto.getId().toString())  // id
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMin * 60 * 1000))
+                .setSubject(subject)  // id
                 .setIssuedAt(new Date())
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Получение данных
-    public AppUserJwtDto extractAllUserData(final String token) {
-        Claims claims = getClaims(token);
-        return appUserMapper.toAppUserJwtDto(claims);  // получаем данные польз. из claims
-    }
-
-    public Integer extractSubject(final String token) {
-        Claims claims = getClaims(token);
-        return Integer.parseInt(claims.getSubject());  // id
-    }
-
     // Проверка токена
     public boolean validateToken(final String token) {
+        if (token.isEmpty()) {
+            return false;
+        }
         try {
             return !isTokenExpired(token);
         } catch (JwtException e) {
@@ -65,44 +38,52 @@ public class JwtTokenUtil {
         }
     }
 
-    // Получение токена из заголовка запроса
-    public Optional<String> getTokenByAuthHeader(final HttpServletRequest request) {
-        // извлекаем заголовок 'Authorization' с префиксом Bearer, и извлекаем токен JWT (если есть) и проверяем его валидность
-        String authHeader = request.getHeader(headerAuthName);
-        return this.getTokenFromAuthHeaderStr(authHeader);
+    public boolean validateTokenWithoutExpiration(final String token) {
+        if (token.isEmpty()) {
+            return false;
+        }
+        try {
+            getClaimsFromExpiredToken(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
-    public Optional<String> getTokenFromAuthHeaderStr(final String authHeader) {
-        if (authHeader != null && authHeader.startsWith(headerValueAuthPrefix)) {
-            return Optional.of(authHeader.substring(headerValueAuthPrefix.length() + 1));
+    // Извлечение всех claims
+    public Claims getClaims(final String token) {
+        Jws<Claims> jws = Jwts.parser()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseSignedClaims(token);
+        return jws.getPayload();
+    }
+
+    public Claims getClaimsFromExpiredToken(final String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
         }
-        return Optional.empty();
     }
 
     // Получение даты истечения токена
     public Date getExpirationDateFromToken(final String token) {
-        Claims claims = this.getClaims(token);
+        Claims claims = getClaims(token);
         return claims.getExpiration();
     }
-
 
     // Получение ключа
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    // Извлечение всех claims
-    private Claims getClaims(final String token) {
-        Jws<Claims> jws = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseSignedClaims(token);
-
-        return jws.getPayload();
-    }
-
     // Проверка истечения срока токена
     private boolean isTokenExpired(final String token) {
-        return this.getClaims(token).getExpiration().before(new Date());
+        return getClaims(token).getExpiration().before(new Date());
     }
 }

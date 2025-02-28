@@ -1,15 +1,17 @@
 package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
-import com.example.cinemate.dto.auth.AuthResponseDto;
-import com.example.cinemate.dto.auth.LoginRequestDto;
+import com.example.cinemate.dto.auth.ResponseAuthDto;
+import com.example.cinemate.dto.auth.LogoutRequestDto;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
+import com.example.cinemate.dto.auth.UpdateAccessTokenDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.exception.auth.*;
-import com.example.cinemate.service.auth.AuthService;
+import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.service.auth.LoginService;
+import com.example.cinemate.service.auth.LogoutService;
 import com.example.cinemate.service.auth.RegisterService;
-import com.example.cinemate.service.redis.BlacklistTokenRedisService;
+import com.example.cinemate.service.auth.UpdateTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,76 +25,49 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.AUTH)
 public class AuthController {
 
-    private final AuthService authService;
     private final LoginService loginService;
     private final RegisterService registerService;
-    private final BlacklistTokenRedisService blacklistTokenRedisService;
+    private final UpdateTokenService updateTokenService;
+    private final LogoutService logoutService;
 
-    public AuthController(AuthService authService, LoginService loginService, RegisterService registerService, BlacklistTokenRedisService blacklistTokenRedisService) {
-        this.authService = authService;
+    public AuthController(LoginService loginService, RegisterService registerService, UpdateTokenService updateTokenService, LogoutService logoutService) {
         this.loginService = loginService;
         this.registerService = registerService;
-        this.blacklistTokenRedisService = blacklistTokenRedisService;
+        this.updateTokenService = updateTokenService;
+        this.logoutService = logoutService;
     }
 
     @PostMapping(value = Endpoint.LOGIN)
     public ResponseEntity<?> login(HttpServletRequest request) {
-        // проверяем, есть ли токен в заголовке и валидный ли он
-        String token = authService.tokenValidateFromHeader(request).orElse(null);
-        if (token != null) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorResponseDto("User already authenticated", HttpStatus.BAD_REQUEST.value()));
-        }
-
-        // Basic authentication (получаем логин и пароль)
-        LoginRequestDto loginRequestDto = loginService.getBaseAuthDataFromHeader(request).orElse(null);
-        if (loginRequestDto == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponseDto("Invalid Basic Authentication", HttpStatus.BAD_REQUEST.value()));
-        }
-
         // аутентификация и генерация токена
         ErrorResponseDto errorResponseDto;
         try {
-            Logger.info("-------- User Login (" + loginRequestDto.getEmail() + ") --------");
-
-            token = loginService.loginUser(loginRequestDto);
-
+            ResponseAuthDto responseAuthDto = loginService.loginUser(request);
             Logger.info("User authenticated!");
+            return ResponseEntity.ok(responseAuthDto);  // отправляем два токена
 
-            return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
-
+        } catch (BadRequestException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (BadCredentialsException | InternalAuthenticationServiceException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        }  catch (Exception e) {
+        } catch (Exception e) {
             Logger.error(e.getMessage());
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
     @PostMapping(value = Endpoint.REGISTER)
-    public ResponseEntity<?> register(HttpServletRequest request, @RequestBody RegisterRequestDto registerRequestDto) {
-        // проверяем, есть ли токен в заголовке и валидный ли он
-        String token = authService.tokenValidateFromHeader(request).orElse(null);
-        if (token != null) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorResponseDto("User already authenticated", HttpStatus.BAD_REQUEST.value()));
-        }
-
+    public ResponseEntity<?> register(@RequestBody RegisterRequestDto registerRequestDto) {
         // регистрация и генерация токена
         ErrorResponseDto errorResponseDto;
         try {
             Logger.info("-------- User Register (" + registerRequestDto + ") --------");
-
-            token = registerService.registerUser(registerRequestDto);
-
+            ResponseAuthDto responseAuthDto = registerService.registerUser(registerRequestDto);
             Logger.info("User registered!");
-
-            return ResponseEntity.ok(new AuthResponseDto(token));  // отправка токена
+            return ResponseEntity.ok(responseAuthDto);  // отправляем два токена
 
         } catch (UserAlreadyExistsException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
@@ -103,25 +78,41 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (Exception e) {
+            Logger.error(e.getMessage());
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+    }
 
+    @PostMapping(value = Endpoint.UPDATE_ACCESS_TOKEN)
+    public ResponseEntity<?> updateAccessToken(@RequestBody UpdateAccessTokenDto updateAccessTokenDto, HttpServletRequest request) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            String accessToken = updateTokenService.updateAccessToken(updateAccessTokenDto, request);
+            return ResponseEntity.ok(new UpdateAccessTokenDto(accessToken));
+        } catch (BadRequestException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        } catch (UnauthorizedException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
     @PostMapping(value = Endpoint.LOGOUT)
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        String token = authService.tokenValidateFromHeader(request).orElse(null);
-        if (token == null) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value()));
+    public ResponseEntity<?> logout(@RequestBody LogoutRequestDto logoutRequestDto, HttpServletRequest request) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            logoutService.logoutUser(logoutRequestDto, request);
+            return ResponseEntity.ok("Logout successful");
+        } catch (UnauthorizedException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-
-        Logger.info("-------- Token in logout controller (" + token + ") --------");
-
-        // добавление токена в 'Redis' blacklist (чтобы до истечение срока нельзя было его использ.)
-        blacklistTokenRedisService.addToBlacklist(token);
-
-        return ResponseEntity.ok("Logout successful");
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 }

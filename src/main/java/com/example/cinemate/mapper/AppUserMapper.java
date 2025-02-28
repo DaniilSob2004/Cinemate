@@ -4,6 +4,7 @@ import com.example.cinemate.dto.auth.*;
 import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.model.db.AppUser;
 import io.jsonwebtoken.Claims;
+import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -32,28 +33,30 @@ public class AppUserMapper {
     }
 
     public Map<String, Object> toClaimsJwt(final AppUserJwtDto appUserJwtDto) {
-        if (appUserJwtDto == null) {
-            return Map.of();
-        }
-
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", appUserJwtDto.getEmail());
         claims.put("roles", appUserJwtDto.getRoles());
         claims.put("provider", appUserJwtDto.getProvider());
-
         return claims;
     }
 
-    public AppUserJwtDto toAppUserJwtDto(final Claims claims) {
-        if (claims == null) {
-            return new AppUserJwtDto();
-        }
+    public Map<String, Object> toClaimsJwt(final RefreshTokenDto refreshTokenDto) {
+        Map<String, Object> claims = new HashMap<>();
+        return claims;
+    }
 
+    public AppUserJwtDto toAppUserJwtDto(@NonNull final Claims claims) {
         return new AppUserJwtDto(
                 Integer.valueOf(claims.getSubject()),  // id
                 claims.get("email", String.class),
                 grantedAuthorityMapper.toListRolesString(claims.get("roles")),  // список ролей
                 claims.get("provider", String.class)
+        );
+    }
+
+    public RefreshTokenDto toRefreshTokenDto(@NonNull final Claims claims) {
+        return new RefreshTokenDto(
+                Integer.valueOf(claims.getSubject())  // id
         );
     }
 

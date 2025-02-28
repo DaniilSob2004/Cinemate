@@ -1,6 +1,7 @@
 package com.example.cinemate.service.redis;
 
-import com.example.cinemate.utils.JwtTokenUtil;
+import com.example.cinemate.utils.DateTimeUtil;
+import com.example.cinemate.service.auth.jwt.JwtTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -17,16 +18,16 @@ public class BlacklistTokenRedisService extends AbstractRedisRepository<String> 
     @Value("${redis_data.blacklist_token_key_prefix}")
     private String blacklistTokenKeyPrefix;
 
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenService jwtTokenService;
 
-    public BlacklistTokenRedisService(RedisTemplate<String, String> redisBlacklistTokenTemplate, JwtTokenUtil jwtTokenUtil) {
+    public BlacklistTokenRedisService(RedisTemplate<String, String> redisBlacklistTokenTemplate, JwtTokenService jwtTokenService) {
         super(redisBlacklistTokenTemplate);
-        this.jwtTokenUtil = jwtTokenUtil;
+        this.jwtTokenService = jwtTokenService;
     }
 
     public void addToBlacklist(final String token) {
-        Date expirationDate = jwtTokenUtil.getExpirationDateFromToken(token);
-        long ttl = (expirationDate.getTime() - System.currentTimeMillis()) / 1000;
+        Date expirationDate = jwtTokenService.getExpirationDateFromToken(token);
+        long ttl = DateTimeUtil.calculateTtl(expirationDate);
 
         if (ttl > 0 && !this.exists(token)) {
             String key = blacklistTokenKeyPrefix + token;

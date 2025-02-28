@@ -41,8 +41,7 @@ public class UserDetailsCacheService extends AbstractRedisRepository<UserDetails
         // преобразовываем в UserDetails
         String key = userDetailsPrefix + id;
         var userDetailsDto = this.get(key);
-        return Optional.ofNullable(userDetailsDto)
-                .map(userDetailsMapper::toUserDetails);
+        return Optional.ofNullable(userDetailsDto).map(userDetailsMapper::toUserDetails);
     }
 
     public void remove(final String id) {

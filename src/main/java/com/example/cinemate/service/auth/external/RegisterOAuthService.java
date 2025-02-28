@@ -1,5 +1,6 @@
 package com.example.cinemate.service.auth.external;
 
+import com.example.cinemate.dto.auth.ResponseAuthDto;
 import com.example.cinemate.dto.auth.OAuthUserDto;
 import com.example.cinemate.exception.auth.OAuthException;
 import com.example.cinemate.mapper.AppUserMapper;
@@ -30,7 +31,7 @@ public class RegisterOAuthService {
     }
 
     @Transactional
-    public String registerUser(final OAuthUserDto oAuthUserDto) {
+    public ResponseAuthDto registerUser(final OAuthUserDto oAuthUserDto) {
         oAuthUserDto.setEmail(oAuthUserDto.getEmail().toLowerCase());
 
         // если пользователь есть
@@ -43,6 +44,8 @@ public class RegisterOAuthService {
             )) {
                 throw new OAuthException("This email is already associated with another OAuth provider");
             }
+
+            // TODO: если вход, то обновляем запись в ExternalAuth
         }
         else {  // если пользователь нет, то создаём
             user = this.createNewUserFromOAuth(oAuthUserDto);

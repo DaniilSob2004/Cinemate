@@ -36,7 +36,8 @@ spring:
 
 security:
   secret_key: "********************"
-  expiration_time: 300000  # 300000 5 min 3600000 60 min
+  access_token_expiration_time: 5  # 5 min
+  refresh_token_expiration_time: 30  # 30 min
   header_auth_name: Authorization
   header_value_auth_prefix: Bearer
   header_value_basic_auth_prefix: Basic
@@ -45,6 +46,7 @@ redis_data:
   blacklist_token_value: "blacklisted"
   blacklist_token_key_prefix: "blacklist::token::"
   user_details_prefix: "user::details::"
+  refresh_token_key_prefix: "refresh_token::"
   user_details_expiration_time: 3600  # 3600 60 min
   base_redis_expiration_time: 3600  # 3600 60 min
 

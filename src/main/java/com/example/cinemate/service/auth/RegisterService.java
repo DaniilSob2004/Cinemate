@@ -1,5 +1,6 @@
 package com.example.cinemate.service.auth;
 
+import com.example.cinemate.dto.auth.ResponseAuthDto;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
 import com.example.cinemate.model.AuthenticationRequest;
@@ -41,7 +42,7 @@ public class RegisterService {
     }
 
     @Transactional
-    public String registerUser(final RegisterRequestDto registerRequestDto) {
+    public ResponseAuthDto registerUser(final RegisterRequestDto registerRequestDto) {
         registerRequestDto.setEmail(registerRequestDto.getEmail().toLowerCase());
 
         // проверка данных (если ошибка, то будет исключение)
@@ -55,7 +56,7 @@ public class RegisterService {
         return this.authenticateAndGenerateToken(user.getId(), "");  // авторизация и генерация токена
     }
 
-    public String authenticateAndGenerateToken(final Integer id, final String provider) {
+    public ResponseAuthDto authenticateAndGenerateToken(final Integer id, final String provider) {
         var authRequest = new AuthenticationRequest(
                 id.toString(),
                 null,

@@ -1,6 +1,6 @@
 package com.example.cinemate.utils;
 
-import com.example.cinemate.dto.auth.AuthResponseDto;
+import com.example.cinemate.dto.auth.ResponseAuthDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
@@ -28,8 +28,8 @@ public class SendResponseUtil {
         response.getWriter().flush();
     }
 
-    public void sendData(final HttpServletResponse response, final AuthResponseDto authResponseDto) throws IOException {
-        String jsonResponse = objectMapper.writeValueAsString(authResponseDto);
+    public void sendData(final HttpServletResponse response, final ResponseAuthDto responseAuthDto) throws IOException {
+        String jsonResponse = objectMapper.writeValueAsString(responseAuthDto);
 
         // устанавливаем заголовки, статус и отправляем
         response.setStatus(HttpServletResponse.SC_OK);

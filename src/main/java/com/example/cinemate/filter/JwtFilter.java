@@ -2,6 +2,7 @@ package com.example.cinemate.filter;
 
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.service.auth.AuthService;
+import com.example.cinemate.service.auth.jwt.JwtTokenService;
 import com.example.cinemate.service.redis.BlacklistTokenRedisService;
 import com.example.cinemate.utils.SendResponseUtil;
 import lombok.NonNull;
@@ -18,14 +19,16 @@ import java.io.IOException;
 
 // фильтрация HTTP-запросов и проверка JWT-токена
 @Component
-public class JwtFilter extends OncePerRequestFilter{
+public class JwtFilter extends OncePerRequestFilter {
 
     private final AuthService authService;
+    private final JwtTokenService jwtTokenService;
     private final BlacklistTokenRedisService blacklistTokenRedisService;
     private final SendResponseUtil sendResponseUtil;
 
-    public JwtFilter(AuthService authService, BlacklistTokenRedisService blacklistTokenRedisService, SendResponseUtil sendResponseUtil) {
+    public JwtFilter(AuthService authService, JwtTokenService jwtTokenService, BlacklistTokenRedisService blacklistTokenRedisService, SendResponseUtil sendResponseUtil) {
         this.authService = authService;
+        this.jwtTokenService = jwtTokenService;
         this.blacklistTokenRedisService = blacklistTokenRedisService;
         this.sendResponseUtil = sendResponseUtil;
     }
@@ -34,10 +37,10 @@ public class JwtFilter extends OncePerRequestFilter{
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain chain) throws ServletException, IOException {
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             // проверяем, есть ли токен в заголовке и валидный ли он
-            authService.tokenValidateFromHeader(request)
+            jwtTokenService.getValidateTokenFromHeader(request)
                     .ifPresent(token -> {
                         Logger.info("-------- JWT auth filter ({}) --------", token);
 
@@ -56,7 +59,7 @@ public class JwtFilter extends OncePerRequestFilter{
                         }
                         authService.authorizationUserByToken(token);  // авторизация пользователя
                     });
-            chain.doFilter(request, response);
+            filterChain.doFilter(request, response);
         } finally {
             // после каждого запроса очищаем контекст, чтобы не запоминался польз. (чтобы отправлять всегда токен)
             SecurityContextHolder.clearContext();

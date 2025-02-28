@@ -1,6 +1,6 @@
 package com.example.cinemate.listener;
 
-import com.example.cinemate.dto.auth.AuthResponseDto;
+import com.example.cinemate.dto.auth.ResponseAuthDto;
 import com.example.cinemate.event.StartOAuthEvent;
 import com.example.cinemate.service.auth.external.OAuthFactory;
 import com.example.cinemate.service.auth.external.OAuthService;
@@ -30,17 +30,17 @@ public class OAuthListener {
         if (oauthUser != null) {
             // вход/регистрация
             OAuthService authService = authFactory.getAuthService(event.getProvider());  // получение сервиса по названию провайдера
-            String token = authService.processAuth(oauthUser, event.getAccessToken());  // запуск авторизации
+            var authResponseDto = authService.processAuth(oauthUser, event.getAccessToken());  // запуск авторизации
 
             // отправляем json ответ с токеном
-            this.sendAuthResponse(event, token);
+            this.sendAuthResponse(event, authResponseDto);
         }
     }
 
-    private void sendAuthResponse(final StartOAuthEvent event, final String token) {
+    private void sendAuthResponse(final StartOAuthEvent event, final ResponseAuthDto responseAuthDto) {
         try {
-            Logger.info("Token - " + token);
-            sendResponseUtil.sendData(event.getResponse(), new AuthResponseDto(token));
+            Logger.info(responseAuthDto);
+            sendResponseUtil.sendData(event.getResponse(), responseAuthDto);
             event.setResponseHandled(true);  // флаг ответ отправлен
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
