@@ -9,7 +9,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 @Component
-public class BaseAuthUtils {
+public class BaseAuthUtil {
 
     @Value("${security.header_auth_name}")
     private String headerAuthName;

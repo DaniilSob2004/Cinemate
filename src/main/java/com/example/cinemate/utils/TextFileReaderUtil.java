@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @UtilityClass
-public class TextFileReader {
+public class TextFileReaderUtil {
     public static List<String> ReadTextFile(final String fileName) {
         try {
             return Files.readAllLines(Paths.get(fileName));

@@ -97,8 +97,7 @@ public class AuthService {
     private UserDetails authenticateUser(final String username, final String password) {
         // аутентификацию пользователя (логин, пароль, роли)
         var usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(username, password
-        );
+                new UsernamePasswordAuthenticationToken(username, password);
 
         // устанавливаем аутентификацию в контекст безопасности Spring
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);

@@ -44,4 +44,9 @@ public class ExternalAuthServiceImpl implements ExternalAuthService {
     public void deleteAll() {
         externalAuthRepository.deleteAll();
     }
+
+    @Override
+    public boolean existsByProviderAndExternalId(String providerName, String externalId) {
+        return externalAuthRepository.existsByProviderNameAndExternalId(providerName, externalId);
+    }
 }

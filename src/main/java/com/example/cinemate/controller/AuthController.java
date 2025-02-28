@@ -97,7 +97,7 @@ public class AuthController {
 
         } catch (UserAlreadyExistsException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        } catch (PasswordMismatchException e) {
+        } catch (PasswordMismatchException | InvalidEmailException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());

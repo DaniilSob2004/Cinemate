@@ -8,13 +8,13 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GoogleAuthService implements OAuthService {
+public class FacebookAuthService implements OAuthService {
 
     private final AuthProviderService authProviderService;
     private final RegisterService registerService;
     private final OAuthUserMapper oAuthUserMapper;
 
-    public GoogleAuthService(AuthProviderService authProviderService, RegisterService registerService, OAuthUserMapper oAuthUserMapper) {
+    public FacebookAuthService(AuthProviderService authProviderService, RegisterService registerService, OAuthUserMapper oAuthUserMapper) {
         this.authProviderService = authProviderService;
         this.registerService = registerService;
         this.oAuthUserMapper = oAuthUserMapper;
@@ -23,10 +23,10 @@ public class GoogleAuthService implements OAuthService {
     @Override
     public String processAuth(OAuth2User oauthUser) {
         // получаем данные
-        AuthProvider provider = authProviderService.findByName("google")
-                .orElseThrow(() -> new RuntimeException("Google provider not found"));
+        AuthProvider provider = authProviderService.findByName("facebook")
+                .orElseThrow(() -> new RuntimeException("Facebook provider not found"));
 
-        var googleUserAuthDto = oAuthUserMapper.toOAuthGoogleUserDto(oauthUser, provider);
-        return registerService.registerUserWithOAuth(googleUserAuthDto);
+        var facebookUserAuthDto = oAuthUserMapper.toOAuthFacebookUserDto(oauthUser, provider);
+        return registerService.registerUserWithOAuth(facebookUserAuthDto);
     }
 }

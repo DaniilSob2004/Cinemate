@@ -2,13 +2,14 @@ package com.example.cinemate.handling.auth;
 
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.event.StartOAuthEvent;
-import com.example.cinemate.exception.auth.UserAlreadyExistsException;
-import com.example.cinemate.exception.auth.UserNotFoundException;
+import com.example.cinemate.exception.auth.*;
 import com.example.cinemate.utils.SendResponseUtil;
-import com.example.cinemate.utils.StringUtils;
+import com.example.cinemate.utils.StringUtil;
+import com.example.cinemate.validate.RegisterValidate;
 import lombok.NonNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -26,10 +27,12 @@ import java.io.IOException;
 public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler, ApplicationEventPublisherAware {
 
     private final SendResponseUtil sendResponseUtil;
+    private final RegisterValidate registerValidate;
     private ApplicationEventPublisher eventPublisher;
 
-    public OAuth2LoginAuthenticationSuccessHandler(SendResponseUtil sendResponseUtil) {
+    public OAuth2LoginAuthenticationSuccessHandler(SendResponseUtil sendResponseUtil, RegisterValidate registerValidate) {
         this.sendResponseUtil = sendResponseUtil;
+        this.registerValidate = registerValidate;
     }
 
     @Override
@@ -44,24 +47,27 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
 
                     // получаем данные авторизации google
                     OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
-                    provider = StringUtils.capitalizeFirstLetter(oauthToken.getAuthorizedClientRegistrationId());
 
+                    // валидация email (если ошибка, то исключение)
+                    registerValidate.validateEmail(oauthUser.getAttribute("email"));
+
+                    provider = StringUtil.capitalizeFirstLetter(oauthToken.getAuthorizedClientRegistrationId());
                     Logger.info("Provider auth: " + provider);
 
                     // вызываем событие (в publisher отправляется токен)
                     var startOAuthEvent = new StartOAuthEvent(this, oauthUser, provider, response);
                     eventPublisher.publishEvent(startOAuthEvent);
-
-                    // если ответ был отправлен
-                    if (startOAuthEvent.isResponseHandled()) {
+                    if (startOAuthEvent.isResponseHandled()) {  // если ответ был отправлен
                         return;
                     }
                 }
             }
             errorResponse = new ErrorResponseDto(provider + " authentication failed", HttpServletResponse.SC_UNAUTHORIZED);
 
-        } catch (UserAlreadyExistsException e) {
+        } catch (UserAlreadyExistsException | OAuthException e) {
             errorResponse = new ErrorResponseDto(e.getMessage(), HttpServletResponse.SC_CONFLICT);
+        } catch (InvalidEmailException e) {
+            errorResponse = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (BadCredentialsException | UserNotFoundException e) {
             errorResponse = new ErrorResponseDto(e.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
         } catch (Exception e) {

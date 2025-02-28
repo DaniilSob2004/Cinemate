@@ -6,7 +6,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GoogleUserAuthDto {
+public class OAuthUserDto {
     private String externalId;
     private String email;
     private String username;

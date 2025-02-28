@@ -16,6 +16,10 @@ A service for viewing video content. Thesis on backend.
  - ![Image](https://github.com/user-attachments/assets/e6a011ff-4ef6-4eb2-a51c-2a5e967ab347)
 
 -------------------------------------------------------
+ - Facebook authorization
+ - 
+ - ![Image](https://github.com/user-attachments/assets/fa2b3f64-df33-4e6e-b13b-a0b1e17af7fb)
+-------------------------------------------------------
  - Login / Register / Logout / GetUserById / GetCurrentUser / SecureTestPhoto (Endpoints)
  - 
  - ![Image](https://github.com/user-attachments/assets/5cca4c2e-c5e6-416d-be35-6c87b4e6bcb6)

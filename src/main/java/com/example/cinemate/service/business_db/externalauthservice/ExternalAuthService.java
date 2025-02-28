@@ -1,6 +1,7 @@
 package com.example.cinemate.service.business_db.externalauthservice;
 
 import com.example.cinemate.model.db.ExternalAuth;
+
 import java.util.List;
 
 public interface ExternalAuthService {
@@ -10,4 +11,6 @@ public interface ExternalAuthService {
     void delete(ExternalAuth externalAuth);
     List<ExternalAuth> findAll();
     void deleteAll();
+
+    boolean existsByProviderAndExternalId(String providerName, String externalId);
 }

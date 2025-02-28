@@ -70,13 +70,13 @@ public class AppUserMapper {
         );
     }
 
-    public AppUser toAppUser(final GoogleUserAuthDto googleUserAuthDto, final String password) {
+    public AppUser toAppUser(final OAuthUserDto oAuthUserDto, final String password) {
         return new AppUser(
                 null,
-                googleUserAuthDto.getUsername(),
-                googleUserAuthDto.getFirstname(),
-                googleUserAuthDto.getSurname(),
-                googleUserAuthDto.getEmail(),
+                oAuthUserDto.getUsername(),
+                oAuthUserDto.getFirstname(),
+                oAuthUserDto.getSurname(),
+                oAuthUserDto.getEmail(),
                 "",
                 password,
                 "",

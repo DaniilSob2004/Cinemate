@@ -25,21 +25,23 @@ public class OAuthListener {
 
     @EventListener
     public void handleOAuthEvent(@NonNull final StartOAuthEvent event) {
-        OAuth2User user = event.getOauthUser();  // получаем данные авторизации google
-        if (user != null) {
+        OAuth2User oauthUser = event.getOauthUser();  // получаем данные авторизации google
+        if (oauthUser != null) {
             // вход/регистрация
-            String token = baseOAuthService.processOAuth(event.getProvider(), user);
-            AuthResponseDto authResponseDto = new AuthResponseDto(token);
-
-            Logger.info("Token - " + authResponseDto.getToken());
+            String token = baseOAuthService.processOAuth(event.getProvider(), oauthUser);
 
             // отправляем json ответ с токеном
-            try {
-                sendResponseUtil.sendData(event.getResponse(), authResponseDto);
-                event.setResponseHandled(true);  // флаг ответ отправлен
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            this.sendAuthResponse(event, token);
+        }
+    }
+
+    private void sendAuthResponse(final StartOAuthEvent event, final String token) {
+        try {
+            Logger.info("Token - " + token);
+            sendResponseUtil.sendData(event.getResponse(), new AuthResponseDto(token));
+            event.setResponseHandled(true);  // флаг ответ отправлен
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

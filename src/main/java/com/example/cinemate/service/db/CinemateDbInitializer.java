@@ -7,7 +7,7 @@ import com.example.cinemate.service.business_db.externalauthservice.ExternalAuth
 import com.example.cinemate.service.business_db.roleservice.RoleService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.utils.GenerateUtil;
-import com.example.cinemate.utils.TextFileReader;
+import com.example.cinemate.utils.TextFileReaderUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
@@ -64,9 +64,9 @@ public class CinemateDbInitializer {
 
     @PostConstruct
     public void init() {
-        Surnames = TextFileReader.ReadTextFile(dataSurname);
-        Usernames = TextFileReader.ReadTextFile(dataUsername);
-        DeleteTablesLines = TextFileReader.ReadTextFile(deleteTablesSql);
+        Surnames = TextFileReaderUtil.ReadTextFile(dataSurname);
+        Usernames = TextFileReaderUtil.ReadTextFile(dataUsername);
+        DeleteTablesLines = TextFileReaderUtil.ReadTextFile(deleteTablesSql);
     }
 
     public void deleteTables() {
