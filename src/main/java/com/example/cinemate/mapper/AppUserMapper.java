@@ -1,6 +1,7 @@
 package com.example.cinemate.mapper;
 
 import com.example.cinemate.dto.auth.*;
+import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.model.db.AppUser;
 import io.jsonwebtoken.Claims;
@@ -24,7 +25,6 @@ public class AppUserMapper {
         if (userDetails instanceof CustomUserDetails customUserDetails) {
             return new AppUserJwtDto(
                     customUserDetails.getId(),
-                    customUserDetails.getUsername(),
                     grantedAuthorityMapper.toStringList(userDetails.getAuthorities()),
                     provider
             );
@@ -34,7 +34,6 @@ public class AppUserMapper {
 
     public Map<String, Object> toClaimsJwt(final AppUserJwtDto appUserJwtDto) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", appUserJwtDto.getEmail());
         claims.put("roles", appUserJwtDto.getRoles());
         claims.put("provider", appUserJwtDto.getProvider());
         return claims;
@@ -48,7 +47,6 @@ public class AppUserMapper {
     public AppUserJwtDto toAppUserJwtDto(@NonNull final Claims claims) {
         return new AppUserJwtDto(
                 Integer.valueOf(claims.getSubject()),  // id
-                claims.get("email", String.class),
                 grantedAuthorityMapper.toListRolesString(claims.get("roles")),  // список ролей
                 claims.get("provider", String.class)
         );
@@ -94,6 +92,7 @@ public class AppUserMapper {
 
     public UserDto toUserDto(final AppUser appUser, final String provider) {
         return new UserDto(
+                appUser.getId(),
                 appUser.getUsername(),
                 appUser.getFirstname(),
                 appUser.getSurname(),

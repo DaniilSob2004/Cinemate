@@ -27,6 +27,11 @@ public class AccessJwtTokenService {
         return jwtTokenService.generateToken(claims, appUserJwtDto.getId().toString(), expirationTime);
     }
 
+    public Integer getIdFromToken(final String token) {
+        String strId = jwtTokenService.getSubject(token);
+        return Integer.parseInt(strId);
+    }
+
     public AppUserJwtDto extractAllData(final String token) {
         Claims claims = jwtTokenService.getClaims(token);
         return appUserMapper.toAppUserJwtDto(claims);  // получаем данные польз. из claims

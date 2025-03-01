@@ -50,6 +50,16 @@ public class JwtTokenUtil {
         }
     }
 
+    // Извлечение sub
+    public String getSubject(final String token) {
+        return Jwts.parser()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
     // Извлечение всех claims
     public Claims getClaims(final String token) {
         Jws<Claims> jws = Jwts.parser()

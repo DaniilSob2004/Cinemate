@@ -14,5 +14,5 @@ public interface ExternalAuthService {
     void deleteAll();
 
     Optional<ExternalAuth> findByUserId(Integer userId);
-    boolean existsByProviderAndExternalId(String providerName, String externalId);
+    Optional<ExternalAuth> findByProviderNameAndExternalId(String providerName, String externalId);
 }

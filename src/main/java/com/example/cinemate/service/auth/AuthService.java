@@ -56,7 +56,7 @@ public class AuthService {
         }
 
         // исключение, если пользователь не найден
-        throw new UserNotFoundException("User '" + appUserJwtDto.getEmail() + "' was not found");
+        throw new UserNotFoundException("User '" + userDetails.getUsername() + "' was not found");
     }
 
     public ResponseAuthDto authenticateAndGenerateToken(@NonNull final AuthenticationRequest authRequest) {

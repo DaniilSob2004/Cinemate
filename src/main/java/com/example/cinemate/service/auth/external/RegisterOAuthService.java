@@ -37,15 +37,19 @@ public class RegisterOAuthService {
         // если пользователь есть
         AppUser user = appUserService.findByEmail(oAuthUserDto.getEmail()).orElse(null);
         if (user != null) {
-            // есть ли уже авторизация через другой внешний провайдер
-            if (!externalAuthService.existsByProviderAndExternalId(
+            var externalAuth = externalAuthService.findByProviderNameAndExternalId(
                     oAuthUserDto.getProvider().getName(),
                     oAuthUserDto.getExternalId()
-            )) {
+            ).orElse(null);
+
+            // есть ли уже авторизация через другой внешний провайдер
+            if (externalAuth == null) {
                 throw new OAuthException("This email is already associated with another OAuth provider");
             }
 
-            // TODO: если вход, то обновляем запись в ExternalAuth
+            // обновляем запись в ExternalAuth
+            externalAuth.setAccessToken(oAuthUserDto.getAccessToken());
+            externalAuthService.update(externalAuth);
         }
         else {  // если пользователь нет, то создаём
             user = this.createNewUserFromOAuth(oAuthUserDto);

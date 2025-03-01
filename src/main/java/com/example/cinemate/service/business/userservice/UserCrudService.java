@@ -1,6 +1,6 @@
 package com.example.cinemate.service.business.userservice;
 
-import com.example.cinemate.dto.auth.UserDto;
+import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.model.db.AppUser;

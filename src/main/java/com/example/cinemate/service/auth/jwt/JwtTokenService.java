@@ -27,6 +27,10 @@ public class JwtTokenService {
         return jwtTokenUtil.generateToken(claims, subject, expirationTimeMin);
     }
 
+    public String getSubject(final String token) {
+        return jwtTokenUtil.getSubject(token);
+    }
+
     public Claims getClaims(final String token) {
         return jwtTokenUtil.getClaims(token);
     }

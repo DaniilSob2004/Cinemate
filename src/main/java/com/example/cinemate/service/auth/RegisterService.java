@@ -10,6 +10,7 @@ import com.example.cinemate.model.db.UserRole;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.roleservice.RoleService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
+import com.example.cinemate.utils.StringUtil;
 import com.example.cinemate.validate.RegisterValidate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -66,6 +67,7 @@ public class RegisterService {
     }
 
     public void createUser(final AppUser user) {
+        this.setDefaultUserData(user);
         appUserService.save(user);
         this.addUserRole(user);
     }
@@ -75,5 +77,12 @@ public class RegisterService {
                 .orElseThrow(() -> new RuntimeException(nameUserRole + " not found..."));
         UserRole roleForUser = new UserRole(null, user, userRole);
         userRoleService.save(roleForUser);
+    }
+
+    private void setDefaultUserData(final AppUser user) {
+        if (user.getUsername().isEmpty()) {
+            String newUsername = StringUtil.getUsernameFromEmail(user.getEmail(), "User");
+            user.setUsername(StringUtil.addSymbolInStart(newUsername, "@"));
+        }
     }
 }

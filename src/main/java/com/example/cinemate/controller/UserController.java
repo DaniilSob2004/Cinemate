@@ -1,9 +1,10 @@
 package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
+import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.exception.auth.UnauthorizedException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
-import com.example.cinemate.dto.auth.UserDto;
+import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.service.business.userservice.CurrentUserService;
 import com.example.cinemate.service.business.userservice.UserCrudService;
@@ -32,7 +33,7 @@ public class UserController {
         return ResponseEntity.ok("Your photo for admin!");
     }
 
-    @GetMapping(value = Endpoint.USER_ID)
+    @GetMapping(value = Endpoint.GET_BY_USER_ID)
     public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
@@ -53,6 +54,23 @@ public class UserController {
         try {
             UserDto userDto = currentUserService.getCurrentUser(request);
             return ResponseEntity.ok(userDto);
+        } catch (UnauthorizedException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        } catch (UserNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+    }
+
+    @PutMapping(value = Endpoint.ME)
+    public ResponseEntity<?> updateUserData(@RequestBody UserUpdateDto userUpdateDto, HttpServletRequest request) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            currentUserService.updateUser(userUpdateDto, request);
+            return ResponseEntity.ok("User updated successfully");
         } catch (UnauthorizedException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (UserNotFoundException e) {

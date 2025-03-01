@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface ExternalAuthRepository extends JpaRepository<ExternalAuth, Integer> {
     Optional<ExternalAuth> findExternalAuthByUserId(Integer userId);
 
-    @Query("SELECT COUNT(e) > 0 FROM ExternalAuth e WHERE e.provider.name = :providerName AND e.externalId = :externalId")
-    boolean existsByProviderNameAndExternalId(
+    @Query("SELECT e FROM ExternalAuth e WHERE e.provider.name = :providerName AND e.externalId = :externalId")
+    Optional<ExternalAuth> findByProviderNameAndExternalId(
             @Param("providerName") String providerName,
             @Param("externalId") String externalId
     );

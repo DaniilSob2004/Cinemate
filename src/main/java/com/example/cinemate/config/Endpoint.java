@@ -18,7 +18,7 @@ public class Endpoint {
     public static final String PRIVACY_POLICY = "/privacy-policy";
 
     // auth users
-    public static final String USER_ID = "/{id}";
+    public static final String GET_BY_USER_ID = "/{id}";
     public static final String ME = "/me";
     public static final String UPDATE_ACCESS_TOKEN = "/update-access-token";
     public static final String LOGOUT = "/logout";
@@ -45,7 +45,7 @@ public class Endpoint {
 
     static public List<String> getEndpointForAdmin() {
         List<String> endpoints = new ArrayList<>();
-        endpoints.add(API_V1 + USERS + USER_ID);
+        endpoints.add(API_V1 + USERS + GET_BY_USER_ID);
         endpoints.add(API_V1 + USERS + GET_PHOTO);
         return endpoints;
     }

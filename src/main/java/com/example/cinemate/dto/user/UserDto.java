@@ -1,4 +1,4 @@
-package com.example.cinemate.dto.auth;
+package com.example.cinemate.dto.user;
 
 import lombok.*;
 
@@ -6,6 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
+    private Integer id;
     private String username;
     private String firstname;
     private String surname;

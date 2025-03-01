@@ -52,7 +52,7 @@ public class ExternalAuthServiceImpl implements ExternalAuthService {
     }
 
     @Override
-    public boolean existsByProviderAndExternalId(String providerName, String externalId) {
-        return externalAuthRepository.existsByProviderNameAndExternalId(providerName, externalId);
+    public Optional<ExternalAuth> findByProviderNameAndExternalId(String providerName, String externalId) {
+        return externalAuthRepository.findByProviderNameAndExternalId(providerName, externalId);
     }
 }
