@@ -1,9 +1,11 @@
 package com.example.cinemate.service.business.userservice;
 
+import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.exception.auth.UnauthorizedException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
+import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
@@ -34,7 +36,7 @@ public class CurrentUserService {
         this.appUserMapper = appUserMapper;
     }
 
-    public UserDto getCurrentUser(final HttpServletRequest request) {
+    public UserDto getUser(final HttpServletRequest request) {
         String token = jwtTokenService.getValidateTokenFromHeader(request)
                 .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));
 
@@ -54,20 +56,25 @@ public class CurrentUserService {
         String token = jwtTokenService.getValidateTokenFromHeader(request)
                 .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));
 
-        Integer userId = accessJwtTokenService.getIdFromToken(token);
+        AppUserJwtDto appUserJwtDto = accessJwtTokenService.extractAllData(token);
 
         // найти пользователя в БД
-        AppUser appUser = appUserService.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id '" + userId + "' was not found..."));
+        AppUser appUser = appUserService.findById(appUserJwtDto.getId())
+                .orElseThrow(() -> new UserNotFoundException("User with id '" + appUserJwtDto.getId() + "' was not found..."));
 
         // изменён ли email
         if (!appUser.getEmail().equals(userUpdateDto.getEmail())) {
-            userDetailsCacheService.remove(userId.toString());  // удаляем из кэша UserDetails этого пользователя
+            // запрещаем смену email если пользователь атворизовался через внешние провайдеры
+            if (!appUserJwtDto.getProvider().isEmpty()) {
+                throw new BadRequestException("External-authenticated users cannot change their email");
+            }
+            userDetailsCacheService.remove(appUserJwtDto.getId().toString());  // удаляем из кэша UserDetails этого пользователя
         }
+
         // изменён ли username
         String username = userUpdateDto.getUsername();
         if (!appUser.getUsername().equals(username)) {
-            if (!StringUtil.getFirstLetter(username).equals("@")) {
+            if (!StringUtil.getFirstLetter(username).equals("@")) {  // добавляем символ '@' в начало
                 userUpdateDto.setUsername(StringUtil.addSymbolInStart(username, "@"));
             }
         }

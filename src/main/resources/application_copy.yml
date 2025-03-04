@@ -43,10 +43,9 @@ security:
   header_value_basic_auth_prefix: Basic
 
 redis_data:
-  blacklist_token_value: "blacklisted"
-  blacklist_token_key_prefix: "blacklist::token::"
   user_details_prefix: "user::details::"
-  refresh_token_key_prefix: "refresh_token::"
+  token_key_prefix: "token::"
+  token_user_id_key_prefix: "user_id_tokens::"
   user_details_expiration_time: 3600  # 3600 60 min
   base_redis_expiration_time: 3600  # 3600 60 min
 

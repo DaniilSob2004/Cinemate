@@ -2,7 +2,7 @@ package com.example.cinemate.service.auth.jwt;
 
 import com.example.cinemate.dto.auth.RefreshTokenDto;
 import com.example.cinemate.mapper.AppUserMapper;
-import com.example.cinemate.service.redis.RefreshTokenRedisStorage;
+import com.example.cinemate.service.redis.token.RefreshTokenRedisStorage;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

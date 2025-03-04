@@ -1,11 +1,13 @@
 package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
+import com.example.cinemate.dto.user.UserUpdateAdminDto;
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.exception.auth.UnauthorizedException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
+import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.service.business.userservice.CurrentUserService;
 import com.example.cinemate.service.business.userservice.UserCrudService;
 import org.springframework.http.HttpStatus;
@@ -33,7 +35,43 @@ public class UserController {
         return ResponseEntity.ok("Your photo for admin!");
     }
 
-    @GetMapping(value = Endpoint.GET_BY_USER_ID)
+    @GetMapping(value = Endpoint.ME)
+    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            UserDto userDto = currentUserService.getUser(request);
+            return ResponseEntity.ok(userDto);
+        } catch (UnauthorizedException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        } catch (UserNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+    }
+
+    @PutMapping(value = Endpoint.ME)
+    public ResponseEntity<?> updateCurrentUser(@RequestBody UserUpdateDto userUpdateDto, HttpServletRequest request) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            currentUserService.updateUser(userUpdateDto, request);
+            return ResponseEntity.ok("User updated successfully");
+        } catch (UnauthorizedException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        } catch (UserNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (BadRequestException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+    }
+
+    @GetMapping(value = Endpoint.BY_USER_ID)
     public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
@@ -48,33 +86,12 @@ public class UserController {
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
-    @GetMapping(value = Endpoint.ME)
-    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+    @PutMapping(value = Endpoint.BY_USER_ID)
+    public ResponseEntity<?> updateUserById(@PathVariable Integer id, @RequestBody UserUpdateAdminDto userUpdateAdminDto) {
         ErrorResponseDto errorResponseDto;
         try {
-            UserDto userDto = currentUserService.getCurrentUser(request);
-            return ResponseEntity.ok(userDto);
-        } catch (UnauthorizedException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-        } catch (UserNotFoundException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
-    }
-
-    @PutMapping(value = Endpoint.ME)
-    public ResponseEntity<?> updateUserData(@RequestBody UserUpdateDto userUpdateDto, HttpServletRequest request) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            currentUserService.updateUser(userUpdateDto, request);
+            userCrudService.updateUserById(id, userUpdateAdminDto);
             return ResponseEntity.ok("User updated successfully");
-        } catch (UnauthorizedException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-        } catch (UserNotFoundException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
         } catch (Exception e) {
             Logger.error(e.getMessage());
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());

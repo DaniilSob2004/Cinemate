@@ -44,6 +44,9 @@ public class AppUser {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
+
     @Transient
     private List<String> userRoles = new ArrayList<>();
 }

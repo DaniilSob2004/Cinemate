@@ -68,7 +68,7 @@ public class AuthService {
             var appUserJwtDto = appUserMapper.toAppUserJwtDto(userDetails, authRequest.getProvider());
             var refreshTokenDto = new RefreshTokenDto(appUserJwtDto.getId());
             return new ResponseAuthDto(
-                    accessJwtTokenService.generateToken(appUserJwtDto),
+                    accessJwtTokenService.generateAndSaveToken(appUserJwtDto),
                     refreshJwtTokenService.generateAndSaveToken(refreshTokenDto)
             );
         }

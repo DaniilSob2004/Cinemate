@@ -70,6 +70,7 @@ public class AppUserMapper {
                 "",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
+                true,
                 null
         );
     }
@@ -86,6 +87,7 @@ public class AppUserMapper {
                 "",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
+                true,
                 null
         );
     }

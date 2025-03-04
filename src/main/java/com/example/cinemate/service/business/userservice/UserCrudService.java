@@ -1,12 +1,15 @@
 package com.example.cinemate.service.business.userservice;
 
 import com.example.cinemate.dto.user.UserDto;
+import com.example.cinemate.dto.user.UserUpdateAdminDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 
 @Service
 public class UserCrudService {
@@ -30,5 +33,10 @@ public class UserCrudService {
                 .orElse("");
 
         return appUserMapper.toUserDto(appUser, provider);
+    }
+
+    @Transactional
+    public void updateUserById(final Integer id, final UserUpdateAdminDto userUpdateAdminDto) {
+
     }
 }

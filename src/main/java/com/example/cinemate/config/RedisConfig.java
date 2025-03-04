@@ -32,6 +32,7 @@ public class RedisConfig {
     @Value("${redis_data.base_redis_expiration_time}")
     private long expirationTime;
 
+
     // фабрика соединения для кэширования (БД 0)
     @Bean
     public RedisConnectionFactory redisCacheConnectionFactory() {
@@ -42,15 +43,26 @@ public class RedisConfig {
         return new LettuceConnectionFactory(configuration);
     }
 
-    // фабрика соединения для refresh_token (БД 1)
+    // фабрика соединения для access_token (БД 1)
     @Bean
-    public RedisConnectionFactory redisRefreshTokenConnectionFactory() {
+    public RedisConnectionFactory redisAccessTokenConnectionFactory() {
         var configuration = new RedisStandaloneConfiguration();
         configuration.setDatabase(1);
         configuration.setHostName(hostName);
         configuration.setPort(port);
         return new LettuceConnectionFactory(configuration);
     }
+
+    // фабрика соединения для refresh_token (БД 2)
+    @Bean
+    public RedisConnectionFactory redisRefreshTokenConnectionFactory() {
+        var configuration = new RedisStandaloneConfiguration();
+        configuration.setDatabase(2);
+        configuration.setHostName(hostName);
+        configuration.setPort(port);
+        return new LettuceConnectionFactory(configuration);
+    }
+
 
     // (для кэширования результатов методов) (БД 0) Spring будет использ. для управления кэшированием данных с использ. Redis
     @Bean
@@ -68,16 +80,6 @@ public class RedisConfig {
                 .build();
     }
 
-    // для сохранения токенов в blacklist (БД 0)
-    @Bean
-    public RedisTemplate<String, String> redisBlacklistTokenTemplate(RedisConnectionFactory redisCacheConnectionFactory) {
-        RedisTemplate<String, String> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisCacheConnectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer());
-        return template;
-    }
-
     // для кэширования UserDetails (БД 0)
     @Bean
     public RedisTemplate<String, UserDetailsDto> redisUserDetailsTemplate(RedisConnectionFactory redisCacheConnectionFactory) {
@@ -88,7 +90,17 @@ public class RedisConfig {
         return template;
     }
 
-    // для работы с refresh_token (БД 1)
+    // для работы с access_token (БД 1)
+    @Bean
+    public RedisTemplate<String, String> redisAccessTokenTemplate(RedisConnectionFactory redisAccessTokenConnectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisAccessTokenConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+        return template;
+    }
+
+    // для работы с refresh_token (БД 2)
     @Bean
     public RedisTemplate<String, String> redisRefreshTokenTemplate(RedisConnectionFactory redisRefreshTokenConnectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();

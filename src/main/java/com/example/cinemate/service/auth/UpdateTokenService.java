@@ -8,7 +8,7 @@ import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
 import com.example.cinemate.service.auth.jwt.JwtTokenService;
 import com.example.cinemate.service.auth.jwt.RefreshJwtTokenService;
-import com.example.cinemate.service.redis.RefreshTokenRedisStorage;
+import com.example.cinemate.service.redis.token.RefreshTokenRedisStorage;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,11 +49,11 @@ public class UpdateTokenService {
         }
 
         // проверка есть ли refresh_token в Redis
-        if (!refreshTokenRedisStorage.isHave(refreshToken)) {
+        if (!refreshTokenRedisStorage.isExists(refreshToken)) {
             throw new UnauthorizedException("Invalid refresh token");
         }
 
-        // генерация нового access_token
-        return accessJwtTokenService.generateToken(oldAppUserJwtDto);
+        // генерация и сохранение нового access_token
+        return accessJwtTokenService.generateAndSaveToken(oldAppUserJwtDto);
     }
 }
