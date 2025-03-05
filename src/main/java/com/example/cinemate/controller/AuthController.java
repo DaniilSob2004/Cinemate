@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.AUTH)
@@ -60,7 +61,7 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.REGISTER)
-    public ResponseEntity<?> register(@RequestBody RegisterRequestDto registerRequestDto) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
         // регистрация и генерация токена
         ErrorResponseDto errorResponseDto;
         try {
@@ -85,7 +86,7 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.UPDATE_ACCESS_TOKEN)
-    public ResponseEntity<?> updateAccessToken(@RequestBody UpdateAccessTokenDto updateAccessTokenDto, HttpServletRequest request) {
+    public ResponseEntity<?> updateAccessToken(@Valid @RequestBody UpdateAccessTokenDto updateAccessTokenDto, HttpServletRequest request) {
         ErrorResponseDto errorResponseDto;
         try {
             String accessToken = updateTokenService.updateAccessToken(updateAccessTokenDto, request);
@@ -102,7 +103,7 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.LOGOUT)
-    public ResponseEntity<?> logout(@RequestBody LogoutRequestDto logoutRequestDto, HttpServletRequest request) {
+    public ResponseEntity<?> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto, HttpServletRequest request) {
         ErrorResponseDto errorResponseDto;
         try {
             logoutService.logoutUser(logoutRequestDto, request);

@@ -1,6 +1,7 @@
 package com.example.cinemate.service.business_db.appuserservice;
 
 import com.example.cinemate.model.db.AppUser;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,8 @@ public interface AppUserService {
     List<AppUser> findAll();
     void deleteAll();
 
+    boolean existsByEmail(String email);
+    Optional<AppUser> findByIdWithoutIsActive(Integer id);
     Optional<AppUser> findByEmail(String email);
     Optional<AppUser> findById(Integer id);
 }

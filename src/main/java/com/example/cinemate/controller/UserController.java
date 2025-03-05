@@ -4,6 +4,7 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.user.UserUpdateAdminDto;
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.exception.auth.UnauthorizedException;
+import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.USERS)
@@ -53,7 +55,7 @@ public class UserController {
     }
 
     @PutMapping(value = Endpoint.ME)
-    public ResponseEntity<?> updateCurrentUser(@RequestBody UserUpdateDto userUpdateDto, HttpServletRequest request) {
+    public ResponseEntity<?> updateCurrentUser(@Valid @RequestBody UserUpdateDto userUpdateDto, HttpServletRequest request) {
         ErrorResponseDto errorResponseDto;
         try {
             currentUserService.updateUser(userUpdateDto, request);
@@ -62,6 +64,8 @@ public class UserController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (UserAlreadyExistsException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
         } catch (BadRequestException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (Exception e) {
@@ -87,11 +91,17 @@ public class UserController {
     }
 
     @PutMapping(value = Endpoint.BY_USER_ID)
-    public ResponseEntity<?> updateUserById(@PathVariable Integer id, @RequestBody UserUpdateAdminDto userUpdateAdminDto) {
+    public ResponseEntity<?> updateUserById(@PathVariable Integer id, @Valid @RequestBody UserUpdateAdminDto userUpdateAdminDto) {
         ErrorResponseDto errorResponseDto;
         try {
             userCrudService.updateUserById(id, userUpdateAdminDto);
             return ResponseEntity.ok("User updated successfully");
+        } catch (UserNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (UserAlreadyExistsException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
+        } catch (BadRequestException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (Exception e) {
             Logger.error(e.getMessage());
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());

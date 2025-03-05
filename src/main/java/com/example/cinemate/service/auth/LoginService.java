@@ -5,6 +5,7 @@ import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.utils.BaseAuthUtil;
+import com.example.cinemate.validate.LoginValidate;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
@@ -15,10 +16,12 @@ import java.util.Optional;
 public class LoginService {
 
     private final AuthService authService;
+    private final LoginValidate loginValidate;
     private final BaseAuthUtil baseAuthUtil;
 
-    public LoginService(AuthService authService, BaseAuthUtil baseAuthUtil) {
+    public LoginService(AuthService authService, LoginValidate loginValidate, BaseAuthUtil baseAuthUtil) {
         this.authService = authService;
+        this.loginValidate = loginValidate;
         this.baseAuthUtil = baseAuthUtil;
     }
 
@@ -37,6 +40,10 @@ public class LoginService {
         // Basic authentication (получаем логин и пароль)
         LoginRequestDto loginRequestDto = this.getBaseAuthLoginDataFromHeader(request)
                 .orElseThrow(() -> new BadRequestException("Invalid Basic Authentication"));
+
+        /* валидация данных */
+        loginValidate.validateLoginRequestDto(loginRequestDto);
+
         return this.loginUser(loginRequestDto);
     }
 

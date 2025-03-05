@@ -46,14 +46,23 @@ public class AppUserServiceImpl implements AppUserService {
         appUserRepository.deleteAll();
     }
 
+    @Override
+    public boolean existsByEmail(String email) {
+        return appUserRepository.existsAppUserByEmail(email);
+    }
+
+    @Override
+    public Optional<AppUser> findByIdWithoutIsActive(Integer id) {
+        return appUserRepository.findAppUserById(id);
+    }
 
     @Override
     public Optional<AppUser> findByEmail(String email) {
-        return appUserRepository.findAppUserByEmail(email);
+        return appUserRepository.findByEmailAndIsActiveTrue(email);
     }
 
     @Override
     public Optional<AppUser> findById(Integer id) {
-        return appUserRepository.findAppUserById(id);
+        return appUserRepository.findByIdAndIsActiveTrue(id);
     }
 }

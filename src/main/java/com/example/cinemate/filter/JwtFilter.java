@@ -1,5 +1,6 @@
 package com.example.cinemate.filter;
 
+import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.service.auth.AuthService;
 import com.example.cinemate.service.auth.jwt.JwtTokenService;
@@ -52,7 +53,8 @@ public class JwtFilter extends OncePerRequestFilter {
                         // проверяем, если токена нет в хранилище
                         if (!accessTokenRedisStorage.isExists(token)) {
                             // если это запрос на update access token (то проверка refresh token)
-                            if (requestURI.equals("/api/v1/auth/update-access-token")) {
+                            String endpoint = Endpoint.API_V1 + Endpoint.AUTH + Endpoint.UPDATE_ACCESS_TOKEN;
+                            if (requestURI.equals(endpoint)) {
                                 if (!refreshTokenRedisStorage.isExists(token)) {
                                     Logger.error("JWT auth filter - refresh token is incorrect");
                                     this.sendUnauthorizedError(response, "Refresh token is incorrect");

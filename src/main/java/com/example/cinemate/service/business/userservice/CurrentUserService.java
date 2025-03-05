@@ -5,14 +5,12 @@ import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.exception.auth.UnauthorizedException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
-import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
 import com.example.cinemate.service.auth.jwt.JwtTokenService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
-import com.example.cinemate.utils.StringUtil;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
@@ -23,13 +21,15 @@ import javax.transaction.Transactional;
 public class CurrentUserService {
 
     private final AppUserService appUserService;
+    private final SaveUserDataService saveUserDataService;
     private final JwtTokenService jwtTokenService;
     private final AccessJwtTokenService accessJwtTokenService;
     private final UserDetailsCacheService userDetailsCacheService;
     private final AppUserMapper appUserMapper;
 
-    public CurrentUserService(AppUserService appUserService, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, AppUserMapper appUserMapper) {
+    public CurrentUserService(AppUserService appUserService, SaveUserDataService saveUserDataService, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, AppUserMapper appUserMapper) {
         this.appUserService = appUserService;
+        this.saveUserDataService = saveUserDataService;
         this.jwtTokenService = jwtTokenService;
         this.accessJwtTokenService = accessJwtTokenService;
         this.userDetailsCacheService = userDetailsCacheService;
@@ -52,7 +52,7 @@ public class CurrentUserService {
     public void updateUser(final UserUpdateDto userUpdateDto, final HttpServletRequest request) {
         Logger.info("User update: " + userUpdateDto);
 
-        // получить токен и id пользователя
+        // получить токен и данные пользователя из токена
         String token = jwtTokenService.getValidateTokenFromHeader(request)
                 .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));
 
@@ -63,29 +63,16 @@ public class CurrentUserService {
                 .orElseThrow(() -> new UserNotFoundException("User with id '" + appUserJwtDto.getId() + "' was not found..."));
 
         // изменён ли email
-        if (!appUser.getEmail().equals(userUpdateDto.getEmail())) {
-            // запрещаем смену email если пользователь атворизовался через внешние провайдеры
-            if (!appUserJwtDto.getProvider().isEmpty()) {
-                throw new BadRequestException("External-authenticated users cannot change their email");
-            }
-            userDetailsCacheService.remove(appUserJwtDto.getId().toString());  // удаляем из кэша UserDetails этого пользователя
+        boolean isEdit = saveUserDataService.saveEmail(appUser.getEmail(), userUpdateDto.getEmail(), !appUserJwtDto.getProvider().isEmpty());
+        if (isEdit) {
+            userDetailsCacheService.remove(appUser.getId().toString());
         }
 
-        // изменён ли username
-        String username = userUpdateDto.getUsername();
-        if (!appUser.getUsername().equals(username)) {
-            if (!StringUtil.getFirstLetter(username).equals("@")) {  // добавляем символ '@' в начало
-                userUpdateDto.setUsername(StringUtil.addSymbolInStart(username, "@"));
-            }
-        }
+        // проверяем и изменяем username у user (если необходимо)
+        saveUserDataService.saveUsername(appUser, userUpdateDto.getUsername());
 
         // обновляем данные
-        appUser.setUsername(userUpdateDto.getUsername());
-        appUser.setFirstname(userUpdateDto.getFirstname());
-        appUser.setSurname(userUpdateDto.getSurname());
-        appUser.setEmail(userUpdateDto.getEmail());
-        appUser.setPhoneNum(userUpdateDto.getPhoneNum());
-        appUser.setAvatar(userUpdateDto.getAvatar());
+        saveUserDataService.saveUser(appUser, userUpdateDto);
 
         appUserService.save(appUser);
     }

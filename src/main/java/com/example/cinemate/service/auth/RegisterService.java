@@ -7,10 +7,10 @@ import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.model.db.Role;
 import com.example.cinemate.model.db.UserRole;
+import com.example.cinemate.service.business.userservice.SaveUserDataService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.roleservice.RoleService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
-import com.example.cinemate.utils.StringUtil;
 import com.example.cinemate.validate.RegisterValidate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,15 +29,17 @@ public class RegisterService {
     private final RoleService roleService;
     private final UserRoleService userRoleService;
     private final AuthService authService;
+    private final SaveUserDataService saveUserDataService;
     private final AppUserMapper appUserMapper;
     private final RegisterValidate registerValidate;
 
-    public RegisterService(BCryptPasswordEncoder passwordEncoder, AppUserService appUserService, RoleService roleService, UserRoleService userRoleService, AuthService authService, AppUserMapper appUserMapper, RegisterValidate registerValidate) {
+    public RegisterService(BCryptPasswordEncoder passwordEncoder, AppUserService appUserService, RoleService roleService, UserRoleService userRoleService, AuthService authService, SaveUserDataService saveUserDataService, AppUserMapper appUserMapper, RegisterValidate registerValidate) {
         this.passwordEncoder = passwordEncoder;
         this.appUserService = appUserService;
         this.roleService = roleService;
         this.userRoleService = userRoleService;
         this.authService = authService;
+        this.saveUserDataService = saveUserDataService;
         this.appUserMapper = appUserMapper;
         this.registerValidate = registerValidate;
     }
@@ -67,7 +69,7 @@ public class RegisterService {
     }
 
     public void createUser(final AppUser user) {
-        this.setDefaultUserData(user);
+        saveUserDataService.saveUsername(user, user.getUsername());  // установка по умолчанию
         appUserService.save(user);
         this.addUserRole(user);
     }
@@ -77,12 +79,5 @@ public class RegisterService {
                 .orElseThrow(() -> new RuntimeException(nameUserRole + " not found..."));
         UserRole roleForUser = new UserRole(null, user, userRole);
         userRoleService.save(roleForUser);
-    }
-
-    private void setDefaultUserData(final AppUser user) {
-        if (user.getUsername().isEmpty()) {
-            String newUsername = StringUtil.getUsernameFromEmail(user.getEmail(), "User");
-            user.setUsername(StringUtil.addSymbolInStart(newUsername, "@"));
-        }
     }
 }

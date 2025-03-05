@@ -20,8 +20,9 @@ A service for viewing video content. Thesis on backend.
  - 
  - ![Image](https://github.com/user-attachments/assets/fa2b3f64-df33-4e6e-b13b-a0b1e17af7fb)
 -------------------------------------------------------
- - Login / Register / Logout / UpdateAccessToken / GetUserById / GetCurrentUser / UpdateCurrentUser / SecureTestPhoto (Endpoints)
- - 
+ --------------- (Endpoints) ---------------
+ - Login / Register / Logout / UpdateAccessToken /
+ - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById /
  - ![Image](https://github.com/user-attachments/assets/5cca4c2e-c5e6-416d-be35-6c87b4e6bcb6)
  - ![Image](https://github.com/user-attachments/assets/0f83b631-c509-40a9-bd05-12af3efefb10)
  - ![Image](https://github.com/user-attachments/assets/74ffdea5-44eb-44bc-8edd-46ec0a267b29)
