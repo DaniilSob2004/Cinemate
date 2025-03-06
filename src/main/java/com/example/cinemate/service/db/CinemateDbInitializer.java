@@ -152,8 +152,7 @@ public class CinemateDbInitializer {
                 "",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                true,
-                null
+                true
         );
     }
 
@@ -172,8 +171,7 @@ public class CinemateDbInitializer {
                 "",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                true,
-                null
+                true
         );
     }
 

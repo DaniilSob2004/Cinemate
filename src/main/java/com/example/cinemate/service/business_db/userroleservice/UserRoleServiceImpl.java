@@ -27,7 +27,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    @CachePut(key = "#userRole.user.id")
+    @CacheEvict(key = "#userRole.user.id")
     public void save(UserRole userRole) {
         userRoleRepository.save(userRole);
     }

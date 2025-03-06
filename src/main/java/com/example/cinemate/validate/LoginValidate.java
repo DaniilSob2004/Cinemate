@@ -19,6 +19,7 @@ public class LoginValidate {
     }
 
     public void validateLoginRequestDto(LoginRequestDto loginRequestDto) {
+        // используем валидацию прописанную с помощью аннотаций в 'LoginRequestDto'
         Set<ConstraintViolation<LoginRequestDto>> violations = validator.validate(loginRequestDto);  // объект валидации
         if (!violations.isEmpty()) {
             String errorMessages = violations.stream()

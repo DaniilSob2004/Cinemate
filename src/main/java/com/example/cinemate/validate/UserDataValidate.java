@@ -17,10 +17,6 @@ public class UserDataValidate {
         return !(email == null || email.trim().isEmpty());
     }
 
-    public boolean validatePasswords(final String password, final String confirmPassword) {
-        return password.equals(confirmPassword);
-    }
-
     public boolean validateUserExistence(final String email) {
         return appUserService.existsByEmail(email);
     }

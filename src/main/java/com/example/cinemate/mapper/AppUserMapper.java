@@ -1,6 +1,7 @@
 package com.example.cinemate.mapper;
 
 import com.example.cinemate.dto.auth.*;
+import com.example.cinemate.dto.user.UserAdminDto;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.model.db.AppUser;
@@ -70,8 +71,7 @@ public class AppUserMapper {
                 "",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                true,
-                null
+                true
         );
     }
 
@@ -87,8 +87,7 @@ public class AppUserMapper {
                 "",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                true,
-                null
+                true
         );
     }
 
@@ -103,5 +102,22 @@ public class AppUserMapper {
                 appUser.getAvatar(),
                 provider
         );
+    }
+
+    public UserAdminDto toUserAdminDto(final AppUser appUser, final String provider, final List<String> roles) {
+        return UserAdminDto.builder()
+                .id(appUser.getId())
+                .username(appUser.getUsername())
+                .firstname(appUser.getFirstname())
+                .surname(appUser.getSurname())
+                .email(appUser.getEmail())
+                .phoneNum(appUser.getPhoneNum())
+                .avatar(appUser.getAvatar())
+                .provider(provider)
+                .roles(roles)
+                .createdAt(appUser.getCreatedAt())
+                .updatedAt(appUser.getUpdatedAt())
+                .isActive(appUser.getIsActive())
+                .build();
     }
 }

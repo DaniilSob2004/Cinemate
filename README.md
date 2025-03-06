@@ -24,7 +24,7 @@ A service for viewing video content. Thesis on backend.
  - Login / Register / Logout / UpdateAccessToken /
  - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById /
  - ![Image](https://github.com/user-attachments/assets/5cca4c2e-c5e6-416d-be35-6c87b4e6bcb6)
- - ![Image](https://github.com/user-attachments/assets/0f83b631-c509-40a9-bd05-12af3efefb10)
+ - ![Image](https://github.com/user-attachments/assets/0c94b4bf-059d-4ca1-b409-ba510e67a1ee)
  - ![Image](https://github.com/user-attachments/assets/74ffdea5-44eb-44bc-8edd-46ec0a267b29)
  - ![Image](https://github.com/user-attachments/assets/ee1560dc-56cc-4d8f-9d91-ccf47ec56c38)
  - ![Image](https://github.com/user-attachments/assets/8c61996f-7b69-442c-84fb-9b57df599bb2)

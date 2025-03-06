@@ -1,5 +1,6 @@
 package com.example.cinemate.dto.auth;
 
+import com.example.cinemate.validate.annotation.PasswordMatches;
 import lombok.*;
 
 import javax.validation.constraints.Email;
@@ -9,6 +10,7 @@ import javax.validation.constraints.Size;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@PasswordMatches(message = "Passwords don`t match")  // кастомная
 public class RegisterRequestDto {
 
     @NotBlank(message = "Email should not be blank")

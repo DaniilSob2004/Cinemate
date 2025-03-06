@@ -1,35 +1,39 @@
 package com.example.cinemate.service.business.userservice;
 
-import com.example.cinemate.dto.user.UserDto;
+import com.example.cinemate.dto.user.UserAdminDto;
 import com.example.cinemate.dto.user.UserUpdateAdminDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
+import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class UserCrudService {
 
     private final AppUserService appUserService;
+    private final UserRoleService userRoleService;
     private final ExternalAuthService externalAuthService;
     private final SaveUserDataService saveUserDataService;
     private final UpdateAdminUserService updateAdminUserService;
     private final AppUserMapper appUserMapper;
 
-    public UserCrudService(AppUserService appUserService, ExternalAuthService externalAuthService, SaveUserDataService saveUserDataService, UpdateAdminUserService updateAdminUserService, AppUserMapper appUserMapper) {
+    public UserCrudService(AppUserService appUserService, UserRoleService userRoleService, ExternalAuthService externalAuthService, SaveUserDataService saveUserDataService, UpdateAdminUserService updateAdminUserService, AppUserMapper appUserMapper) {
         this.appUserService = appUserService;
+        this.userRoleService = userRoleService;
         this.externalAuthService = externalAuthService;
         this.saveUserDataService = saveUserDataService;
         this.updateAdminUserService = updateAdminUserService;
         this.appUserMapper = appUserMapper;
     }
 
-    public UserDto getUserById(final Integer id) {
+    public UserAdminDto getUserById(final Integer id) {
         AppUser appUser = appUserService.findByIdWithoutIsActive(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id '" + id + "' was not found..."));
 
@@ -37,7 +41,9 @@ public class UserCrudService {
                 .map(auth -> auth.getProvider().getName())
                 .orElse("");
 
-        return appUserMapper.toUserDto(appUser, provider);
+        List<String> roles = userRoleService.getRoleNames(appUser.getId());
+
+        return appUserMapper.toUserAdminDto(appUser, provider, roles);
     }
 
     @Transactional
