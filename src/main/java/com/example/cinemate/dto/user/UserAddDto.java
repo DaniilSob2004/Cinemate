@@ -10,8 +10,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UserUpdateAdminDto extends UserUpdateDto {
+public class UserAddDto extends UserUpdateDto {
 
+    @Size(min = 3, message = "Password must contain a minimum of 3 characters")
     private String password;
 
     @Size(min = 1, message = "The roles list must contain at least one role")

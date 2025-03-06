@@ -17,7 +17,6 @@ public class RegisterRequestDto {
     @Email(message = "Invalid email")
     private String email;
 
-    @NotBlank(message = "The password must not be blank")
     @Size(min = 3, message = "Password must contain a minimum of 3 characters")
     private String password;
 

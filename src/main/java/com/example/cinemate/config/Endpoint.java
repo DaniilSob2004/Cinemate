@@ -24,6 +24,7 @@ public class Endpoint {
 
     // admin
     public static final String BY_USER_ID = "/{id}";
+    public static final String ADD_USER = "/add";
     public static final String GET_PHOTO = "/secure/photo";
 
     static public List<String> getEndpointForAllUsers() {
@@ -46,6 +47,7 @@ public class Endpoint {
     static public List<String> getEndpointForAdmin() {
         List<String> endpoints = new ArrayList<>();
         endpoints.add(API_V1 + USERS + BY_USER_ID);
+        endpoints.add(API_V1 + USERS + ADD_USER);
         endpoints.add(API_V1 + USERS + GET_PHOTO);
         return endpoints;
     }

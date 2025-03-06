@@ -5,7 +5,7 @@ import com.example.cinemate.event.StartOAuthEvent;
 import com.example.cinemate.exception.auth.*;
 import com.example.cinemate.utils.SendResponseUtil;
 import com.example.cinemate.utils.StringUtil;
-import com.example.cinemate.validate.RegisterValidate;
+import com.example.cinemate.validate.user.UserDataValidate;
 import lombok.NonNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -30,13 +30,13 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
 
     private final OAuth2AuthorizedClientService authorizedClientService;
     private final SendResponseUtil sendResponseUtil;
-    private final RegisterValidate registerValidate;
+    private final UserDataValidate userDataValidate;
     private ApplicationEventPublisher eventPublisher;
 
-    public OAuth2LoginAuthenticationSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, SendResponseUtil sendResponseUtil, RegisterValidate registerValidate) {
+    public OAuth2LoginAuthenticationSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, SendResponseUtil sendResponseUtil, UserDataValidate userDataValidate) {
         this.authorizedClientService = authorizedClientService;
         this.sendResponseUtil = sendResponseUtil;
-        this.registerValidate = registerValidate;
+        this.userDataValidate = userDataValidate;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
                     OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
 
                     // валидация email (если ошибка, то исключение)
-                    registerValidate.validateEmail(oauthUser.getAttribute("email"));
+                    userDataValidate.validateEmail(oauthUser.getAttribute("email"));
 
                     // получаем провайдера
                     provider = StringUtil.capitalizeFirstLetter(oauthToken.getAuthorizedClientRegistrationId());

@@ -1,5 +1,6 @@
 package com.example.cinemate.service.business.userservice;
 
+import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
@@ -9,6 +10,7 @@ import com.example.cinemate.service.redis.token.RefreshTokenRedisStorage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -80,5 +82,15 @@ public class UpdateAdminUserService {
         accessTokenRedisStorage.removeByUserId(userId);
         refreshTokenRedisStorage.removeByUserId(userId);
         userDetailsCacheService.remove(userId);
+    }
+
+    public void saveUserData(final AppUser appUser, final UserUpdateDto userUpdateDto) {
+        appUser.setUsername(userUpdateDto.getUsername());
+        appUser.setFirstname(userUpdateDto.getFirstname());
+        appUser.setSurname(userUpdateDto.getSurname());
+        appUser.setEmail(userUpdateDto.getEmail());
+        appUser.setPhoneNum(userUpdateDto.getPhoneNum());
+        appUser.setAvatar(userUpdateDto.getAvatar());
+        appUser.setUpdatedAt(LocalDateTime.now());
     }
 }

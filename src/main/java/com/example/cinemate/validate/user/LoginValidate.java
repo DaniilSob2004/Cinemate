@@ -1,4 +1,4 @@
-package com.example.cinemate.validate;
+package com.example.cinemate.validate.user;
 
 import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.exception.common.BadRequestException;

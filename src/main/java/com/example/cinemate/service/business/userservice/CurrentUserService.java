@@ -11,6 +11,7 @@ import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
 import com.example.cinemate.service.auth.jwt.JwtTokenService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
+import com.example.cinemate.validate.user.UserDataValidate;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
@@ -21,18 +22,20 @@ import javax.transaction.Transactional;
 public class CurrentUserService {
 
     private final AppUserService appUserService;
-    private final SaveUserDataService saveUserDataService;
     private final JwtTokenService jwtTokenService;
     private final AccessJwtTokenService accessJwtTokenService;
     private final UserDetailsCacheService userDetailsCacheService;
+    private final UpdateAdminUserService updateAdminUserService;
+    private final UserDataValidate userDataValidate;
     private final AppUserMapper appUserMapper;
 
-    public CurrentUserService(AppUserService appUserService, SaveUserDataService saveUserDataService, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, AppUserMapper appUserMapper) {
+    public CurrentUserService(AppUserService appUserService, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, UpdateAdminUserService updateAdminUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
         this.appUserService = appUserService;
-        this.saveUserDataService = saveUserDataService;
         this.jwtTokenService = jwtTokenService;
         this.accessJwtTokenService = accessJwtTokenService;
         this.userDetailsCacheService = userDetailsCacheService;
+        this.updateAdminUserService = updateAdminUserService;
+        this.userDataValidate = userDataValidate;
         this.appUserMapper = appUserMapper;
     }
 
@@ -62,17 +65,18 @@ public class CurrentUserService {
         AppUser appUser = appUserService.findById(appUserJwtDto.getId())
                 .orElseThrow(() -> new UserNotFoundException("User with id '" + appUserJwtDto.getId() + "' was not found..."));
 
-        // изменён ли email
-        boolean isEdit = saveUserDataService.saveEmail(appUser.getEmail(), userUpdateDto.getEmail(), !appUserJwtDto.getProvider().isEmpty());
-        if (isEdit) {
+        // валидация email (иначе исключение)
+        if (userDataValidate.validateEmailForUpdate(appUser.getEmail(), userUpdateDto.getEmail(), !appUserJwtDto.getProvider().isEmpty())) {
             userDetailsCacheService.remove(appUser.getId().toString());
         }
 
         // проверяем и изменяем username у user (если необходимо)
-        saveUserDataService.saveUsername(appUser, userUpdateDto.getUsername());
+        userUpdateDto.setUsername(
+                userDataValidate.normalizeUsername(userUpdateDto.getUsername(), appUser.getUsername(), appUser.getEmail())
+        );
 
         // обновляем данные
-        saveUserDataService.saveUser(appUser, userUpdateDto);
+        updateAdminUserService.saveUserData(appUser, userUpdateDto);
 
         appUserService.save(appUser);
     }

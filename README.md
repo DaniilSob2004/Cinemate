@@ -22,14 +22,15 @@ A service for viewing video content. Thesis on backend.
 -------------------------------------------------------
  --------------- (Endpoints) ---------------
  - Login / Register / Logout / UpdateAccessToken /
- - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById /
+ - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById / AddUser
+ - 
  - ![Image](https://github.com/user-attachments/assets/5cca4c2e-c5e6-416d-be35-6c87b4e6bcb6)
  - ![Image](https://github.com/user-attachments/assets/0c94b4bf-059d-4ca1-b409-ba510e67a1ee)
- - ![Image](https://github.com/user-attachments/assets/74ffdea5-44eb-44bc-8edd-46ec0a267b29)
  - ![Image](https://github.com/user-attachments/assets/ee1560dc-56cc-4d8f-9d91-ccf47ec56c38)
  - ![Image](https://github.com/user-attachments/assets/8c61996f-7b69-442c-84fb-9b57df599bb2)
  - ![Image](https://github.com/user-attachments/assets/84f7c6d7-5efb-44bd-827c-3e4e6e40fd30)
  - ![Image](https://github.com/user-attachments/assets/52ec5480-3b8f-4a48-9958-de54310973a8)
+ - ![Image](https://github.com/user-attachments/assets/dec10577-e09c-412d-9f3b-c44c06014cd9)
  - ![Image](https://github.com/user-attachments/assets/5c117ea7-7c74-4a35-8d4f-cbc575841a12)
  - ![Image](https://github.com/user-attachments/assets/9b3926f6-8371-43a4-90d0-50cbbd21c0df)
  - ![Image](https://github.com/user-attachments/assets/124d0fdb-9559-48dd-aefa-48ac7dc34bfc)

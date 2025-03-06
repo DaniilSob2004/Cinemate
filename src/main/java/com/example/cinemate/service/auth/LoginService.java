@@ -5,7 +5,7 @@ import com.example.cinemate.dto.auth.LoginRequestDto;
 import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.utils.BaseAuthUtil;
-import com.example.cinemate.validate.LoginValidate;
+import com.example.cinemate.validate.user.LoginValidate;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
