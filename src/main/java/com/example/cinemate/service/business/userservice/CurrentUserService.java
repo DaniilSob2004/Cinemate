@@ -72,7 +72,7 @@ public class CurrentUserService {
 
         // проверяем и изменяем username у user (если необходимо)
         userUpdateDto.setUsername(
-                userDataValidate.normalizeUsername(userUpdateDto.getUsername(), appUser.getUsername(), appUser.getEmail())
+                userDataValidate.normalizeUsername(userUpdateDto.getUsername(), appUser.getEmail())
         );
 
         // обновляем данные

@@ -37,7 +37,7 @@ public class SaveUserService {
 
     public void prepareUserDataForSave(final AppUser user) {
         user.setUsername(
-                userDataValidate.normalizeUsername("", user.getUsername(), user.getEmail())
+                userDataValidate.normalizeUsername(user.getUsername(), user.getEmail())
         );
         user.setEmail(
                 user.getEmail().toLowerCase()

@@ -42,17 +42,15 @@ public class UserDataValidate {
         return false;
     }
 
-    public String normalizeUsername(String newUsername, final String username, final String email) {
+    public String normalizeUsername(String newUsername, final String email) {
         if (newUsername.isEmpty()) {
             newUsername = StringUtil.addSymbolInStart(
                     StringUtil.getUsernameFromEmail(email), "@"
-            ).toLowerCase();
+            );
         }
-        else if (!username.equals(newUsername)) {
-            if (!StringUtil.getFirstLetter(newUsername).equals("@")) {
-                newUsername = StringUtil.addSymbolInStart(newUsername, "@").toLowerCase();
-            }
+        if (!StringUtil.getFirstLetter(newUsername).equals("@")) {
+            newUsername = StringUtil.addSymbolInStart(newUsername, "@");
         }
-        return newUsername;
+        return newUsername.toLowerCase();
     }
 }

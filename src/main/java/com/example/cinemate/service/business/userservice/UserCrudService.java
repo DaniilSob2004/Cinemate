@@ -71,7 +71,7 @@ public class UserCrudService {
 
         // проверяем и изменяем username у user (если необходимо)
         userUpdateAdminDto.setUsername(
-                userDataValidate.normalizeUsername(userUpdateAdminDto.getUsername(), appUser.getUsername(), appUser.getEmail())
+                userDataValidate.normalizeUsername(userUpdateAdminDto.getUsername(), appUser.getEmail())
         );
 
         // удаляем все access, refresh токены и UserDetails этого пользователя
