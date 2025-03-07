@@ -35,7 +35,7 @@ public class SaveUserService {
         }
     }
 
-    public void prepareUserDataForSave(final AppUser user) {
+    private void prepareUserDataForSave(final AppUser user) {
         user.setUsername(
                 userDataValidate.normalizeUsername(user.getUsername(), user.getEmail())
         );

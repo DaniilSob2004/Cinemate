@@ -57,6 +57,11 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public Optional<AppUser> findByEmailWithoutIsActive(String email) {
+        return appUserRepository.findAppUserByEmail(email);
+    }
+
+    @Override
     public Optional<AppUser> findByEmail(String email) {
         return appUserRepository.findByEmailAndIsActiveTrue(email);
     }

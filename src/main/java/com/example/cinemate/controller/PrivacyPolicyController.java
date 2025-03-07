@@ -12,7 +12,7 @@ public class PrivacyPolicyController {
 
     @GetMapping(value = Endpoint.PRIVACY_POLICY)
     public ResponseEntity<String> getPrivacyPolicy() {
-        String privacyPolicyText = "Мой текст политики конфиденциальности...";
+        String privacyPolicyText = "My text privacy policy...";
         return ResponseEntity.ok(privacyPolicyText);
     }
 }

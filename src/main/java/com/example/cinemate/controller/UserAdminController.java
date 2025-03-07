@@ -26,6 +26,23 @@ public class UserAdminController {
         this.userCrudService = userCrudService;
     }
 
+    @PostMapping(value = Endpoint.ADD_USER)
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserAddDto userAddDto) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            userCrudService.add(userAddDto);
+            return ResponseEntity.ok("User added successfully");
+        } catch (UserAlreadyExistsException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
+        } catch (BadRequestException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+    }
+
     @GetMapping(value = Endpoint.BY_USER_ID)
     public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
@@ -60,18 +77,14 @@ public class UserAdminController {
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
-    @PostMapping(value = Endpoint.ADD_USER)
-    public ResponseEntity<?> addUser(@Valid @RequestBody UserAddDto userAddDto) {
+    @DeleteMapping(value = Endpoint.BY_USER_ID)
+    public ResponseEntity<?> deleteUserById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
-            userCrudService.add(userAddDto);
-            return ResponseEntity.ok("User added successfully");
+            userCrudService.delete(id);
+            return ResponseEntity.ok("User deleted successfully");
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (UserAlreadyExistsException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        } catch (BadRequestException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (Exception e) {
             Logger.error(e.getMessage());
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());

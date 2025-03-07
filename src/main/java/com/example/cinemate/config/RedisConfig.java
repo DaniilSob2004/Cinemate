@@ -33,34 +33,31 @@ public class RedisConfig {
     private long expirationTime;
 
 
-    // фабрика соединения для кэширования (БД 0)
-    @Bean
-    public RedisConnectionFactory redisCacheConnectionFactory() {
+    // создание фабрики соединения по указанному index db
+    private RedisConnectionFactory createRedisConnectionFactory(int indexDb) {
         var configuration = new RedisStandaloneConfiguration();
-        configuration.setDatabase(0);
+        configuration.setDatabase(indexDb);
         configuration.setHostName(hostName);
         configuration.setPort(port);
         return new LettuceConnectionFactory(configuration);
+    }
+
+    // фабрика соединения для кэширования (БД 0)
+    @Bean
+    public RedisConnectionFactory redisCacheConnectionFactory() {
+        return createRedisConnectionFactory(0);
     }
 
     // фабрика соединения для access_token (БД 1)
     @Bean
     public RedisConnectionFactory redisAccessTokenConnectionFactory() {
-        var configuration = new RedisStandaloneConfiguration();
-        configuration.setDatabase(1);
-        configuration.setHostName(hostName);
-        configuration.setPort(port);
-        return new LettuceConnectionFactory(configuration);
+        return createRedisConnectionFactory(1);
     }
 
     // фабрика соединения для refresh_token (БД 2)
     @Bean
     public RedisConnectionFactory redisRefreshTokenConnectionFactory() {
-        var configuration = new RedisStandaloneConfiguration();
-        configuration.setDatabase(2);
-        configuration.setHostName(hostName);
-        configuration.setPort(port);
-        return new LettuceConnectionFactory(configuration);
+        return createRedisConnectionFactory(2);
     }
 
 

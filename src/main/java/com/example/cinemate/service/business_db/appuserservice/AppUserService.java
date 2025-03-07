@@ -15,6 +15,7 @@ public interface AppUserService {
 
     boolean existsByEmail(String email);
     Optional<AppUser> findByIdWithoutIsActive(Integer id);
+    Optional<AppUser> findByEmailWithoutIsActive(String email);
     Optional<AppUser> findByEmail(String email);
     Optional<AppUser> findById(Integer id);
 }

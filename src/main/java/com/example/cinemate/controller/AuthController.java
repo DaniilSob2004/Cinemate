@@ -12,9 +12,11 @@ import com.example.cinemate.service.auth.LoginService;
 import com.example.cinemate.service.auth.LogoutService;
 import com.example.cinemate.service.auth.RegisterService;
 import com.example.cinemate.service.auth.UpdateTokenService;
+import com.example.cinemate.utils.HandleErrorUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -47,10 +49,12 @@ public class AuthController {
             Logger.info("User authenticated!");
             return ResponseEntity.ok(responseAuthDto);  // отправляем два токена
 
+        } catch (DisabledException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.LOCKED.value());
         } catch (BadRequestException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (BadCredentialsException | InternalAuthenticationServiceException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+            errorResponseDto = HandleErrorUtil.handleUserInactiveException(e);  // обработка ошибки
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
         } catch (Exception e) {

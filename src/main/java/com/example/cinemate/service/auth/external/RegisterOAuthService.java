@@ -3,6 +3,7 @@ package com.example.cinemate.service.auth.external;
 import com.example.cinemate.dto.auth.ResponseAuthDto;
 import com.example.cinemate.dto.auth.OAuthUserDto;
 import com.example.cinemate.exception.auth.OAuthException;
+import com.example.cinemate.exception.auth.UserInactiveException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.mapper.OAuthUserMapper;
 import com.example.cinemate.model.db.AppUser;
@@ -35,8 +36,13 @@ public class RegisterOAuthService {
         oAuthUserDto.setEmail(oAuthUserDto.getEmail().toLowerCase());
 
         // если пользователь есть
-        AppUser user = appUserService.findByEmail(oAuthUserDto.getEmail()).orElse(null);
+        AppUser user = appUserService.findByEmailWithoutIsActive(oAuthUserDto.getEmail()).orElse(null);
         if (user != null) {
+            // если пользователь неактивный
+            if (!user.getIsActive()) {
+                throw new UserInactiveException("User is inactive...");
+            }
+
             var externalAuth = externalAuthService.findByProviderNameAndExternalId(
                     oAuthUserDto.getProvider().getName(),
                     oAuthUserDto.getExternalId()

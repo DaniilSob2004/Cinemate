@@ -91,12 +91,28 @@ public class UserCrudService {
 
     @Transactional
     public void add(final UserAddDto userAddDto) {
-        // валидация
+        // валидация (если ошибка, то исключение)
         userDataValidate.validateUserExistence(userAddDto.getEmail());
 
         // добавление пользователя
         AppUser newUser = appUserMapper.toAppUser(userAddDto);
         saveUserService.createUser(newUser);
         saveUserService.createUserRoles(newUser, userAddDto.getRoles());
+    }
+
+    @Transactional
+    public void delete(final Integer id) {
+        // найти пользователя в БД
+        AppUser appUser = appUserService.findByIdWithoutIsActive(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id '" + id + "' was not found..."));
+
+        // делаем неактивным
+        if (appUser.getIsActive()) {
+            appUser.setIsActive(false);
+            appUserService.save(appUser);
+        }
+
+        // удалить все токены и кэш
+        updateAdminUserService.deleteAllUserCache(id.toString());
     }
 }

@@ -22,7 +22,7 @@ A service for viewing video content. Thesis on backend.
 -------------------------------------------------------
  --------------- (Endpoints) ---------------
  - Login / Register / Logout / UpdateAccessToken /
- - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById / AddUser
+ - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById / AddUser / DeleteUserById
  - 
  - ![Image](https://github.com/user-attachments/assets/5cca4c2e-c5e6-416d-be35-6c87b4e6bcb6)
  - ![Image](https://github.com/user-attachments/assets/0c94b4bf-059d-4ca1-b409-ba510e67a1ee)
@@ -31,8 +31,8 @@ A service for viewing video content. Thesis on backend.
  - ![Image](https://github.com/user-attachments/assets/84f7c6d7-5efb-44bd-827c-3e4e6e40fd30)
  - ![Image](https://github.com/user-attachments/assets/52ec5480-3b8f-4a48-9958-de54310973a8)
  - ![Image](https://github.com/user-attachments/assets/9d9d87ec-e143-4939-aafc-bcfa7dbf2a7d)
- - ![Image](https://github.com/user-attachments/assets/5c117ea7-7c74-4a35-8d4f-cbc575841a12)
- - ![Image](https://github.com/user-attachments/assets/9b3926f6-8371-43a4-90d0-50cbbd21c0df)
+ - ![Image](https://github.com/user-attachments/assets/632d6f6e-6b91-4dc5-9d28-762b880ff5af)
+ - ![Image](https://github.com/user-attachments/assets/2a0d1809-297a-455b-9f02-a99aa5ff8771)
  - ![Image](https://github.com/user-attachments/assets/124d0fdb-9559-48dd-aefa-48ac7dc34bfc)
  - ![Image](https://github.com/user-attachments/assets/12853119-00cb-4c39-a4b1-61c6762f6cf7)
  - ![Image](https://github.com/user-attachments/assets/15d320e7-1d94-4f83-b009-b15b399d6bfb)

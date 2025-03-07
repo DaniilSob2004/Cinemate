@@ -1,5 +1,6 @@
 package com.example.cinemate.service.auth.userdetail;
 
+import com.example.cinemate.exception.auth.UserInactiveException;
 import com.example.cinemate.mapper.GrantedAuthorityMapper;
 import com.example.cinemate.mapper.UserDetailsMapper;
 import com.example.cinemate.exception.auth.UserNotFoundException;
@@ -37,8 +38,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) {
         Logger.info("!!! CREATE UserDetails (by username) !!!");
-        AppUser user = appUserService.findByEmail(username)
+        AppUser user = appUserService.findByEmailWithoutIsActive(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' was not found..."));
+
+        // проверка активирован ли пользователь (иначе serInactiveException)
+        this.checkInactiveUser(user);
 
         return this.createUserDetails(user);
     }
@@ -53,8 +57,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 })
                 .orElseGet(() -> {
                     Logger.info("!!! CREATE UserDetails (by ID) !!!");
-                    AppUser user = appUserService.findById(id)
+                    AppUser user = appUserService.findByIdWithoutIsActive(id)
                             .orElseThrow(() -> new UserNotFoundException("User with id '" + id + "' was not found..."));
+
+                    // проверка активирован ли пользователь (иначе serInactiveException)
+                    this.checkInactiveUser(user);
+
                     return createUserDetails(user);
                 });
     }
@@ -74,5 +82,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private List<GrantedAuthority> getRolesForUser(final Integer id) {
         List<String> roleNames = userRoleService.getRoleNames(id);  // используется кеш
         return grantedAuthorityMapper.toGrantedAuthorities(roleNames);
+    }
+
+    private void checkInactiveUser(final AppUser user) {
+        if (!user.getIsActive()) {
+            throw new UserInactiveException("inactive");
+        }
     }
 }

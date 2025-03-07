@@ -76,6 +76,8 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
             }
             errorResponse = new ErrorResponseDto(provider + " authentication failed", HttpServletResponse.SC_UNAUTHORIZED);
 
+        } catch (UserInactiveException e) {
+            errorResponse = new ErrorResponseDto(e.getMessage(), HttpStatus.LOCKED.value());
         } catch (UserAlreadyExistsException | OAuthException e) {
             errorResponse = new ErrorResponseDto(e.getMessage(), HttpServletResponse.SC_CONFLICT);
         } catch (InvalidEmailException e) {
