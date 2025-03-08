@@ -1,4 +1,4 @@
-package com.example.cinemate.service.business.userservice;
+package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.exception.common.BadRequestException;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class UpdateAdminUserService {
+public class UpdateUserService {
 
     private final UserRoleService userRoleService;
     private final UserDetailsCacheService userDetailsCacheService;
@@ -22,7 +22,7 @@ public class UpdateAdminUserService {
     private final RefreshTokenRedisStorage refreshTokenRedisStorage;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UpdateAdminUserService(UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, AccessTokenRedisStorage accessTokenRedisStorage, RefreshTokenRedisStorage refreshTokenRedisStorage, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UpdateUserService(UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, AccessTokenRedisStorage accessTokenRedisStorage, RefreshTokenRedisStorage refreshTokenRedisStorage, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRoleService = userRoleService;
         this.userDetailsCacheService = userDetailsCacheService;
         this.accessTokenRedisStorage = accessTokenRedisStorage;

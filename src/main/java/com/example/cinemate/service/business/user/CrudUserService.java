@@ -1,4 +1,4 @@
-package com.example.cinemate.service.business.userservice;
+package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.dto.user.UserAddDto;
 import com.example.cinemate.dto.user.UserAdminDto;
@@ -17,21 +17,21 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
-public class UserCrudService {
+public class CrudUserService {
 
     private final AppUserService appUserService;
     private final UserRoleService userRoleService;
     private final ExternalAuthService externalAuthService;
-    private final UpdateAdminUserService updateAdminUserService;
+    private final UpdateUserService updateUserService;
     private final SaveUserService saveUserService;
     private final UserDataValidate userDataValidate;
     private final AppUserMapper appUserMapper;
 
-    public UserCrudService(AppUserService appUserService, UserRoleService userRoleService, ExternalAuthService externalAuthService, UpdateAdminUserService updateAdminUserService, SaveUserService saveUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
+    public CrudUserService(AppUserService appUserService, UserRoleService userRoleService, ExternalAuthService externalAuthService, UpdateUserService updateUserService, SaveUserService saveUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
         this.appUserService = appUserService;
         this.userRoleService = userRoleService;
         this.externalAuthService = externalAuthService;
-        this.updateAdminUserService = updateAdminUserService;
+        this.updateUserService = updateUserService;
         this.saveUserService = saveUserService;
         this.userDataValidate = userDataValidate;
         this.appUserMapper = appUserMapper;
@@ -63,10 +63,10 @@ public class UserCrudService {
                 userDataValidate.validateEmailForUpdate(appUser.getEmail(), userUpdateAdminDto.getEmail(), appUser.getEncPassword().isEmpty());
 
         // проверяем и изменяем password у user (если необходимо)
-        updateAdminUserService.updateUserPassword(appUser, userUpdateAdminDto.getPassword());
+        updateUserService.updateUserPassword(appUser, userUpdateAdminDto.getPassword());
 
         boolean isAllCacheUserDel =
-                updateAdminUserService.updateUserRole(appUser, userUpdateAdminDto.getRoles())  // изменены ли роли
+                updateUserService.updateUserRole(appUser, userUpdateAdminDto.getRoles())  // изменены ли роли
                 || (appUser.getIsActive() != userUpdateAdminDto.isActive() && !userUpdateAdminDto.isActive());  // если заблокировали
 
         // проверяем и изменяем username у user (если необходимо)
@@ -76,14 +76,14 @@ public class UserCrudService {
 
         // удаляем все access, refresh токены и UserDetails этого пользователя
         if (isAllCacheUserDel) {
-            updateAdminUserService.deleteAllUserCache(appUser.getId().toString());
+            updateUserService.deleteAllUserCache(appUser.getId().toString());
         }
         else if (isUserDetailsCacheDel) {  // удаляем UserDetails этого пользователя
-            updateAdminUserService.deleteUserDetailsCache(appUser.getId().toString());
+            updateUserService.deleteUserDetailsCache(appUser.getId().toString());
         }
 
         // обновляем данные
-        updateAdminUserService.saveUserData(appUser, userUpdateAdminDto);
+        updateUserService.saveUserData(appUser, userUpdateAdminDto);
         appUser.setIsActive(userUpdateAdminDto.isActive());
 
         appUserService.save(appUser);
@@ -113,6 +113,6 @@ public class UserCrudService {
         }
 
         // удалить все токены и кэш
-        updateAdminUserService.deleteAllUserCache(id.toString());
+        updateUserService.deleteAllUserCache(id.toString());
     }
 }

@@ -14,6 +14,7 @@ public class Endpoint {
     // all
     public static final String LOGIN = "/login";
     public static final String REGISTER = "/register";
+    public static final String FORGOT_PASSWORD = "/forgot-password";
     public static final String PRIVACY_POLICY = "/privacy-policy";
 
     // auth users
@@ -30,6 +31,7 @@ public class Endpoint {
         List<String> endpoints = new ArrayList<>();
         endpoints.add(API_V1 + AUTH + LOGIN);
         endpoints.add(API_V1 + AUTH + REGISTER);
+        endpoints.add(API_V1 + AUTH + FORGOT_PASSWORD);
         endpoints.add(API_V1 + PRIVACY_POLICY);
         return endpoints;
     }

@@ -2,6 +2,7 @@ package com.example.cinemate.utils;
 
 import lombok.experimental.UtilityClass;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -12,6 +13,10 @@ public class GenerateUtil {
     private static final int MIN_INT = 1;
     private static final int MAX_INT = 100_000_000;
     private static final int SIZE_NUM_TEL = 12;
+
+    public static String getRandomUuid() {
+        return UUID.randomUUID().toString();
+    }
 
     public static String getEmailByName(final String name) {
         int num = getRandomInteger(1000, false);

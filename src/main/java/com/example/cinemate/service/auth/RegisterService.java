@@ -5,7 +5,7 @@ import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.dto.auth.RegisterRequestDto;
 import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.model.db.AppUser;
-import com.example.cinemate.service.business.userservice.SaveUserService;
+import com.example.cinemate.service.business.user.SaveUserService;
 import com.example.cinemate.validate.user.UserDataValidate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

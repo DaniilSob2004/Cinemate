@@ -8,7 +8,7 @@ import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.exception.common.BadRequestException;
-import com.example.cinemate.service.business.userservice.CurrentUserService;
+import com.example.cinemate.service.business.user.CurrentUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

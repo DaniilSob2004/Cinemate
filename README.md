@@ -11,6 +11,11 @@ A service for viewing video content. Thesis on backend.
  - ![Image](https://github.com/user-attachments/assets/f5dfa42c-033c-4507-af0a-669e429e56d6)
 
 -------------------------------------------------------
+ - Send email for url reset password
+ -
+ - ![Image](https://github.com/user-attachments/assets/012d8adc-2b6a-4751-a07b-1fe82f64e3ee)
+
+-------------------------------------------------------
  - Google authorization
  - 
  - ![Image](https://github.com/user-attachments/assets/e6a011ff-4ef6-4eb2-a51c-2a5e967ab347)
@@ -21,7 +26,7 @@ A service for viewing video content. Thesis on backend.
  - ![Image](https://github.com/user-attachments/assets/fa2b3f64-df33-4e6e-b13b-a0b1e17af7fb)
 -------------------------------------------------------
  --------------- (Endpoints) ---------------
- - Login / Register / Logout / UpdateAccessToken /
+ - Login / Register / Logout / UpdateAccessToken / ForgotPassword
  - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById / AddUser / DeleteUserById
  - 
  - ![Image](https://github.com/user-attachments/assets/5cca4c2e-c5e6-416d-be35-6c87b4e6bcb6)
@@ -35,5 +40,5 @@ A service for viewing video content. Thesis on backend.
  - ![Image](https://github.com/user-attachments/assets/2a0d1809-297a-455b-9f02-a99aa5ff8771)
  - ![Image](https://github.com/user-attachments/assets/124d0fdb-9559-48dd-aefa-48ac7dc34bfc)
  - ![Image](https://github.com/user-attachments/assets/12853119-00cb-4c39-a4b1-61c6762f6cf7)
- - ![Image](https://github.com/user-attachments/assets/15d320e7-1d94-4f83-b009-b15b399d6bfb)
+ - ![Image](https://github.com/user-attachments/assets/1be354f7-67eb-4a8c-ad65-c387a536deb4)
  - ![Image](https://github.com/user-attachments/assets/5f56e17a-8331-4eab-bd83-d2db5b477f0f)

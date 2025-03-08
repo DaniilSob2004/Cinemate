@@ -1,6 +1,5 @@
 package com.example.cinemate.service.auth.userdetail;
 
-import com.example.cinemate.exception.auth.UserInactiveException;
 import com.example.cinemate.mapper.GrantedAuthorityMapper;
 import com.example.cinemate.mapper.UserDetailsMapper;
 import com.example.cinemate.exception.auth.UserNotFoundException;
@@ -8,6 +7,7 @@ import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
+import com.example.cinemate.validate.user.UserDataValidate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,13 +23,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final AppUserService appUserService;
     private final UserRoleService userRoleService;
     private final UserDetailsCacheService userDetailsCacheService;
+    private final UserDataValidate userDataValidate;
     private final UserDetailsMapper userDetailsMapper;
     private final GrantedAuthorityMapper grantedAuthorityMapper;
 
-    public UserDetailsServiceImpl(AppUserService appUserService, UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, UserDetailsMapper userDetailsMapper, GrantedAuthorityMapper grantedAuthorityMapper) {
+    public UserDetailsServiceImpl(AppUserService appUserService, UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, UserDataValidate userDataValidate, UserDetailsMapper userDetailsMapper, GrantedAuthorityMapper grantedAuthorityMapper) {
         this.appUserService = appUserService;
         this.userRoleService = userRoleService;
         this.userDetailsCacheService = userDetailsCacheService;
+        this.userDataValidate = userDataValidate;
         this.userDetailsMapper = userDetailsMapper;
         this.grantedAuthorityMapper = grantedAuthorityMapper;
     }
@@ -41,8 +43,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         AppUser user = appUserService.findByEmailWithoutIsActive(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' was not found..."));
 
-        // проверка активирован ли пользователь (иначе serInactiveException)
-        this.checkInactiveUser(user);
+        // проверка активирован ли пользователь (иначе UserInactiveException)
+        userDataValidate.validateIsActiveUser(user);
 
         return this.createUserDetails(user);
     }
@@ -60,8 +62,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     AppUser user = appUserService.findByIdWithoutIsActive(id)
                             .orElseThrow(() -> new UserNotFoundException("User with id '" + id + "' was not found..."));
 
-                    // проверка активирован ли пользователь (иначе serInactiveException)
-                    this.checkInactiveUser(user);
+                    // проверка активирован ли пользователь (иначе UserInactiveException)
+                    userDataValidate.validateIsActiveUser(user);
 
                     return createUserDetails(user);
                 });
@@ -82,11 +84,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private List<GrantedAuthority> getRolesForUser(final Integer id) {
         List<String> roleNames = userRoleService.getRoleNames(id);  // используется кеш
         return grantedAuthorityMapper.toGrantedAuthorities(roleNames);
-    }
-
-    private void checkInactiveUser(final AppUser user) {
-        if (!user.getIsActive()) {
-            throw new UserInactiveException("inactive");
-        }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.cinemate.service.business.userservice;
+package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
@@ -42,8 +42,10 @@ public class SaveUserService {
         user.setEmail(
                 user.getEmail().toLowerCase()
         );
-        user.setEncPassword(
-                passwordEncoder.encode(user.getEncPassword())
-        );
+        if (user.getEncPassword() != null) {
+            user.setEncPassword(
+                    passwordEncoder.encode(user.getEncPassword())
+            );
+        }
     }
 }

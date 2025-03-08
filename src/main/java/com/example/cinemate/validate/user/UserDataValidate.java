@@ -2,7 +2,9 @@ package com.example.cinemate.validate.user;
 
 import com.example.cinemate.exception.auth.InvalidEmailException;
 import com.example.cinemate.exception.auth.UserAlreadyExistsException;
+import com.example.cinemate.exception.auth.UserInactiveException;
 import com.example.cinemate.exception.common.BadRequestException;
+import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.utils.StringUtil;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,18 @@ public class UserDataValidate {
         }
     }
 
+    public void validateIsActiveUser(final AppUser user) {
+        if (!user.getIsActive()) {
+            throw new UserInactiveException("User is inactive");
+        }
+    }
+
+    public void validateIsNotHaveProvider(final boolean isAuthProvider) {
+        if (isAuthProvider) {
+            throw new BadRequestException("External-authenticated users cannot change their email");
+        }
+    }
+
     public void validateUserExistence(final String email) {
         if (appUserService.existsByEmail(email)) {
             throw new UserAlreadyExistsException("This email already exists: " + email);
@@ -31,9 +45,8 @@ public class UserDataValidate {
     public boolean validateEmailForUpdate(final String email, final String newEmail, final boolean isAuthProvider) {
         if (!email.equals(newEmail)) {
             // запрещаем сохранение email если пользователь атворизовался через внешние провайдеры
-            if (isAuthProvider) {
-                throw new BadRequestException("External-authenticated users cannot change their email");
-            }
+            this.validateIsNotHaveProvider(isAuthProvider);
+
             // ошибка если такой email уже есть
             this.validateUserExistence(newEmail);
 
@@ -49,6 +62,7 @@ public class UserDataValidate {
             );
         }
         if (!StringUtil.getFirstLetter(newUsername).equals("@")) {
+            newUsername = newUsername.replace(' ', '_');
             newUsername = StringUtil.addSymbolInStart(newUsername, "@");
         }
         return newUsername.toLowerCase();

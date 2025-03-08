@@ -1,4 +1,4 @@
-package com.example.cinemate.service.business.userservice;
+package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.dto.user.UserDto;
@@ -25,16 +25,16 @@ public class CurrentUserService {
     private final JwtTokenService jwtTokenService;
     private final AccessJwtTokenService accessJwtTokenService;
     private final UserDetailsCacheService userDetailsCacheService;
-    private final UpdateAdminUserService updateAdminUserService;
+    private final UpdateUserService updateUserService;
     private final UserDataValidate userDataValidate;
     private final AppUserMapper appUserMapper;
 
-    public CurrentUserService(AppUserService appUserService, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, UpdateAdminUserService updateAdminUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
+    public CurrentUserService(AppUserService appUserService, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, UpdateUserService updateUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
         this.appUserService = appUserService;
         this.jwtTokenService = jwtTokenService;
         this.accessJwtTokenService = accessJwtTokenService;
         this.userDetailsCacheService = userDetailsCacheService;
-        this.updateAdminUserService = updateAdminUserService;
+        this.updateUserService = updateUserService;
         this.userDataValidate = userDataValidate;
         this.appUserMapper = appUserMapper;
     }
@@ -76,7 +76,7 @@ public class CurrentUserService {
         );
 
         // обновляем данные
-        updateAdminUserService.saveUserData(appUser, userUpdateDto);
+        updateUserService.saveUserData(appUser, userUpdateDto);
 
         appUserService.save(appUser);
     }

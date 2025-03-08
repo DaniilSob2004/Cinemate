@@ -17,6 +17,25 @@ spring:
     port: 6379
     timeout: 60000  # 60 seconds
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: my@gmail.com
+    password: "**** **** **** ****"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  mvc:
+    throw-exception-if-no-handler-found: true  # Spring будет выбрасывать исключение, если для запроса не найден соответствующий обработчик
+
+  web:
+    resources:
+      add-mappings: false  # отключает добавление стандартных маппингов для статических ресурсов
+
   security:
     oauth2:
       client:
@@ -43,10 +62,12 @@ security:
   header_value_basic_auth_prefix: Basic
 
 redis_data:
-  user_details_prefix: "user::details::"
+  user_details_key_prefix: "user::details::"
   token_key_prefix: "token::"
   token_user_id_key_prefix: "user_id_tokens::"
+  reset_token_key_prefix: "reset_token::"
   user_details_expiration_time: 3600  # 3600 60 min
+  reset_token_expiration_time: 600  # 600 10 min
   base_redis_expiration_time: 3600  # 3600 60 min
 
 db_data:

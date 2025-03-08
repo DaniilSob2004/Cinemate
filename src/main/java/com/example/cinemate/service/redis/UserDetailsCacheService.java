@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class UserDetailsCacheService extends AbstractRedisRepository<UserDetailsDto> {
 
-    @Value("${redis_data.user_details_prefix}")
+    @Value("${redis_data.user_details_key_prefix}")
     private String userDetailsPrefix;
 
     @Value("${redis_data.user_details_expiration_time}")
@@ -28,7 +28,7 @@ public class UserDetailsCacheService extends AbstractRedisRepository<UserDetails
 
     public void addToCache(final String id, final UserDetails userDetails) {
         // если объект уже в кэше
-        if (this.isHave(id)) {
+        if (this.isExists(id)) {
             return;
         }
         // преобразовываем в DTO
@@ -49,7 +49,7 @@ public class UserDetailsCacheService extends AbstractRedisRepository<UserDetails
         this.delete(key);
     }
 
-    public boolean isHave(final String id) {
+    public boolean isExists(final String id) {
         String key = userDetailsPrefix + id;
         return this.exists(key);
     }

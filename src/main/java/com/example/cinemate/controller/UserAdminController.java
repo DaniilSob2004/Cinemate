@@ -8,7 +8,7 @@ import com.example.cinemate.dto.user.UserUpdateAdminDto;
 import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.exception.common.BadRequestException;
-import com.example.cinemate.service.business.userservice.UserCrudService;
+import com.example.cinemate.service.business.user.CrudUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,17 +20,17 @@ import javax.validation.Valid;
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.USERS)
 public class UserAdminController {
 
-    private final UserCrudService userCrudService;
+    private final CrudUserService crudUserService;
 
-    public UserAdminController(UserCrudService userCrudService) {
-        this.userCrudService = userCrudService;
+    public UserAdminController(CrudUserService crudUserService) {
+        this.crudUserService = crudUserService;
     }
 
     @PostMapping(value = Endpoint.ADD_USER)
     public ResponseEntity<?> addUser(@Valid @RequestBody UserAddDto userAddDto) {
         ErrorResponseDto errorResponseDto;
         try {
-            userCrudService.add(userAddDto);
+            crudUserService.add(userAddDto);
             return ResponseEntity.ok("User added successfully");
         } catch (UserAlreadyExistsException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
@@ -47,7 +47,7 @@ public class UserAdminController {
     public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
-            UserDto userDto =  userCrudService.getById(id);
+            UserDto userDto =  crudUserService.getById(id);
             return ResponseEntity.ok(userDto);
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
@@ -62,7 +62,7 @@ public class UserAdminController {
     public ResponseEntity<?> updateUserById(@PathVariable Integer id, @Valid @RequestBody UserUpdateAdminDto userUpdateAdminDto) {
         ErrorResponseDto errorResponseDto;
         try {
-            userCrudService.updateById(id, userUpdateAdminDto);
+            crudUserService.updateById(id, userUpdateAdminDto);
             return ResponseEntity.ok("User updated successfully");
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
@@ -81,7 +81,7 @@ public class UserAdminController {
     public ResponseEntity<?> deleteUserById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
-            userCrudService.delete(id);
+            crudUserService.delete(id);
             return ResponseEntity.ok("User deleted successfully");
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());

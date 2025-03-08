@@ -60,6 +60,12 @@ public class RedisConfig {
         return createRedisConnectionFactory(2);
     }
 
+    // фабрика соединения для reset_password_token (БД 3)
+    @Bean
+    public RedisConnectionFactory redisResetPasswordTokenConnectionFactory() {
+        return createRedisConnectionFactory(3);
+    }
+
 
     // (для кэширования результатов методов) (БД 0) Spring будет использ. для управления кэшированием данных с использ. Redis
     @Bean
@@ -102,6 +108,16 @@ public class RedisConfig {
     public RedisTemplate<String, String> redisRefreshTokenTemplate(RedisConnectionFactory redisRefreshTokenConnectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(redisRefreshTokenConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+        return template;
+    }
+
+    // для работы с reset_password_token (БД 3)
+    @Bean
+    public RedisTemplate<String, String> redisResetPasswordTokenTemplate(RedisConnectionFactory redisResetPasswordTokenConnectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisResetPasswordTokenConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new StringRedisSerializer());
         return template;
