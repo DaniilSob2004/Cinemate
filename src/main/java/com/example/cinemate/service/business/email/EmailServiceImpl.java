@@ -1,7 +1,7 @@
 package com.example.cinemate.service.business.email;
 
 import com.example.cinemate.exception.common.EmailSendException;
-import com.example.cinemate.model.EmailContext;
+import com.example.cinemate.model.email.EmailContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;

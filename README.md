@@ -26,7 +26,7 @@ A service for viewing video content. Thesis on backend.
  - ![Image](https://github.com/user-attachments/assets/fa2b3f64-df33-4e6e-b13b-a0b1e17af7fb)
 -------------------------------------------------------
  --------------- (Endpoints) ---------------
- - Login / Register / Logout / UpdateAccessToken / ForgotPassword
+ - Login / Register / Logout / UpdateAccessToken / ForgotPassword / ResetPassword
  - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById / AddUser / DeleteUserById
  - 
  - ![Image](https://github.com/user-attachments/assets/5cca4c2e-c5e6-416d-be35-6c87b4e6bcb6)
@@ -41,4 +41,5 @@ A service for viewing video content. Thesis on backend.
  - ![Image](https://github.com/user-attachments/assets/124d0fdb-9559-48dd-aefa-48ac7dc34bfc)
  - ![Image](https://github.com/user-attachments/assets/12853119-00cb-4c39-a4b1-61c6762f6cf7)
  - ![Image](https://github.com/user-attachments/assets/1be354f7-67eb-4a8c-ad65-c387a536deb4)
+ - ![Image](https://github.com/user-attachments/assets/af574274-6fe9-4636-a0f7-31197f24772a)
  - ![Image](https://github.com/user-attachments/assets/5f56e17a-8331-4eab-bd83-d2db5b477f0f)

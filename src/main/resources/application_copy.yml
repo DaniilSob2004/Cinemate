@@ -70,6 +70,9 @@ redis_data:
   reset_token_expiration_time: 600  # 600 10 min
   base_redis_expiration_time: 3600  # 3600 60 min
 
+email_data:
+  reset_password_front_url: "https://myfrontend.com/reset-password?token="
+
 db_data:
   surname: src/main/resources/data/surname.txt
   username: src/main/resources/data/username.txt

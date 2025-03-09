@@ -39,7 +39,8 @@ public class AuthPreventionFilter extends OncePerRequestFilter {
         List<String> endpoints = List.of(
                 Endpoint.API_V1 + Endpoint.AUTH + Endpoint.LOGIN,
                 Endpoint.API_V1 + Endpoint.AUTH + Endpoint.REGISTER,
-                Endpoint.API_V1 + Endpoint.AUTH + Endpoint.FORGOT_PASSWORD
+                Endpoint.API_V1 + Endpoint.AUTH + Endpoint.FORGOT_PASSWORD,
+                Endpoint.API_V1 + Endpoint.AUTH + Endpoint.RESET_PASSWORD
         );
 
         // если запрос на один из указанных 'endpoints'

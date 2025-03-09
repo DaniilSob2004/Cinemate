@@ -1,4 +1,4 @@
-package com.example.cinemate.model;
+package com.example.cinemate.model.email;
 
 import lombok.*;
 

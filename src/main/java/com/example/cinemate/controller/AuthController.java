@@ -137,4 +137,23 @@ public class AuthController {
         }
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
+
+    @PostMapping(value = Endpoint.RESET_PASSWORD)
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequestDto resetPasswordRequestDto) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            updatePasswordService.resetPassword(resetPasswordRequestDto);
+            return ResponseEntity.ok("Reset password successful");
+        } catch (UserInactiveException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.LOCKED.value());
+        } catch (UserNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (BadRequestException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+    }
 }
