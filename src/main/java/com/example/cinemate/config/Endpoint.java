@@ -10,10 +10,13 @@ public class Endpoint {
     // root
     public static final String AUTH = "/auth";
     public static final String USERS = "/users";
+    public static final String ROLES = "/roles";
+    public static final String PROVIDERS = "/providers";
 
     // all
     public static final String LOGIN = "/login";
     public static final String REGISTER = "/register";
+    public static final String GET_ALL = "/all";
     public static final String FORGOT_PASSWORD = "/forgot-password";
     public static final String RESET_PASSWORD = "/reset-password";
     public static final String PRIVACY_POLICY = "/privacy-policy";
@@ -26,12 +29,13 @@ public class Endpoint {
     // admin
     public static final String BY_USER_ID = "/{id}";
     public static final String ADD_USER = "/add";
-    public static final String GET_PHOTO = "/secure/photo";
+    public static final String GET_ALL_FOR_ADMIN = "/all";
 
     static public List<String> getEndpointForAllUsers() {
         List<String> endpoints = new ArrayList<>();
         endpoints.add(API_V1 + AUTH + LOGIN);
         endpoints.add(API_V1 + AUTH + REGISTER);
+        endpoints.add(API_V1 + PROVIDERS + GET_ALL);
         endpoints.add(API_V1 + AUTH + FORGOT_PASSWORD);
         endpoints.add(API_V1 + AUTH + RESET_PASSWORD);
         endpoints.add(API_V1 + PRIVACY_POLICY);
@@ -42,15 +46,16 @@ public class Endpoint {
         List<String> endpoints = new ArrayList<>();
         endpoints.add(API_V1 + USERS + ME);
         endpoints.add(API_V1 + AUTH + UPDATE_ACCESS_TOKEN);
+
         endpoints.add(API_V1 + AUTH + LOGOUT);
         return endpoints;
     }
 
     static public List<String> getEndpointForAdmin() {
         List<String> endpoints = new ArrayList<>();
+        endpoints.add(API_V1 + ROLES + GET_ALL_FOR_ADMIN);
         endpoints.add(API_V1 + USERS + BY_USER_ID);
         endpoints.add(API_V1 + USERS + ADD_USER);
-        endpoints.add(API_V1 + USERS + GET_PHOTO);
         return endpoints;
     }
 }
