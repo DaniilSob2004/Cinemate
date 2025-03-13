@@ -9,6 +9,8 @@ import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.utils.StringUtil;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Component
 public class UserDataValidate {
 
@@ -32,7 +34,7 @@ public class UserDataValidate {
 
     public void validateIsNotHaveProvider(final boolean isAuthProvider) {
         if (isAuthProvider) {
-            throw new BadRequestException("External-authenticated users cannot change their email");
+            throw new BadRequestException("External-authenticated users cannot change email or password");
         }
     }
 
@@ -66,5 +68,18 @@ public class UserDataValidate {
             newUsername = StringUtil.addSymbolInStart(newUsername, "@");
         }
         return newUsername.toLowerCase();
+    }
+
+    public String getValidSortBy(final String sortBy) {
+        String defaultSortBy = "id";
+
+        if (sortBy == null || sortBy.trim().isEmpty()) {
+            return defaultSortBy;
+        }
+
+        boolean fieldExists = Arrays.stream(AppUser.class.getDeclaredFields())
+                .anyMatch(field -> field.getName().equals(sortBy));
+
+        return fieldExists ? sortBy : defaultSortBy;
     }
 }

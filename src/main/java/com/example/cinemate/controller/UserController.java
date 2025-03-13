@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = Endpoint.API_V1 + Endpoint.USERS)
+@RequestMapping(value = Endpoint.API_V1 + Endpoint.USER)
 public class UserController {
 
     private final CurrentUserService currentUserService;

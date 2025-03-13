@@ -1,49 +1,78 @@
 package com.example.cinemate.service.business.user;
 
+import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.user.UserAddDto;
 import com.example.cinemate.dto.user.UserAdminDto;
+import com.example.cinemate.dto.user.UserSearchParamsDto;
 import com.example.cinemate.dto.user.UserUpdateAdminDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
-import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
+import com.example.cinemate.service.redis.UserProviderStorage;
 import com.example.cinemate.validate.user.UserDataValidate;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CrudUserService {
 
     private final AppUserService appUserService;
     private final UserRoleService userRoleService;
-    private final ExternalAuthService externalAuthService;
     private final UpdateUserService updateUserService;
     private final SaveUserService saveUserService;
+    private final UserProviderStorage userProviderStorage;
     private final UserDataValidate userDataValidate;
     private final AppUserMapper appUserMapper;
 
-    public CrudUserService(AppUserService appUserService, UserRoleService userRoleService, ExternalAuthService externalAuthService, UpdateUserService updateUserService, SaveUserService saveUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
+    public CrudUserService(AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
         this.appUserService = appUserService;
         this.userRoleService = userRoleService;
-        this.externalAuthService = externalAuthService;
         this.updateUserService = updateUserService;
         this.saveUserService = saveUserService;
+        this.userProviderStorage = userProviderStorage;
         this.userDataValidate = userDataValidate;
         this.appUserMapper = appUserMapper;
+    }
+
+    public PagedResponse<UserAdminDto> getUsers(final UserSearchParamsDto userSearchParamsDto) {
+        String validSortBy = userDataValidate.getValidSortBy(userSearchParamsDto.getSortBy());
+
+        userSearchParamsDto.setPage(userSearchParamsDto.getPage() - 1);
+        userSearchParamsDto.setSortBy(validSortBy);
+
+        Page<AppUser> pageUsers = appUserService.getUsers(userSearchParamsDto);
+
+        List<Integer> userIds = pageUsers.get().map(AppUser::getId).toList();
+        Map<Integer, String> providers = userProviderStorage.getProviders(userIds);  // bulk-запрос
+        List<UserAdminDto> usersAdminDto = pageUsers.get()
+                .map(user -> appUserMapper.toUserAdminDto(
+                                user,
+                                providers.get(user.getId()),
+                                userRoleService.getRoleNames(user.getId())
+                            ))
+                .toList();
+
+        return new PagedResponse<>(
+                usersAdminDto,
+                pageUsers.getTotalElements(),
+                pageUsers.getTotalPages(),
+                pageUsers.getNumber() + 1,
+                pageUsers.getSize()
+        );
     }
 
     public UserAdminDto getById(final Integer id) {
         AppUser appUser = appUserService.findByIdWithoutIsActive(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id '" + id + "' was not found..."));
 
-        String provider = externalAuthService.findByUserId(appUser.getId())
-                .map(auth -> auth.getProvider().getName())
-                .orElse("");
+        String provider = userProviderStorage.getProvider(id.toString());
 
         List<String> roles = userRoleService.getRoleNames(appUser.getId());
 

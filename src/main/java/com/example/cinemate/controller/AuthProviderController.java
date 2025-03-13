@@ -23,7 +23,7 @@ public class AuthProviderController {
         this.providerService = providerService;
     }
 
-    @GetMapping(value = Endpoint.GET_ALL)
+    @GetMapping
     public ResponseEntity<?> getAll() {
         try {
             List<AuthProviderDto> providers = providerService.getAll();

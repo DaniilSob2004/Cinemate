@@ -1,5 +1,6 @@
 package com.example.cinemate.service.db;
 
+import com.example.cinemate.dto.user.UserSearchParamsDto;
 import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
@@ -9,6 +10,7 @@ import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.TextFileReaderUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -116,7 +118,8 @@ public class CinemateDbInitializer {
         // записываем роли для обычных пользователей
         Role userRole = roleService.findRoleByName(nameUserRole)
                 .orElseThrow(() -> new RuntimeException(nameUserRole + " not found..."));
-        List<AppUser> allUsers = appUserService.findAll();
+        var userSearchParamsDto = new UserSearchParamsDto(0, 20, "id", true, "");
+        List<AppUser> allUsers = appUserService.getUsers(userSearchParamsDto).getContent();
         List<UserRole> userRoles = new ArrayList<>();
         allUsers.forEach(user -> userRoles.add(new UserRole(null, user, userRole)));
         userRoleService.saveUserRolesList(userRoles);
@@ -126,7 +129,10 @@ public class CinemateDbInitializer {
 
     public void createExternalAuth() {
         List<ExternalAuth> externalAuths = new ArrayList<>();
-        List<AppUser> allUsers = appUserService.findAll();
+
+        var userSearchParamsDto = new UserSearchParamsDto(0, 20, "id", true, "");
+        List<AppUser> allUsers = appUserService.getUsers(userSearchParamsDto).getContent();
+
         int countAuths = GenerateUtil.getRandomInteger(1, 3);
 
         AuthProvider googleProvider = authProviderService.findByName("google")

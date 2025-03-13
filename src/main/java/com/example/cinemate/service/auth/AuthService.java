@@ -9,6 +9,7 @@ import com.example.cinemate.model.AuthenticationRequest;
 import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.service.auth.jwt.*;
 import com.example.cinemate.service.auth.userdetail.UserDetailsServiceImpl;
+import com.example.cinemate.service.redis.UserProviderStorage;
 import lombok.NonNull;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,18 +27,20 @@ public class AuthService {
     private final AccessJwtTokenService accessJwtTokenService;
     private final RefreshJwtTokenService refreshJwtTokenService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final UserProviderStorage userProviderStorage;
     private final AppUserMapper appUserMapper;
 
     public AuthService(
             @Lazy AuthenticationManager authenticationManager,
             AccessJwtTokenService accessJwtTokenService,
             RefreshJwtTokenService refreshJwtTokenService,
-            UserDetailsServiceImpl userDetailsService,
+            UserDetailsServiceImpl userDetailsService, UserProviderStorage userProviderStorage,
             AppUserMapper appUserMapper) {
         this.authenticationManager = authenticationManager;
         this.accessJwtTokenService = accessJwtTokenService;
         this.refreshJwtTokenService = refreshJwtTokenService;
         this.userDetailsService = userDetailsService;
+        this.userProviderStorage = userProviderStorage;
         this.appUserMapper = appUserMapper;
     }
 
@@ -50,7 +53,7 @@ public class AuthService {
         // загружается информация о польз, чтобы установить его права доступа
         UserDetails userDetails = userDetailsService.loadUserById(appUserJwtDto.getId());
 
-        if (this.addUserDetailsToCache(userDetails)) {
+        if (this.addUserDetailsToCache(userDetails, appUserJwtDto.getProvider())) {
             this.authenticateUserWithoutPassword(userDetails);  // аутентификация пользователя без пароля
             return;
         }
@@ -64,7 +67,7 @@ public class AuthService {
         UserDetails userDetails = this.getAuthenticatedUserDetails(authRequest);
 
         // после успешной аутентификации добавляем в кэш и генерируем два токена
-        if (this.addUserDetailsToCache(userDetails)) {
+        if (this.addUserDetailsToCache(userDetails, authRequest.getProvider())) {
             var appUserJwtDto = appUserMapper.toAppUserJwtDto(userDetails, authRequest.getProvider());
             var refreshTokenDto = new RefreshTokenDto(appUserJwtDto.getId());
             return new ResponseAuthDto(
@@ -80,9 +83,10 @@ public class AuthService {
                 : "User with id '" + authRequest.getUsernameOrId() + "' was not found");
     }
 
-    private boolean addUserDetailsToCache(final UserDetails userDetails) {
+    private boolean addUserDetailsToCache(final UserDetails userDetails, final String provider) {
         if (userDetails instanceof CustomUserDetails customUserDetails) {
             userDetailsService.addUserToCache(customUserDetails.getId(), customUserDetails);
+            userProviderStorage.addToStorage(customUserDetails.getId().toString(), provider);
             return true;
         }
         return false;

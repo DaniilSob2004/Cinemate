@@ -1,6 +1,5 @@
 package com.example.cinemate.config;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Endpoint {
@@ -9,6 +8,7 @@ public class Endpoint {
 
     // root
     public static final String AUTH = "/auth";
+    public static final String USER = "/user";
     public static final String USERS = "/users";
     public static final String ROLES = "/roles";
     public static final String PROVIDERS = "/providers";
@@ -16,7 +16,6 @@ public class Endpoint {
     // all
     public static final String LOGIN = "/login";
     public static final String REGISTER = "/register";
-    public static final String GET_ALL = "/all";
     public static final String FORGOT_PASSWORD = "/forgot-password";
     public static final String RESET_PASSWORD = "/reset-password";
     public static final String PRIVACY_POLICY = "/privacy-policy";
@@ -29,33 +28,30 @@ public class Endpoint {
     // admin
     public static final String BY_USER_ID = "/{id}";
     public static final String ADD_USER = "/add";
-    public static final String GET_ALL_FOR_ADMIN = "/all";
 
     static public List<String> getEndpointForAllUsers() {
-        List<String> endpoints = new ArrayList<>();
-        endpoints.add(API_V1 + AUTH + LOGIN);
-        endpoints.add(API_V1 + AUTH + REGISTER);
-        endpoints.add(API_V1 + PROVIDERS + GET_ALL);
-        endpoints.add(API_V1 + AUTH + FORGOT_PASSWORD);
-        endpoints.add(API_V1 + AUTH + RESET_PASSWORD);
-        endpoints.add(API_V1 + PRIVACY_POLICY);
-        return endpoints;
+        return List.of(
+                API_V1 + AUTH + LOGIN,
+                API_V1 + AUTH + REGISTER,
+                API_V1 + PROVIDERS,
+                API_V1 + AUTH + FORGOT_PASSWORD,
+                API_V1 + AUTH + RESET_PASSWORD,
+                API_V1 + PRIVACY_POLICY
+        );
     }
 
     static public List<String> getEndpointForAuthUsers() {
-        List<String> endpoints = new ArrayList<>();
-        endpoints.add(API_V1 + USERS + ME);
-        endpoints.add(API_V1 + AUTH + UPDATE_ACCESS_TOKEN);
-
-        endpoints.add(API_V1 + AUTH + LOGOUT);
-        return endpoints;
+        return List.of(
+                API_V1 + USER + ME,
+                API_V1 + AUTH + UPDATE_ACCESS_TOKEN,
+                API_V1 + AUTH + LOGOUT
+        );
     }
 
     static public List<String> getEndpointForAdmin() {
-        List<String> endpoints = new ArrayList<>();
-        endpoints.add(API_V1 + ROLES + GET_ALL_FOR_ADMIN);
-        endpoints.add(API_V1 + USERS + BY_USER_ID);
-        endpoints.add(API_V1 + USERS + ADD_USER);
-        return endpoints;
+        return List.of(
+                API_V1 + ROLES,
+                API_V1 + USERS
+        );
     }
 }

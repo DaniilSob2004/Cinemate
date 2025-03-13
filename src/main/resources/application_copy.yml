@@ -66,6 +66,7 @@ redis_data:
   token_key_prefix: "token::"
   token_user_id_key_prefix: "user_id_tokens::"
   reset_token_key_prefix: "reset_token::"
+  user_provider_key_prefix: "user_provider::"
   user_details_expiration_time: 3600  # 3600 60 min
   reset_token_expiration_time: 600  # 600 10 min
   base_redis_expiration_time: 3600  # 3600 60 min

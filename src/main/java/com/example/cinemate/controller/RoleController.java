@@ -23,7 +23,7 @@ public class RoleController {
         this.roleAdminService = roleAdminService;
     }
 
-    @GetMapping(value = Endpoint.GET_ALL_FOR_ADMIN)
+    @GetMapping
     public ResponseEntity<?> getAll() {
         try {
             List<RoleDto> roles = roleAdminService.getAll();

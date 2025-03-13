@@ -28,7 +28,7 @@ public class UserDetailsCacheService extends AbstractRedisRepository<UserDetails
 
     public void addToCache(final String id, final UserDetails userDetails) {
         // если объект уже в кэше
-        if (this.isExists(id)) {
+        if (userDetails == null || this.isExists(id)) {
             return;
         }
         // преобразовываем в DTO

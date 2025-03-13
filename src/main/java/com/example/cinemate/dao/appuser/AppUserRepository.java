@@ -1,12 +1,13 @@
 package com.example.cinemate.dao.appuser;
 
 import com.example.cinemate.model.db.AppUser;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
+public interface AppUserRepository extends PagingAndSortingRepository<AppUser, Integer>, JpaSpecificationExecutor<AppUser> {
     boolean existsAppUserByEmail(String email);
     Optional<AppUser> findAppUserById(Integer id);
     Optional<AppUser> findAppUserByEmail(String email);

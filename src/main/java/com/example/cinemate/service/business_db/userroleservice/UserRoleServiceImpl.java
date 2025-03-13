@@ -2,12 +2,10 @@ package com.example.cinemate.service.business_db.userroleservice;
 
 import com.example.cinemate.dao.userrole.UserRoleRepository;
 import com.example.cinemate.model.db.AppUser;
-import com.example.cinemate.model.db.Role;
 import com.example.cinemate.model.db.UserRole;
 import com.example.cinemate.service.business_db.roleservice.RoleService;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 

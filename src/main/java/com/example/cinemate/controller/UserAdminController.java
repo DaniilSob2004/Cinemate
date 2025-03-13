@@ -4,6 +4,7 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.dto.user.UserAddDto;
 import com.example.cinemate.dto.user.UserDto;
+import com.example.cinemate.dto.user.UserSearchParamsDto;
 import com.example.cinemate.dto.user.UserUpdateAdminDto;
 import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
@@ -24,6 +25,21 @@ public class UserAdminController {
 
     public UserAdminController(CrudUserService crudUserService) {
         this.crudUserService = crudUserService;
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getUsers(@Valid UserSearchParamsDto userSearchParamsDto) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            Logger.info(userSearchParamsDto);
+            return ResponseEntity.ok(crudUserService.getUsers(userSearchParamsDto));
+        } catch (BadRequestException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
     @PostMapping(value = Endpoint.ADD_USER)

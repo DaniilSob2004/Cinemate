@@ -93,34 +93,28 @@ public class RedisConfig {
         return template;
     }
 
+    // для работы с user_provider (БД 0)
+    @Bean
+    public RedisTemplate<String, String> redisUserProviderTemplate(RedisConnectionFactory redisCacheConnectionFactory) {
+        return this.getStringsRedisTemplate(redisCacheConnectionFactory);
+    }
+
     // для работы с access_token (БД 1)
     @Bean
     public RedisTemplate<String, String> redisAccessTokenTemplate(RedisConnectionFactory redisAccessTokenConnectionFactory) {
-        RedisTemplate<String, String> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisAccessTokenConnectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer());
-        return template;
+        return this.getStringsRedisTemplate(redisAccessTokenConnectionFactory);
     }
 
     // для работы с refresh_token (БД 2)
     @Bean
     public RedisTemplate<String, String> redisRefreshTokenTemplate(RedisConnectionFactory redisRefreshTokenConnectionFactory) {
-        RedisTemplate<String, String> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisRefreshTokenConnectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer());
-        return template;
+        return this.getStringsRedisTemplate(redisRefreshTokenConnectionFactory);
     }
 
     // для работы с reset_password_token (БД 3)
     @Bean
     public RedisTemplate<String, String> redisResetPasswordTokenTemplate(RedisConnectionFactory redisResetPasswordTokenConnectionFactory) {
-        RedisTemplate<String, String> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisResetPasswordTokenConnectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer());
-        return template;
+        return this.getStringsRedisTemplate(redisResetPasswordTokenConnectionFactory);
     }
 
     // по дефолту (БД 0)
@@ -130,6 +124,15 @@ public class RedisConfig {
         template.setConnectionFactory(redisCacheConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(UserDetailsDto.class));
+        return template;
+    }
+
+
+    private RedisTemplate<String, String> getStringsRedisTemplate(final RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
         return template;
     }
 }

@@ -1,7 +1,13 @@
 package com.example.cinemate.service.business_db.appuserservice;
 
 import com.example.cinemate.dao.appuser.AppUserRepository;
+import com.example.cinemate.dto.user.UserSearchParamsDto;
 import com.example.cinemate.model.db.AppUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,14 +43,45 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public List<AppUser> findAll() {
-        return appUserRepository.findAll();
-    }
-
-    @Override
     public void deleteAll() {
         appUserRepository.deleteAll();
     }
+
+
+    @Override
+    public Page<AppUser> getUsers(UserSearchParamsDto userSearchParamsDto) {
+        Pageable pageable = this.getPageable(userSearchParamsDto);
+        Specification<AppUser> specAppUsers = Specification.where(this.searchSpecification(userSearchParamsDto.getSearchStr()));
+        return appUserRepository.findAll(specAppUsers, pageable);
+    }
+
+    private Pageable getPageable(UserSearchParamsDto userSearchParamsDto) {
+        Sort.Direction direction = userSearchParamsDto.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC;
+        return PageRequest.of(
+                userSearchParamsDto.getPage(),
+                userSearchParamsDto.getSize(),
+                Sort.by(direction, userSearchParamsDto.getSortBy())
+        );
+    }
+
+    private Specification<AppUser> searchSpecification(String queryStr) {
+        // Specification<AppUser> - описание условия (WHERE), которое можно применить в findAll()
+        // root — корневая сущность (AppUser)
+        // cb — (CriteriaBuilder), фабрика для создания SQL-выражений (LIKE, AND, OR и т.д.)
+        return (root, cq, cb) -> {
+            if (queryStr == null || queryStr.isEmpty()) {
+                return cb.conjunction();  // никаких условий нет, вернутся все записи
+            }
+            String pattern = "%" + queryStr.toLowerCase() + "%";
+            return cb.or(  // возвращаем OR между условиями
+                    cb.like(cb.lower(root.get("firstname")), pattern),
+                    cb.like(cb.lower(root.get("surname")), pattern),
+                    cb.like(cb.lower(root.get("username")), pattern),
+                    cb.like(cb.lower(root.get("email")), pattern)
+            );
+        };
+    }
+
 
     @Override
     public boolean existsByEmail(String email) {

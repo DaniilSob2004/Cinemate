@@ -3,7 +3,7 @@ A service for viewing video content. Thesis on backend.
 
 -------------------------------------------------------
  - Redis for:
-    - data from db: Role, UserRole, AuthProvider
+    - data from db: Role, UserRole, AuthProvider, UserProvider
     - access/refresh token
     - userdetails object
  - 
@@ -28,11 +28,12 @@ A service for viewing video content. Thesis on backend.
  --------------- (Endpoints) ---------------
  - Login / Register / Logout / UpdateAccessToken / ForgotPassword / ResetPassword
  - GetCurrentUser / GetUserById / UpdateCurrentUser / UpdateUserById / AddUser / DeleteUserById
- - GetAllRoles / GetAllProviders
+ - GetUsers (page, size, sortBy, isAsc, searchStr), GetAllRoles / GetAllProviders
  - 
  - ![Image](https://github.com/user-attachments/assets/5cca4c2e-c5e6-416d-be35-6c87b4e6bcb6)
  - ![Image](https://github.com/user-attachments/assets/0c94b4bf-059d-4ca1-b409-ba510e67a1ee)
  - ![Image](https://github.com/user-attachments/assets/ee1560dc-56cc-4d8f-9d91-ccf47ec56c38)
+ - ![Image](https://github.com/user-attachments/assets/778ed50f-d09c-4619-9e59-84d8cbd87368)
  - ![Image](https://github.com/user-attachments/assets/5390dd86-4578-40d8-a117-9dc87590728b)
  - ![Image](https://github.com/user-attachments/assets/8c61996f-7b69-442c-84fb-9b57df599bb2)
  - ![Image](https://github.com/user-attachments/assets/84f7c6d7-5efb-44bd-827c-3e4e6e40fd30)

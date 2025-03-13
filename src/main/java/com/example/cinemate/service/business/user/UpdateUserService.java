@@ -1,12 +1,12 @@
 package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.dto.user.UserUpdateDto;
-import com.example.cinemate.exception.common.BadRequestException;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
 import com.example.cinemate.service.redis.token.AccessTokenRedisStorage;
 import com.example.cinemate.service.redis.token.RefreshTokenRedisStorage;
+import com.example.cinemate.validate.user.UserDataValidate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,22 +20,23 @@ public class UpdateUserService {
     private final UserDetailsCacheService userDetailsCacheService;
     private final AccessTokenRedisStorage accessTokenRedisStorage;
     private final RefreshTokenRedisStorage refreshTokenRedisStorage;
+    private final UserDataValidate userDataValidate;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UpdateUserService(UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, AccessTokenRedisStorage accessTokenRedisStorage, RefreshTokenRedisStorage refreshTokenRedisStorage, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UpdateUserService(UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, AccessTokenRedisStorage accessTokenRedisStorage, RefreshTokenRedisStorage refreshTokenRedisStorage, UserDataValidate userDataValidate, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRoleService = userRoleService;
         this.userDetailsCacheService = userDetailsCacheService;
         this.accessTokenRedisStorage = accessTokenRedisStorage;
         this.refreshTokenRedisStorage = refreshTokenRedisStorage;
+        this.userDataValidate = userDataValidate;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public void updateUserPassword(final AppUser appUser, final String newPassword) {
         if (!newPassword.isEmpty()) {
             // запрещаем смену пароля если пользователь атворизовался через внешние провайдеры
-            if (appUser.getEncPassword() == null) {
-                throw new BadRequestException("External-authenticated users cannot change password");
-            }
+            userDataValidate.validateIsNotHaveProvider(appUser.getEncPassword() == null);
+
             String newEncPassword = bCryptPasswordEncoder.encode(newPassword);
             if (!newEncPassword.equals(appUser.getEncPassword())) {
                 userDetailsCacheService.remove(appUser.getId().toString());  // удаляем из кэша UserDetails этого пользователя
