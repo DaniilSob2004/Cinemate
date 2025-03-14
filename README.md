@@ -1,5 +1,5 @@
-Cinemate (Netflix Clone, REST API)
-A service for viewing video content. Thesis on backend. IT Step(2021-2025).
+ - Cinemate (Netflix Clone, REST API)
+ - A service for viewing video content. Thesis on backend. IT Step(2021-2025).
 
 -------------------------------------------------------
  - Redis for:
@@ -30,7 +30,6 @@ A service for viewing video content. Thesis on backend. IT Step(2021-2025).
  - login / register / logout / update_access_token / forgot_password / reset_password
  - get_current_user / get_user_by_id / update_current_user / update_user_by_id / add_user / delete_user_by_id
  - get_users (page, size, sortBy, isAsc, searchStr), get_all_roles / get_all_providers
- - 
  -------------------- Admin User --------------------
  - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
  - ![Image](https://github.com/user-attachments/assets/1cc6d172-a20b-47fe-ac35-470bcdd58d2b)
