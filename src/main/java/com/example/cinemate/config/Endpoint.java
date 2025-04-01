@@ -12,6 +12,7 @@ public class Endpoint {
     public static final String USERS = "/users";
     public static final String ROLES = "/roles";
     public static final String PROVIDERS = "/providers";
+    public static final String CONTENT_TYPES = "/content-types";
 
     // all
     public static final String LOGIN = "/login";
@@ -26,7 +27,7 @@ public class Endpoint {
     public static final String LOGOUT = "/logout";
 
     // admin
-    public static final String BY_USER_ID = "/{id}";
+    public static final String BY_ID = "/{id}";
     public static final String ADD_USER = "/add";
 
     static public List<String> getEndpointForAllUsers() {
@@ -51,7 +52,8 @@ public class Endpoint {
     static public List<String> getEndpointForAdmin() {
         return List.of(
                 API_V1 + ROLES,
-                API_V1 + USERS
+                API_V1 + USERS,
+                API_V1 + CONTENT_TYPES
         );
     }
 }

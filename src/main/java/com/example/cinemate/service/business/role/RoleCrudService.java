@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RoleAdminService {
+public class RoleCrudService {
 
     private final RoleService roleService;
     private final RoleMapper roleMapper;
 
-    public RoleAdminService(RoleService roleService, RoleMapper roleMapper) {
+    public RoleCrudService(RoleService roleService, RoleMapper roleMapper) {
         this.roleService = roleService;
         this.roleMapper = roleMapper;
     }

@@ -5,6 +5,7 @@ import com.example.cinemate.model.db.ContentType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContentTypeServiceImpl implements ContentTypeService {
@@ -43,5 +44,10 @@ public class ContentTypeServiceImpl implements ContentTypeService {
     @Override
     public void deleteAll() {
         contentTypeRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<ContentType> findByName(String name) {
+        return contentTypeRepository.findContentTypeByName(name);
     }
 }

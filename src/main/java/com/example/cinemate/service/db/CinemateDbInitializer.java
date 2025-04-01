@@ -25,6 +25,7 @@ public class CinemateDbInitializer {
 
     private static List<String> Surnames;
     private static List<String> Usernames;
+    private static List<String> ContentTypes;
     private static List<String> DeleteTablesLines;
 
     @Value("${db_data.surname}")
@@ -32,6 +33,9 @@ public class CinemateDbInitializer {
 
     @Value("${db_data.username}")
     private String dataUsername;
+
+    @Value("${db_data.content_types}")
+    private String dataContentTypes;
 
     @Value("${db_data.delete_tables_sql}")
     private String deleteTablesSql;
@@ -66,10 +70,12 @@ public class CinemateDbInitializer {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+
     @PostConstruct
     public void init() {
         Surnames = TextFileReaderUtil.ReadTextFile(dataSurname);
         Usernames = TextFileReaderUtil.ReadTextFile(dataUsername);
+        ContentTypes = TextFileReaderUtil.ReadTextFile(dataContentTypes);
         DeleteTablesLines = TextFileReaderUtil.ReadTextFile(deleteTablesSql);
     }
 
@@ -96,6 +102,7 @@ public class CinemateDbInitializer {
 
         Logger.info("Delete all rows successfully...");
     }
+
 
     public void createAppUsers() {
         List<AppUser> users = new ArrayList<>();
@@ -149,6 +156,20 @@ public class CinemateDbInitializer {
 
         Logger.info("ExternalAuths created successfully...");
     }
+
+    public void createContentTypes() {
+        List<ContentType> contentTypes = new ArrayList<>();
+        for (String contentType : ContentTypes) {
+            contentTypes.add(new ContentType(
+                    null,
+                    contentType,
+                    "",
+                    ""
+            ));
+        }
+        contentTypeService.saveContentTypesList(contentTypes);
+    }
+
 
     private AppUser CreateAdmin() {
         return new AppUser(

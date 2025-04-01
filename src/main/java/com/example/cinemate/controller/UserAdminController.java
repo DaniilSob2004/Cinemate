@@ -59,7 +59,7 @@ public class UserAdminController {
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
-    @GetMapping(value = Endpoint.BY_USER_ID)
+    @GetMapping(value = Endpoint.BY_ID)
     public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
@@ -74,7 +74,7 @@ public class UserAdminController {
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
-    @PutMapping(value = Endpoint.BY_USER_ID)
+    @PutMapping(value = Endpoint.BY_ID)
     public ResponseEntity<?> updateUserById(@PathVariable Integer id, @Valid @RequestBody UserUpdateAdminDto userUpdateAdminDto) {
         ErrorResponseDto errorResponseDto;
         try {
@@ -93,7 +93,7 @@ public class UserAdminController {
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 
-    @DeleteMapping(value = Endpoint.BY_USER_ID)
+    @DeleteMapping(value = Endpoint.BY_ID)
     public ResponseEntity<?> deleteUserById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
