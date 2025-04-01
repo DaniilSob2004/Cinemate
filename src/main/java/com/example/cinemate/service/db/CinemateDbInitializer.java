@@ -4,13 +4,13 @@ import com.example.cinemate.dto.user.UserSearchParamsDto;
 import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
+import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeService;
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
 import com.example.cinemate.service.business_db.roleservice.RoleService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.TextFileReaderUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -53,14 +53,16 @@ public class CinemateDbInitializer {
     private final ExternalAuthService externalAuthService;
     private final RoleService roleService;
     private final UserRoleService userRoleService;
+    private final ContentTypeService contentTypeService;
     private final JdbcTemplate jdbcTemplate;
 
-    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, JdbcTemplate jdbcTemplate) {
+    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, JdbcTemplate jdbcTemplate) {
         this.appUserService = appUserService;
         this.authProviderService = authProviderService;
         this.externalAuthService = externalAuthService;
         this.roleService = roleService;
         this.userRoleService = userRoleService;
+        this.contentTypeService = contentTypeService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -89,6 +91,8 @@ public class CinemateDbInitializer {
         externalAuthService.deleteAll();
         userRoleService.deleteAll();
         appUserService.deleteAll();
+
+        contentTypeService.deleteAll();
 
         Logger.info("Delete all rows successfully...");
     }
