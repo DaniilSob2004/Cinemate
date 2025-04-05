@@ -8,6 +8,7 @@ import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeSe
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
 import com.example.cinemate.service.business_db.roleservice.RoleService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
+import com.example.cinemate.service.business_db.warningservice.WarningService;
 import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.TextFileReaderUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ public class CinemateDbInitializer {
     private static List<String> Surnames;
     private static List<String> Usernames;
     private static List<String> ContentTypes;
+    private static List<String> Warnings;
     private static List<String> DeleteTablesLines;
 
     @Value("${db_data.surname}")
@@ -36,6 +38,9 @@ public class CinemateDbInitializer {
 
     @Value("${db_data.content_types}")
     private String dataContentTypes;
+
+    @Value("${db_data.warnings}")
+    private String dataWarnings;
 
     @Value("${db_data.delete_tables_sql}")
     private String deleteTablesSql;
@@ -58,15 +63,17 @@ public class CinemateDbInitializer {
     private final RoleService roleService;
     private final UserRoleService userRoleService;
     private final ContentTypeService contentTypeService;
+    private final WarningService warningService;
     private final JdbcTemplate jdbcTemplate;
 
-    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, JdbcTemplate jdbcTemplate) {
+    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, JdbcTemplate jdbcTemplate) {
         this.appUserService = appUserService;
         this.authProviderService = authProviderService;
         this.externalAuthService = externalAuthService;
         this.roleService = roleService;
         this.userRoleService = userRoleService;
         this.contentTypeService = contentTypeService;
+        this.warningService = warningService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -76,6 +83,7 @@ public class CinemateDbInitializer {
         Surnames = TextFileReaderUtil.ReadTextFile(dataSurname);
         Usernames = TextFileReaderUtil.ReadTextFile(dataUsername);
         ContentTypes = TextFileReaderUtil.ReadTextFile(dataContentTypes);
+        Warnings = TextFileReaderUtil.ReadTextFile(dataWarnings);
         DeleteTablesLines = TextFileReaderUtil.ReadTextFile(deleteTablesSql);
     }
 
@@ -99,6 +107,7 @@ public class CinemateDbInitializer {
         appUserService.deleteAll();
 
         contentTypeService.deleteAll();
+        warningService.deleteAll();
 
         Logger.info("Delete all rows successfully...");
     }
@@ -168,6 +177,21 @@ public class CinemateDbInitializer {
             ));
         }
         contentTypeService.saveContentTypesList(contentTypes);
+
+        Logger.info("ContentTypes created successfully...");
+    }
+
+    public void createWarnings() {
+        List<Warning> warnings = new ArrayList<>();
+        for (String warning : Warnings) {
+            warnings.add(new Warning(
+                    null,
+                    warning
+            ));
+        }
+        warningService.saveWarningsList(warnings);
+
+        Logger.info("Warnings created successfully...");
     }
 
 

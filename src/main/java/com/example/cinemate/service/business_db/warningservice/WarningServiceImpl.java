@@ -5,6 +5,7 @@ import com.example.cinemate.model.db.Warning;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class WarningServiceImpl implements WarningService {
@@ -43,5 +44,10 @@ public class WarningServiceImpl implements WarningService {
     @Override
     public void deleteAll() {
         warningRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<Warning> findByName(String name) {
+        return warningRepository.findWarningByName(name);
     }
 }

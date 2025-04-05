@@ -13,6 +13,7 @@ public class Endpoint {
     public static final String ROLES = "/roles";
     public static final String PROVIDERS = "/providers";
     public static final String CONTENT_TYPES = "/content-types";
+    public static final String WARNINGS = "/warnings";
 
     // all
     public static final String LOGIN = "/login";
@@ -53,7 +54,8 @@ public class Endpoint {
         return List.of(
                 API_V1 + ROLES,
                 API_V1 + USERS,
-                API_V1 + CONTENT_TYPES
+                API_V1 + CONTENT_TYPES,
+                API_V1 + WARNINGS
         );
     }
 }

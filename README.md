@@ -30,6 +30,7 @@
  - login / register / logout / update_access_token / forgot_password / reset_password
  - get_current_user / get_user_by_id / update_current_user / update_user_by_id / add_user / delete_user_by_id
  - get_users (page, size, sortBy, isAsc, searchStr), get_all_roles / get_all_providers / get_all_content_types
+ - add_content_type / get_all_warnings / add_warning
  - 
  -------------------- Admin User --------------------
  - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
@@ -53,5 +54,8 @@
  - ![Image](https://github.com/user-attachments/assets/ee4f1642-84d6-4009-83a4-aa07baf41743)
  - ![Image](https://github.com/user-attachments/assets/ac40ed47-ab36-4a09-82d0-ed23f8d8d8d3)
  -------------------- Content Types --------------------
- - ![Image](https://github.com/user-attachments/assets/b3565e81-b08e-4ce7-8a5f-a84892021ecd)
- - ![Image](https://github.com/user-attachments/assets/b5d48bd9-a932-4cda-addc-aa2c003709e7)
+ - ![Image](https://github.com/user-attachments/assets/12294241-b9bb-4a16-afc2-34a8a2e34cc0)
+ - ![Image](https://github.com/user-attachments/assets/f738859d-40d3-4619-8a55-a1dffc6ec197)
+ -------------------- Warnings --------------------
+ - ![Image](https://github.com/user-attachments/assets/56a5af99-033a-4b2d-98c0-cdd273310b5f)
+ - ![Image](https://github.com/user-attachments/assets/6836b32e-4a8f-419e-b534-777c379de9dc)

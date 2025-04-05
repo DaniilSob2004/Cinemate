@@ -19,6 +19,7 @@ public class CinemateInitializer {
             //cinemateDbInitializer.createAppUsers();
             //cinemateDbInitializer.createExternalAuth();
             //cinemateDbInitializer.createContentTypes();
+            //cinemateDbInitializer.createWarnings();
         }
         catch (Exception e) {
             Logger.error(e.getMessage());
