@@ -20,6 +20,6 @@ public class Actor {
     @Column(name = "surname", nullable = false)
     private String surname;
 
-    @Column(name = "tags", nullable = false)
-    private String tags;
+    @Column(name = "biography")
+    private String biography;
 }

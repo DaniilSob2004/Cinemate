@@ -5,6 +5,7 @@ import com.example.cinemate.model.db.Actor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ActorServiceImpl implements ActorService {
@@ -43,5 +44,10 @@ public class ActorServiceImpl implements ActorService {
     @Override
     public void deleteAll() {
         actorRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<Actor> findByNameAndSurname(String name, String surname) {
+        return actorRepository.findActorByNameAndSurname(name, surname);
     }
 }

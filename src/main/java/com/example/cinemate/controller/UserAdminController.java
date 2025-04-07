@@ -28,7 +28,7 @@ public class UserAdminController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getUsers(@Valid UserSearchParamsDto userSearchParamsDto) {
+    public ResponseEntity<?> get(@Valid UserSearchParamsDto userSearchParamsDto) {
         ErrorResponseDto errorResponseDto;
         try {
             Logger.info(userSearchParamsDto);
@@ -43,7 +43,7 @@ public class UserAdminController {
     }
 
     @PostMapping(value = Endpoint.ADD_USER)
-    public ResponseEntity<?> addUser(@Valid @RequestBody UserAddDto userAddDto) {
+    public ResponseEntity<?> add(@Valid @RequestBody UserAddDto userAddDto) {
         ErrorResponseDto errorResponseDto;
         try {
             crudUserService.add(userAddDto);
@@ -60,7 +60,7 @@ public class UserAdminController {
     }
 
     @GetMapping(value = Endpoint.BY_ID)
-    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
             UserDto userDto =  crudUserService.getById(id);
@@ -75,7 +75,7 @@ public class UserAdminController {
     }
 
     @PutMapping(value = Endpoint.BY_ID)
-    public ResponseEntity<?> updateUserById(@PathVariable Integer id, @Valid @RequestBody UserUpdateAdminDto userUpdateAdminDto) {
+    public ResponseEntity<?> updateById(@PathVariable Integer id, @Valid @RequestBody UserUpdateAdminDto userUpdateAdminDto) {
         ErrorResponseDto errorResponseDto;
         try {
             crudUserService.updateById(id, userUpdateAdminDto);
@@ -94,7 +94,7 @@ public class UserAdminController {
     }
 
     @DeleteMapping(value = Endpoint.BY_ID)
-    public ResponseEntity<?> deleteUserById(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteById(@PathVariable Integer id) {
         ErrorResponseDto errorResponseDto;
         try {
             crudUserService.delete(id);
