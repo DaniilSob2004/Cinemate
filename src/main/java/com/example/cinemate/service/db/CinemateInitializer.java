@@ -21,6 +21,7 @@ public class CinemateInitializer {
             //cinemateDbInitializer.createContentTypes();
             //cinemateDbInitializer.createWarnings();
             //cinemateDbInitializer.createActors();
+            //cinemateDbInitializer.createGenres();
         }
         catch (Exception e) {
             Logger.error(e.getMessage());

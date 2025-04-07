@@ -16,6 +16,7 @@ public class Endpoint {
     public static final String WARNINGS = "/warnings";
     public static final String CONTENTS = "/contents";
     public static final String ACTORS = "/actors";
+    public static final String GENRES = "/genres";
 
     // all
     public static final String LOGIN = "/login";
@@ -59,7 +60,8 @@ public class Endpoint {
                 API_V1 + CONTENT_TYPES,
                 API_V1 + WARNINGS,
                 API_V1 + CONTENTS,
-                API_V1 + ACTORS
+                API_V1 + ACTORS,
+                API_V1 + GENRES
         );
     }
 }

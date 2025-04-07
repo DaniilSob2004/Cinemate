@@ -5,6 +5,7 @@ import com.example.cinemate.model.db.Genre;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GenreServiceImpl implements GenreService {
@@ -43,5 +44,10 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public void deleteAll() {
         genreRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<Genre> findByName(String name) {
+        return genreRepository.findGenreByName(name);
     }
 }

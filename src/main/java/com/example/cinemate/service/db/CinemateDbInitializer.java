@@ -7,6 +7,7 @@ import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
 import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeService;
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
+import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.service.business_db.roleservice.RoleService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.business_db.warningservice.WarningService;
@@ -30,6 +31,7 @@ public class CinemateDbInitializer {
     private static List<String> ContentTypes;
     private static List<String> Warnings;
     private static List<String> Actors;
+    private static List<String> Genres;
     private static List<String> DeleteTablesLines;
 
     @Value("${db_data.surname}")
@@ -46,6 +48,9 @@ public class CinemateDbInitializer {
 
     @Value("${db_data.actors}")
     private String dataActors;
+
+    @Value("${db_data.genres}")
+    private String dataGenres;
 
     @Value("${db_data.delete_tables_sql}")
     private String deleteTablesSql;
@@ -70,9 +75,10 @@ public class CinemateDbInitializer {
     private final ContentTypeService contentTypeService;
     private final WarningService warningService;
     private final ActorService actorService;
+    private final GenreService genreService;
     private final JdbcTemplate jdbcTemplate;
 
-    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, ActorService actorService, JdbcTemplate jdbcTemplate) {
+    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, ActorService actorService, GenreService genreService, JdbcTemplate jdbcTemplate) {
         this.appUserService = appUserService;
         this.authProviderService = authProviderService;
         this.externalAuthService = externalAuthService;
@@ -81,6 +87,7 @@ public class CinemateDbInitializer {
         this.contentTypeService = contentTypeService;
         this.warningService = warningService;
         this.actorService = actorService;
+        this.genreService = genreService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -92,6 +99,7 @@ public class CinemateDbInitializer {
         ContentTypes = TextFileReaderUtil.ReadTextFile(dataContentTypes);
         Warnings = TextFileReaderUtil.ReadTextFile(dataWarnings);
         Actors = TextFileReaderUtil.ReadTextFile(dataActors);
+        Genres = TextFileReaderUtil.ReadTextFile(dataGenres);
         DeleteTablesLines = TextFileReaderUtil.ReadTextFile(deleteTablesSql);
     }
 
@@ -117,6 +125,7 @@ public class CinemateDbInitializer {
         contentTypeService.deleteAll();
         warningService.deleteAll();
         actorService.deleteAll();
+        genreService.deleteAll();
 
         Logger.info("Delete all rows successfully...");
     }
@@ -177,14 +186,14 @@ public class CinemateDbInitializer {
 
     public void createContentTypes() {
         List<ContentType> contentTypes = new ArrayList<>();
-        for (String contentType : ContentTypes) {
+        ContentTypes.forEach(contentType -> {
             contentTypes.add(new ContentType(
                     null,
                     contentType,
                     "",
                     ""
             ));
-        }
+        });
         contentTypeService.saveContentTypesList(contentTypes);
 
         Logger.info("ContentTypes created successfully...");
@@ -192,12 +201,12 @@ public class CinemateDbInitializer {
 
     public void createWarnings() {
         List<Warning> warnings = new ArrayList<>();
-        for (String warning : Warnings) {
+        Warnings.forEach(warning -> {
             warnings.add(new Warning(
                     null,
                     warning
             ));
-        }
+        });
         warningService.saveWarningsList(warnings);
 
         Logger.info("Warnings created successfully...");
@@ -205,21 +214,35 @@ public class CinemateDbInitializer {
 
     public void createActors() {
         List<Actor> actors = new ArrayList<>();
-        for (String actor : Actors) {
+        Actors.forEach(actor -> {
             var nameSurname = actor.split(" ");
-            if (nameSurname.length != 2) {
-                continue;
+            if (nameSurname.length == 2) {
+                actors.add(new Actor(
+                        null,
+                        nameSurname[0],
+                        nameSurname[1],
+                        "Biography for " + nameSurname[0] + " " + nameSurname[1]
+                ));
             }
-            actors.add(new Actor(
-                    null,
-                    nameSurname[0],
-                    nameSurname[1],
-                    "Biography for " + nameSurname[0] + " " + nameSurname[1]
-            ));
-        }
+        });
         actorService.saveActorsList(actors);
 
         Logger.info("Actors created successfully...");
+    }
+
+    public void createGenres() {
+        List<Genre> genres = new ArrayList<>();
+        Genres.forEach(genre -> {
+            genres.add(new Genre(
+                   null,
+                   genre,
+                   "Description for " + genre,
+                   ""
+            ));
+        });
+        genreService.saveGenresList(genres);
+
+        Logger.info("Genres created successfully...");
     }
 
 

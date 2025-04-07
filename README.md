@@ -30,7 +30,7 @@
  - login / register / logout / update_access_token / forgot_password / reset_password
  - get_current_user / get_user_by_id / update_current_user / update_user_by_id / add_user / delete_user_by_id
  - get_users (page, size, sortBy, isAsc, searchStr), get_all_roles / get_all_providers / get_all_content_types
- - add_content_type / get_all_warnings / add_warning / get_all_actors / add_actor
+ - add_content_type / get_all_warnings / add_warning / get_all_actors / add_actor / get_all_genres / add_genre
  - 
  -------------------- Admin User --------------------
  - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
@@ -62,3 +62,6 @@
  -------------------- Actors --------------------
  - ![Image](https://github.com/user-attachments/assets/5b7add82-5225-46e1-8245-5b7c9762a15b)
  - ![Image](https://github.com/user-attachments/assets/6d33d39d-8a56-4c05-aa46-1492c9a5b203)
+ -------------------- Genres --------------------
+ - ![Image](https://github.com/user-attachments/assets/2cd48f40-a981-47e9-8bde-7ea2e5b5b7f4)
+ - ![Image](https://github.com/user-attachments/assets/86a949a8-63a2-431f-8c95-72728627fec9)
