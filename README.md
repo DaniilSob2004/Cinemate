@@ -31,7 +31,7 @@
  - get_current_user / get_user_by_id / update_current_user / update_user_by_id / add_user / delete_user_by_id
  - get_users (page, size, sortBy, isAsc, searchStr), get_all_roles / get_all_providers / get_all_content_types
  - add_content_type / get_all_warnings / add_warning / get_all_actors / add_actor / get_all_genres / add_genre
- - add_content / update_content / 
+ - add_content / update_content / delete_content / 
  - 
  -------------------- Admin User --------------------
  - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
@@ -54,6 +54,7 @@
  -------------------- Contents --------------------
  - ![Image](https://github.com/user-attachments/assets/fd2b44bd-ac41-48ee-a5af-a75f468c19af)
  - ![Image](https://github.com/user-attachments/assets/63d6013c-d4a3-4472-ba62-2f857157be10)
+ - ![Image](https://github.com/user-attachments/assets/12af7126-9bd9-48e6-a3d6-c6760f18e81f)
  -------------------- Roles / Providers --------------------
  - ![Image](https://github.com/user-attachments/assets/ee4f1642-84d6-4009-83a4-aa07baf41743)
  - ![Image](https://github.com/user-attachments/assets/ac40ed47-ab36-4a09-82d0-ed23f8d8d8d3)

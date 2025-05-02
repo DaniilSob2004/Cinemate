@@ -113,6 +113,19 @@ public class ContentAdminCrudService {
         this.updateContentGenres(content, contentFullAdminDto.getGenres());
     }
 
+    @Transactional
+    public void delete(final Integer id) {
+        contentService.findById(id).ifPresentOrElse(
+                content -> {
+                    content.setActive(false);
+                    contentService.save(content);
+                },
+                () -> {
+                    throw new ContentNotFoundException("Content with id '" + id + "' not found");
+                }
+        );
+    }
+
 
     private void updateContentGenres(final Content content, final List<Integer> listUpdatedGenreIds) {
         // получение id жанров для добавления и удаления

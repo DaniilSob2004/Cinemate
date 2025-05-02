@@ -3,6 +3,7 @@ package com.example.cinemate.controller;
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
+import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.content.ContentNotFoundException;
 import com.example.cinemate.service.business.content.ContentAdminCrudService;
@@ -52,6 +53,21 @@ public class ContentAdminController {
             Logger.error(e.getMessage());
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+    }
+
+    @DeleteMapping(value = Endpoint.BY_ID)
+    public ResponseEntity<?> deleteById(@PathVariable Integer id) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            contentAdminCrudService.delete(id);
+            return ResponseEntity.ok("Content deleted successfully");
+        } catch (ContentNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 }
