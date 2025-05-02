@@ -1,13 +1,14 @@
 package com.example.cinemate.dao.content;
 
 import com.example.cinemate.model.db.Content;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ContentRepository extends JpaRepository<Content, Integer> {
+public interface ContentRepository extends PagingAndSortingRepository<Content, Integer>, JpaSpecificationExecutor<Content> {
     Optional<Content> findContentById(Integer id);
     Optional<Content> findContentByNameIgnoreCase(String name);
 }

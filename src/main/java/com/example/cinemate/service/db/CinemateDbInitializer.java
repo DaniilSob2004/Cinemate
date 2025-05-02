@@ -187,7 +187,12 @@ public class CinemateDbInitializer {
         // записываем роли для обычных пользователей
         Role userRole = roleService.findRoleByName(nameUserRole)
                 .orElseThrow(() -> new RuntimeException(nameUserRole + " not found..."));
-        var userSearchParamsDto = new UserSearchParamsDto(0, 20, "id", true, "");
+        var userSearchParamsDto = UserSearchParamsDto.builder()
+                .page(0)
+                .size(20)
+                .sortBy("id")
+                .isAsc(true)
+                .searchStr("").build();
         List<AppUser> allUsers = appUserService.getUsers(userSearchParamsDto).getContent();
         List<UserRole> userRoles = new ArrayList<>();
         allUsers.forEach(user -> userRoles.add(new UserRole(null, user, userRole)));
@@ -199,7 +204,12 @@ public class CinemateDbInitializer {
     public void createExternalAuth() {
         List<ExternalAuth> externalAuths = new ArrayList<>();
 
-        var userSearchParamsDto = new UserSearchParamsDto(0, 20, "id", true, "");
+        var userSearchParamsDto = UserSearchParamsDto.builder()
+                .page(0)
+                .size(20)
+                .sortBy("id")
+                .isAsc(true)
+                .searchStr("").build();
         List<AppUser> allUsers = appUserService.getUsers(userSearchParamsDto).getContent();
 
         int countAuths = GenerateUtil.getRandomInteger(1, 3);

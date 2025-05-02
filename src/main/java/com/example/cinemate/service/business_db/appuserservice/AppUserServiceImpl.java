@@ -3,10 +3,9 @@ package com.example.cinemate.service.business_db.appuserservice;
 import com.example.cinemate.dao.appuser.AppUserRepository;
 import com.example.cinemate.dto.user.UserSearchParamsDto;
 import com.example.cinemate.model.db.AppUser;
+import com.example.cinemate.utils.PaginationUtil;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -50,21 +49,12 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public Page<AppUser> getUsers(UserSearchParamsDto userSearchParamsDto) {
-        Pageable pageable = this.getPageable(userSearchParamsDto);
+        Pageable pageable = PaginationUtil.getPageable(userSearchParamsDto);
         Specification<AppUser> specAppUsers = Specification.where(this.searchSpecification(userSearchParamsDto.getSearchStr()));
         return appUserRepository.findAll(specAppUsers, pageable);
     }
 
-    private Pageable getPageable(UserSearchParamsDto userSearchParamsDto) {
-        Sort.Direction direction = userSearchParamsDto.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC;
-        return PageRequest.of(
-                userSearchParamsDto.getPage(),
-                userSearchParamsDto.getSize(),
-                Sort.by(direction, userSearchParamsDto.getSortBy())
-        );
-    }
-
-    private Specification<AppUser> searchSpecification(String queryStr) {
+    private Specification<AppUser> searchSpecification(final String queryStr) {
         // Specification<AppUser> - описание условия (WHERE), которое можно применить в findAll()
         // root — корневая сущность (AppUser)
         // cb — (CriteriaBuilder), фабрика для создания SQL-выражений (LIKE, AND, OR и т.д.)

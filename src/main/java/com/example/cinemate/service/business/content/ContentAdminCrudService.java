@@ -1,13 +1,13 @@
 package com.example.cinemate.service.business.content;
 
+import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
+import com.example.cinemate.dto.content.ContentListAdminDto;
+import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.content.ContentNotFoundException;
 import com.example.cinemate.mapper.ContentMapper;
-import com.example.cinemate.model.db.Content;
-import com.example.cinemate.model.db.ContentActor;
-import com.example.cinemate.model.db.ContentGenre;
-import com.example.cinemate.model.db.ContentWarning;
+import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.business_db.actorservice.ActorService;
 import com.example.cinemate.service.business_db.contentactorservice.ContentActorService;
 import com.example.cinemate.service.business_db.contentgenreservice.ContentGenreService;
@@ -18,6 +18,8 @@ import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.service.business_db.warningservice.WarningService;
 import com.example.cinemate.utils.DateTimeUtil;
 import com.example.cinemate.utils.DiffUtil;
+import com.example.cinemate.validate.common.CommonDataValidate;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -36,8 +38,9 @@ public class ContentAdminCrudService {
     private final WarningService warningService;
     private final ContentWarningService contentWarningService;
     private final ContentMapper contentMapper;
+    private final CommonDataValidate commonDataValidate;
 
-    public ContentAdminCrudService(ContentService contentService, ContentTypeService contentTypeService, GenreService genreService, ContentGenreService contentGenreService, ActorService actorService, ContentActorService contentActorService, WarningService warningService, ContentWarningService contentWarningService, ContentMapper contentMapper) {
+    public ContentAdminCrudService(ContentService contentService, ContentTypeService contentTypeService, GenreService genreService, ContentGenreService contentGenreService, ActorService actorService, ContentActorService contentActorService, WarningService warningService, ContentWarningService contentWarningService, ContentMapper contentMapper, CommonDataValidate commonDataValidate) {
         this.contentService = contentService;
         this.contentTypeService = contentTypeService;
         this.genreService = genreService;
@@ -47,6 +50,31 @@ public class ContentAdminCrudService {
         this.warningService = warningService;
         this.contentWarningService = contentWarningService;
         this.contentMapper = contentMapper;
+        this.commonDataValidate = commonDataValidate;
+    }
+
+    public PagedResponse<ContentListAdminDto> getListContents(final ContentSearchParamsDto contentSearchParamsDto) {
+        String validSortBy = commonDataValidate.getIsFieldExists(
+                contentSearchParamsDto.getSortBy(),
+                Content.class.getDeclaredFields()
+        );
+
+        contentSearchParamsDto.setPage(contentSearchParamsDto.getPage() - 1);
+        contentSearchParamsDto.setSortBy(validSortBy);
+
+        Page<Content> pageContents = contentService.getContents(contentSearchParamsDto);
+
+        List<ContentListAdminDto> contentsDto = pageContents.get()
+                .map(contentMapper::toContentListAdminDto)
+                .toList();
+
+        return new PagedResponse<>(
+                contentsDto,
+                pageContents.getTotalElements(),
+                pageContents.getTotalPages(),
+                pageContents.getNumber() + 1,
+                pageContents.getSize()
+        );
     }
 
     public void add(final ContentFullAdminDto contentFullAdminDto) {

@@ -11,6 +11,7 @@ import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserProviderStorage;
+import com.example.cinemate.validate.common.CommonDataValidate;
 import com.example.cinemate.validate.user.UserDataValidate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -29,20 +30,25 @@ public class CrudUserService {
     private final SaveUserService saveUserService;
     private final UserProviderStorage userProviderStorage;
     private final UserDataValidate userDataValidate;
+    private final CommonDataValidate commonDataValidate;
     private final AppUserMapper appUserMapper;
 
-    public CrudUserService(AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
+    public CrudUserService(AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, CommonDataValidate commonDataValidate, AppUserMapper appUserMapper) {
         this.appUserService = appUserService;
         this.userRoleService = userRoleService;
         this.updateUserService = updateUserService;
         this.saveUserService = saveUserService;
         this.userProviderStorage = userProviderStorage;
         this.userDataValidate = userDataValidate;
+        this.commonDataValidate = commonDataValidate;
         this.appUserMapper = appUserMapper;
     }
 
     public PagedResponse<UserAdminDto> getUsers(final UserSearchParamsDto userSearchParamsDto) {
-        String validSortBy = userDataValidate.getValidSortBy(userSearchParamsDto.getSortBy());
+        String validSortBy = commonDataValidate.getIsFieldExists(
+                userSearchParamsDto.getSortBy(),
+                AppUser.class.getDeclaredFields()
+        );
 
         userSearchParamsDto.setPage(userSearchParamsDto.getPage() - 1);
         userSearchParamsDto.setSortBy(validSortBy);
