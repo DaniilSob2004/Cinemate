@@ -13,5 +13,6 @@ public interface WarningService {
     List<Warning> findAll();
     void deleteAll();
 
+    Optional<Warning> findById(Integer id);
     Optional<Warning> findByName(String name);
 }

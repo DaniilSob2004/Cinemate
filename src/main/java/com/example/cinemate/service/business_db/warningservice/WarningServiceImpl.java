@@ -47,6 +47,11 @@ public class WarningServiceImpl implements WarningService {
     }
 
     @Override
+    public Optional<Warning> findById(Integer id) {
+        return warningRepository.findById(id);
+    }
+
+    @Override
     public Optional<Warning> findByName(String name) {
         return warningRepository.findWarningByName(name);
     }

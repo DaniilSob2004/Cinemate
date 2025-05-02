@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface ActorRepository extends JpaRepository<Actor, Integer> {
+    Optional<Actor> findActorById(Integer id);
     Optional<Actor> findActorByNameAndSurname(String name, String surname);
 }

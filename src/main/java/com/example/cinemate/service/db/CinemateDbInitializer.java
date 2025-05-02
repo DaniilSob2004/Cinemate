@@ -5,7 +5,11 @@ import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.business_db.actorservice.ActorService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.authproviderservice.AuthProviderService;
+import com.example.cinemate.service.business_db.contentactorservice.ContentActorService;
+import com.example.cinemate.service.business_db.contentgenreservice.ContentGenreService;
+import com.example.cinemate.service.business_db.contentservice.ContentService;
 import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeService;
+import com.example.cinemate.service.business_db.contentwarningservice.ContentWarningService;
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
 import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.service.business_db.roleservice.RoleService;
@@ -32,6 +36,9 @@ public class CinemateDbInitializer {
     private static List<String> Warnings;
     private static List<String> Actors;
     private static List<String> Genres;
+    private static List<String> ContentNames;
+    private static List<String> ContentPosters;
+    private static List<String> ContentTrailers;
     private static List<String> DeleteTablesLines;
 
     @Value("${db_data.surname}")
@@ -51,6 +58,15 @@ public class CinemateDbInitializer {
 
     @Value("${db_data.genres}")
     private String dataGenres;
+
+    @Value("${db_data.content_names}")
+    private String dataContentNames;
+
+    @Value("${db_data.content_posters}")
+    private String dataContentPosters;
+
+    @Value("${db_data.content_trailers}")
+    private String dataContentTrailers;
 
     @Value("${db_data.delete_tables_sql}")
     private String deleteTablesSql;
@@ -76,9 +92,13 @@ public class CinemateDbInitializer {
     private final WarningService warningService;
     private final ActorService actorService;
     private final GenreService genreService;
+    private final ContentService contentService;
+    private final ContentGenreService contentGenreService;
+    private final ContentActorService contentActorService;
+    private final ContentWarningService contentWarningService;
     private final JdbcTemplate jdbcTemplate;
 
-    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, ActorService actorService, GenreService genreService, JdbcTemplate jdbcTemplate) {
+    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, ActorService actorService, GenreService genreService, ContentService contentService, ContentGenreService contentGenreService, ContentActorService contentActorService, ContentWarningService contentWarningService, JdbcTemplate jdbcTemplate) {
         this.appUserService = appUserService;
         this.authProviderService = authProviderService;
         this.externalAuthService = externalAuthService;
@@ -88,6 +108,10 @@ public class CinemateDbInitializer {
         this.warningService = warningService;
         this.actorService = actorService;
         this.genreService = genreService;
+        this.contentService = contentService;
+        this.contentGenreService = contentGenreService;
+        this.contentActorService = contentActorService;
+        this.contentWarningService = contentWarningService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -100,6 +124,9 @@ public class CinemateDbInitializer {
         Warnings = TextFileReaderUtil.ReadTextFile(dataWarnings);
         Actors = TextFileReaderUtil.ReadTextFile(dataActors);
         Genres = TextFileReaderUtil.ReadTextFile(dataGenres);
+        ContentNames = TextFileReaderUtil.ReadTextFile(dataContentNames);
+        ContentPosters = TextFileReaderUtil.ReadTextFile(dataContentPosters);
+        ContentTrailers = TextFileReaderUtil.ReadTextFile(dataContentTrailers);
         DeleteTablesLines = TextFileReaderUtil.ReadTextFile(deleteTablesSql);
     }
 
@@ -122,7 +149,11 @@ public class CinemateDbInitializer {
         userRoleService.deleteAll();
         appUserService.deleteAll();
 
+        contentGenreService.deleteAll();
+        contentActorService.deleteAll();
         contentTypeService.deleteAll();
+        contentWarningService.deleteAll();
+        contentService.deleteAll();
         warningService.deleteAll();
         actorService.deleteAll();
         genreService.deleteAll();
@@ -243,6 +274,113 @@ public class CinemateDbInitializer {
         genreService.saveGenresList(genres);
 
         Logger.info("Genres created successfully...");
+    }
+
+    public void createContents() {
+        var contentTypes = contentTypeService.findAll();
+        List<Content> contents = new ArrayList<>();
+
+        for (int i = 0; i < ContentNames.size(); i++) {
+            contents.add(new Content(
+                    null,
+                    ContentNames.get(i),
+                    contentTypes.get(GenerateUtil.getRandomInteger(0, contentTypes.size())),
+                    ContentPosters.get(i),
+                    ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                    ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                    "Super film - " + ContentNames.get(i),
+                    GenerateUtil.getRandomInteger(1, 50000),
+                    "",
+                    GenerateUtil.getRandomDate(),
+                    true,
+                    LocalDateTime.now(),
+                    LocalDateTime.now()
+            ));
+        }
+        contentService.saveContentsList(contents);
+
+        Logger.info("Contents created successfully...");
+    }
+
+    public void createContentGenres() {
+        var allGenres = genreService.findAll();
+        var allContents = contentService.findAll();
+        List<ContentGenre> contentGenres = new ArrayList<>();
+        List<Integer> genreCache = new ArrayList<>();
+
+        for (Content content : allContents) {
+            int countGenres = GenerateUtil.getRandomInteger(1, 3);
+            for (int j = 0; j < countGenres; j++) {
+                int genreInd = GenerateUtil.getRandomInteger(0, allGenres.size());
+                if (genreCache.contains(genreInd)) {
+                    continue;
+                }
+                contentGenres.add(new ContentGenre(
+                        null,
+                        content,
+                        allGenres.get(genreInd)
+                ));
+                genreCache.add(genreInd);
+            }
+            genreCache.clear();
+        }
+        contentGenreService.saveContentGenresList(contentGenres);
+
+        Logger.info("ContentGenres created successfully...");
+    }
+
+    public void createContentActors() {
+        var allActors = actorService.findAll();
+        var allContents = contentService.findAll();
+        List<ContentActor> contentActors = new ArrayList<>();
+        List<Integer> actorCache = new ArrayList<>();
+
+        for (Content content : allContents) {
+            int countActors = GenerateUtil.getRandomInteger(3, allActors.size());
+            for (int j = 0; j < countActors; j++) {
+                int actorInd = GenerateUtil.getRandomInteger(0, allActors.size());
+                if (actorCache.contains(actorInd)) {
+                    continue;
+                }
+                contentActors.add(new ContentActor(
+                        null,
+                        content,
+                        allActors.get(actorInd)
+                ));
+                actorCache.add(actorInd);
+            }
+            actorCache.clear();
+        }
+        contentActorService.saveContentActorsList(contentActors);
+
+        Logger.info("ContentActors created successfully...");
+    }
+
+    public void createContentWarnings() {
+        var allWarnings = warningService.findAll();
+        var allContents = contentService.findAll();
+        List<ContentWarning> contentWarnings = new ArrayList<>();
+        List<Integer> warningCache = new ArrayList<>();
+
+        for (Content content : allContents) {
+            int countWarnings = GenerateUtil.getRandomInteger(0, 2);
+            for (int j = 0; j < countWarnings; j++) {
+                int warningInd = GenerateUtil.getRandomInteger(0, allWarnings.size());
+                if (warningCache.contains(warningInd)) {
+                    continue;
+                }
+                contentWarnings.add(new ContentWarning(
+                        null,
+                        content,
+                        allWarnings.get(warningInd)
+                ));
+                warningCache.add(warningInd);
+            }
+            warningCache.clear();
+        }
+        contentWarningService.saveContentWarningsList(contentWarnings);
+
+        Logger.info("ContentWarnings created successfully...");
     }
 
 

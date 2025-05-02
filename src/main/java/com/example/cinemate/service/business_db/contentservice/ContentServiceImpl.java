@@ -5,6 +5,7 @@ import com.example.cinemate.model.db.Content;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContentServiceImpl implements ContentService {
@@ -16,8 +17,8 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public void save(Content content) {
-        contentRepository.save(content);
+    public Content save(Content content) {
+        return contentRepository.save(content);
     }
 
     @Override
@@ -43,5 +44,10 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public void deleteAll() {
         contentRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<Content> findByName(String name) {
+        return contentRepository.findContentByNameIgnoreCase(name);
     }
 }

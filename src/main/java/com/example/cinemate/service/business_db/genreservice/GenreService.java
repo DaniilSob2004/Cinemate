@@ -13,5 +13,6 @@ public interface GenreService {
     List<Genre> findAll();
     void deleteAll();
 
+    Optional<Genre> findById(Integer id);
     Optional<Genre> findByName(String name);
 }

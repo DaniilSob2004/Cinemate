@@ -13,5 +13,6 @@ public interface ActorService {
     List<Actor> findAll();
     void deleteAll();
 
+    Optional<Actor> findById(Integer id);
     Optional<Actor> findByNameAndSurname(String name, String surname);
 }

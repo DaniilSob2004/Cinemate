@@ -1,8 +1,12 @@
 package com.example.cinemate.utils;
 
 import lombok.experimental.UtilityClass;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -16,6 +20,14 @@ public class GenerateUtil {
 
     public static String getRandomUuid() {
         return UUID.randomUUID().toString();
+    }
+
+    public static LocalDate getRandomDate() {
+        LocalDate start = LocalDate.of(1950, 1, 1);
+        LocalDate end = LocalDate.of(2025, 4, 30);
+        long days = ChronoUnit.DAYS.between(start, end);
+        long randomDays = ThreadLocalRandom.current().nextLong(days + 1);
+        return start.plusDays(randomDays);
     }
 
     public static String getEmailByName(final String name) {

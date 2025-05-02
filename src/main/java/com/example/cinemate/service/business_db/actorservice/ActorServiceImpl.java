@@ -47,6 +47,11 @@ public class ActorServiceImpl implements ActorService {
     }
 
     @Override
+    public Optional<Actor> findById(Integer id) {
+        return actorRepository.findActorById(id);
+    }
+
+    @Override
     public Optional<Actor> findByNameAndSurname(String name, String surname) {
         return actorRepository.findActorByNameAndSurname(name, surname);
     }

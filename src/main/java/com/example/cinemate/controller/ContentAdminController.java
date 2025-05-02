@@ -2,15 +2,41 @@ package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
+import com.example.cinemate.dto.error.ErrorResponseDto;
+import com.example.cinemate.exception.common.ContentAlreadyExists;
+import com.example.cinemate.exception.content.ContentNotFoundException;
+import com.example.cinemate.service.business.content.ContentAdminCrudService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.tinylog.Logger;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.CONTENTS)
 public class ContentAdminController {
 
+    private final ContentAdminCrudService contentAdminCrudService;
+
+    public ContentAdminController(ContentAdminCrudService contentAdminCrudService) {
+        this.contentAdminCrudService = contentAdminCrudService;
+    }
+
     @PutMapping
-    public ResponseEntity<?> add(@RequestBody ContentFullAdminDto contentFullAdminDto) {
-        return ResponseEntity.ok().body("Content: " + contentFullAdminDto);
+    public ResponseEntity<?> add(@Valid @RequestBody ContentFullAdminDto contentFullAdminDto) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            contentAdminCrudService.add(contentFullAdminDto);
+            return ResponseEntity.ok("Content added successfully");
+        } catch (ContentNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
+        } catch (ContentAlreadyExists e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
     }
 }

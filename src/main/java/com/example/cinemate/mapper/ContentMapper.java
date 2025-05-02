@@ -5,6 +5,8 @@ import com.example.cinemate.dto.content.ContentListAdminDto;
 import com.example.cinemate.model.db.Content;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 @Component
 public class ContentMapper {
 
@@ -31,7 +33,7 @@ public class ContentMapper {
                 contentFullAdminDto.getDescription(),
                 contentFullAdminDto.getDurationMin(),
                 contentFullAdminDto.getAgeRating(),
-                contentFullAdminDto.getReleaseDate(),
+                LocalDate.parse(contentFullAdminDto.getReleaseDate()),
                 contentFullAdminDto.isActive(),
                 contentFullAdminDto.getCreatedAt(),
                 contentFullAdminDto.getUpdatedAt()

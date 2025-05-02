@@ -36,7 +36,7 @@ public class Content {
     private String description;
 
     @Column(name = "duration_min")
-    private String durationMin;
+    private Integer durationMin;
 
     @Column(name = "age_rating")
     private String ageRating;

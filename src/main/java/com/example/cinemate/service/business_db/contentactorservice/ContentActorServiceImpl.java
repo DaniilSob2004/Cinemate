@@ -21,7 +21,7 @@ public class ContentActorServiceImpl implements ContentActorService {
     }
 
     @Override
-    public void saveContentTypesList(List<ContentActor> contentActors) {
+    public void saveContentActorsList(List<ContentActor> contentActors) {
         contentActorRepository.saveAll(contentActors);
     }
 

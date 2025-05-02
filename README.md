@@ -50,6 +50,8 @@
  -------------------- Current User --------------------
  - ![Image](https://github.com/user-attachments/assets/fc85c176-2a9e-4ba2-9fb7-1d22d992665b)
  - ![Image](https://github.com/user-attachments/assets/d27be7fe-596d-4df0-89ab-70b352007c52)
+ -------------------- Contents --------------------
+ - ![Image](https://github.com/user-attachments/assets/fd2b44bd-ac41-48ee-a5af-a75f468c19af)
  -------------------- Roles / Providers --------------------
  - ![Image](https://github.com/user-attachments/assets/ee4f1642-84d6-4009-83a4-aa07baf41743)
  - ![Image](https://github.com/user-attachments/assets/ac40ed47-ab36-4a09-82d0-ed23f8d8d8d3)

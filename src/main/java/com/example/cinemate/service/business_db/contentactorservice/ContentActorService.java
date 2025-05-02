@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ContentActorService {
     void save(ContentActor contentActor);
-    void saveContentTypesList(List<ContentActor> contentActors);
+    void saveContentActorsList(List<ContentActor> contentActors);
     void update(ContentActor contentActor);
     void delete(ContentActor contentActor);
     List<ContentActor> findAll();

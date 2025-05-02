@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface WarningRepository extends JpaRepository<Warning, Integer> {
+    Optional<Warning> findWarningById(Integer id);
     Optional<Warning> findWarningByName(String name);
 }
