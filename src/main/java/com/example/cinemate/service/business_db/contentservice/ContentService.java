@@ -13,5 +13,6 @@ public interface ContentService {
     List<Content> findAll();
     void deleteAll();
 
+    Optional<Content> findById(Integer id);
     Optional<Content> findByName(String name);
 }

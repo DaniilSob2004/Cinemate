@@ -16,11 +16,13 @@ import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeSe
 import com.example.cinemate.service.business_db.contentwarningservice.ContentWarningService;
 import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.service.business_db.warningservice.WarningService;
+import com.example.cinemate.utils.DateTimeUtil;
+import com.example.cinemate.utils.DiffUtil;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ContentAdminCrudService {
@@ -77,18 +79,83 @@ public class ContentAdminCrudService {
         this.addContentWarnings(newContent, contentFullAdminDto.getWarnings());
     }
 
+    @Transactional
+    public void updateById(final Integer id, final ContentFullAdminDto contentFullAdminDto) {
+        // есть ли такой контент
+        var content = contentService.findById(id).orElse(null);
+        if (content == null) {
+            throw new ContentNotFoundException("Content with id '" + id + "' not found");
+        }
+
+        // есть ли такой тип контента
+        var contentType = contentTypeService.findByName(contentFullAdminDto.getContentType().toLowerCase()).orElse(null);
+        if (contentType == null) {
+            throw new ContentNotFoundException("Content type '" + contentFullAdminDto.getContentType() + "' not found");
+        }
+
+        // если ContentType разные
+        if (!content.getContentType().getName().equals(contentType.getName())) {
+            content.setContentType(contentType);
+        }
+
+        // если releaseDate больше текущей даты, то VideoUrl ставим пустым (фильм ещё не вышел)
+        if (DateTimeUtil.isDateAfterNow(contentFullAdminDto.getReleaseDate())) {
+            content.setVideoUrl("");
+        }
+
+        // обновление actors
+        this.updateContentActors(content, contentFullAdminDto.getActors());
+
+        // обновление warnings
+        this.updateContentWarnings(content, contentFullAdminDto.getWarnings());
+
+        // обновление genres
+        this.updateContentGenres(content, contentFullAdminDto.getGenres());
+    }
+
+
+    private void updateContentGenres(final Content content, final List<Integer> listUpdatedGenreIds) {
+        // получение id жанров для добавления и удаления
+        var idsToAddAndRemove = DiffUtil.calculateDiffIds(
+                contentGenreService.getIdGenres(content.getId()),
+                listUpdatedGenreIds
+        );
+
+        // обновление в БД
+        this.addContentGenres(content, new ArrayList<>(idsToAddAndRemove.getFirst()));
+        this.deleteContentGenres(content.getId(), new ArrayList<>(idsToAddAndRemove.getSecond()));
+    }
+
+    private void updateContentActors(final Content content, final List<Integer> listUpdatedActorIds) {
+        // получение id актеров для добавления и удаления
+        var idsToAddAndRemove = DiffUtil.calculateDiffIds(
+                contentActorService.getIdActors(content.getId()),
+                listUpdatedActorIds
+        );
+
+        // обновление в БД
+        this.addContentActors(content, new ArrayList<>(idsToAddAndRemove.getFirst()));
+        this.deleteContentActors(content.getId(), new ArrayList<>(idsToAddAndRemove.getSecond()));
+    }
+
+    private void updateContentWarnings(final Content content, final List<Integer> listUpdateWarningIds) {
+        // получение id warnings для добавления и удаления
+        var idsToAddAndRemove = DiffUtil.calculateDiffIds(
+                contentWarningService.getIdWarnings(content.getId()),
+                listUpdateWarningIds
+        );
+
+        // обновление в БД
+        this.addContentWarnings(content, new ArrayList<>(idsToAddAndRemove.getFirst()));
+        this.deleteContentWarnings(content.getId(), new ArrayList<>(idsToAddAndRemove.getSecond()));
+    }
+
+
     private void addContentGenres(final Content newContent, final List<Integer> idGenres) {
         List<ContentGenre> newContentGenres = new ArrayList<>();
         for (int idGenre : idGenres) {
-            var genre = genreService.findById(idGenre).orElse(null);
-            if (genre == null) {
-                continue;
-            }
-            newContentGenres.add(new ContentGenre(
-                    null,
-                    newContent,
-                    genre
-            ));
+            genreService.findById(idGenre).ifPresent(genre ->
+                    newContentGenres.add(new ContentGenre(null, newContent, genre)));
         }
         contentGenreService.saveContentGenresList(newContentGenres);
     }
@@ -96,32 +163,37 @@ public class ContentAdminCrudService {
     private void addContentActors(final Content newContent, final List<Integer> idActors) {
         List<ContentActor> newContentActors = new ArrayList<>();
         for (int idActor : idActors) {
-            var actor = actorService.findById(idActor).orElse(null);
-            if (actor == null) {
-                continue;
-            }
-            newContentActors.add(new ContentActor(
-                    null,
-                    newContent,
-                    actor
-            ));
+            actorService.findById(idActor).ifPresent(actor ->
+                newContentActors.add(new ContentActor(null, newContent, actor)));
         }
         contentActorService.saveContentActorsList(newContentActors);
     }
 
     private void addContentWarnings(final Content newContent, final List<Integer> idWarnings) {
         List<ContentWarning> newContentWarnings = new ArrayList<>();
-        for (int idWarning : idWarnings) {
-            var warning = warningService.findById(idWarning).orElse(null);
-            if (warning == null) {
-                continue;
-            }
-            newContentWarnings.add(new ContentWarning(
-                    null,
-                    newContent,
-                    warning
-            ));
+        for (int idWarn : idWarnings) {
+            warningService.findById(idWarn).ifPresent(warning ->
+                newContentWarnings.add(new ContentWarning(null, newContent, warning)));
         }
         contentWarningService.saveContentWarningsList(newContentWarnings);
+    }
+
+
+    private void deleteContentGenres(final Integer idContent, final List<Integer> idGenres) {
+        for (var idGenre : idGenres) {
+            contentGenreService.deleteByContentIdAndGenreId(idContent, idGenre);
+        }
+    }
+
+    private void deleteContentActors(final Integer idContent, final List<Integer> idActors) {
+        for (var idActor : idActors) {
+            contentActorService.deleteByContentIdAndActorId(idContent, idActor);
+        }
+    }
+
+    private void deleteContentWarnings(final Integer idContent, final List<Integer> idWarnings) {
+        for (var idWarn : idWarnings) {
+            contentWarningService.deleteByContentIdAndWarningId(idContent, idWarn);
+        }
     }
 }

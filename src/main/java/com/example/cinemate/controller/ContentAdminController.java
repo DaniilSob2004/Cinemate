@@ -23,7 +23,7 @@ public class ContentAdminController {
         this.contentAdminCrudService = contentAdminCrudService;
     }
 
-    @PutMapping
+    @PostMapping
     public ResponseEntity<?> add(@Valid @RequestBody ContentFullAdminDto contentFullAdminDto) {
         ErrorResponseDto errorResponseDto;
         try {
@@ -32,6 +32,21 @@ public class ContentAdminController {
         } catch (ContentNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
         } catch (ContentAlreadyExists e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+    }
+
+    @PutMapping(value = Endpoint.BY_ID)
+    public ResponseEntity<?> updateById(@PathVariable Integer id, @Valid @RequestBody ContentFullAdminDto contentFullAdminDto) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            contentAdminCrudService.updateById(id, contentFullAdminDto);
+            return ResponseEntity.ok("Content updated successfully");
+        } catch (ContentNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
         } catch (Exception e) {
             Logger.error(e.getMessage());

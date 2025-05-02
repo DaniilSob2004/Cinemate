@@ -44,4 +44,14 @@ public class ContentGenreServiceImpl implements ContentGenreService {
     public void deleteAll() {
         contentGenreRepository.deleteAll();
     }
+
+    @Override
+    public List<Integer> getIdGenres(Integer contentId) {
+        return contentGenreRepository.getIdGenres(contentId);
+    }
+
+    @Override
+    public void deleteByContentIdAndGenreId(Integer contentId, Integer genreId) {
+        contentGenreRepository.deleteByContentIdAndGenreId(contentId, genreId);
+    }
 }

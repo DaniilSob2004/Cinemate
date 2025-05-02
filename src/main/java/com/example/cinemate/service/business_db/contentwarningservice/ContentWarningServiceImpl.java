@@ -44,4 +44,14 @@ public class ContentWarningServiceImpl implements ContentWarningService {
     public void deleteAll() {
         contentWarningRepository.deleteAll();
     }
+
+    @Override
+    public List<Integer> getIdWarnings(Integer contentId) {
+        return contentWarningRepository.getIdWarnings(contentId);
+    }
+
+    @Override
+    public void deleteByContentIdAndWarningId(Integer contentId, Integer warningId) {
+        contentWarningRepository.deleteByContentIdAndWarningId(contentId, warningId);
+    }
 }

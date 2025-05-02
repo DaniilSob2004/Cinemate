@@ -11,4 +11,7 @@ public interface ContentWarningService {
     void delete(ContentWarning contentWarning);
     List<ContentWarning> findAll();
     void deleteAll();
+
+    List<Integer> getIdWarnings(Integer contentId);
+    void deleteByContentIdAndWarningId(Integer contentId, Integer warningId);
 }

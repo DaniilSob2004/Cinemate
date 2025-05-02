@@ -47,6 +47,11 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    public Optional<Content> findById(Integer id) {
+        return contentRepository.findContentById(id);
+    }
+
+    @Override
     public Optional<Content> findByName(String name) {
         return contentRepository.findContentByNameIgnoreCase(name);
     }

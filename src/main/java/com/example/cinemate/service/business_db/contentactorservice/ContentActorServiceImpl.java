@@ -44,4 +44,14 @@ public class ContentActorServiceImpl implements ContentActorService {
     public void deleteAll() {
         contentActorRepository.deleteAll();
     }
+
+    @Override
+    public List<Integer> getIdActors(Integer contentId) {
+        return contentActorRepository.getIdActors(contentId);
+    }
+
+    @Override
+    public void deleteByContentIdAndActorId(Integer idContent, Integer idActor) {
+       contentActorRepository.deleteByContentIdAndActorId(idContent, idActor);
+    }
 }
