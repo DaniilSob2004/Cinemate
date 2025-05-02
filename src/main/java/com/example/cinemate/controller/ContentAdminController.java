@@ -4,6 +4,7 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
+import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.content.ContentNotFoundException;
 import com.example.cinemate.service.business.content.ContentAdminCrudService;
@@ -30,6 +31,21 @@ public class ContentAdminController {
         try {
             Logger.info(contentSearchParamsDto);
             return ResponseEntity.ok(contentAdminCrudService.getListContents(contentSearchParamsDto));
+        } catch (Exception e) {
+            Logger.error(e.getMessage());
+            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+    }
+
+    @GetMapping(value = Endpoint.BY_ID)
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        ErrorResponseDto errorResponseDto;
+        try {
+            var contentFullAdminDto = contentAdminCrudService.getById(id);
+            return ResponseEntity.ok(contentFullAdminDto);
+        } catch (ContentNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
         } catch (Exception e) {
             Logger.error(e.getMessage());
             errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());

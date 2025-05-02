@@ -6,6 +6,7 @@ import com.example.cinemate.model.db.Content;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Component
 public class ContentMapper {
@@ -37,6 +38,27 @@ public class ContentMapper {
                 contentFullAdminDto.isActive(),
                 contentFullAdminDto.getCreatedAt(),
                 contentFullAdminDto.getUpdatedAt()
+        );
+    }
+
+    public ContentFullAdminDto toContentFullAdminDto(final Content content) {
+        return new ContentFullAdminDto(
+                content.getId(),
+                content.getName(),
+                content.getContentType().getName(),
+                content.getPosterUrl(),
+                content.getTrailerUrl(),
+                content.getVideoUrl(),
+                content.getDescription(),
+                content.getDurationMin(),
+                content.getAgeRating(),
+                content.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                null,
+                null,
+                null,
+                content.isActive(),
+                content.getCreatedAt(),
+                content.getUpdatedAt()
         );
     }
 }

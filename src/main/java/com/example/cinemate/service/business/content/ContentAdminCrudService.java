@@ -77,6 +77,20 @@ public class ContentAdminCrudService {
         );
     }
 
+    public ContentFullAdminDto getById(final Integer id) {
+        Content content = contentService.findById(id).orElse(null);
+        if (content == null) {
+            throw new ContentNotFoundException("Content with id '" + id + "' not found");
+        }
+
+        var contentFullAdminDto = contentMapper.toContentFullAdminDto(content);
+        contentFullAdminDto.setActors(contentActorService.getIdActors(content.getId()));
+        contentFullAdminDto.setGenres(contentGenreService.getIdGenres(content.getId()));
+        contentFullAdminDto.setWarnings(contentWarningService.getIdWarnings(content.getId()));
+
+        return contentFullAdminDto;
+    }
+
     public void add(final ContentFullAdminDto contentFullAdminDto) {
         // есть ли такой контент
         contentService.findByName(contentFullAdminDto.getName().toLowerCase())
