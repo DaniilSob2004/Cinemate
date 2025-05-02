@@ -3,7 +3,7 @@
 
 -------------------------------------------------------
  - Redis for:
-    - data from db: Role, UserRole, AuthProvider, UserProvider
+    - data from db: Role, UserRole, AuthProvider, UserProvider, Actor, Genre, Warning, ContentActor, ContentGenre, ContentWarning
     - access/refresh token
     - userdetails object
     - users token for reset password

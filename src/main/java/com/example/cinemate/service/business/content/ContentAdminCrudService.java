@@ -1,9 +1,7 @@
 package com.example.cinemate.service.business.content;
 
 import com.example.cinemate.dto.common.PagedResponse;
-import com.example.cinemate.dto.content.ContentFullAdminDto;
-import com.example.cinemate.dto.content.ContentListAdminDto;
-import com.example.cinemate.dto.content.ContentSearchParamsDto;
+import com.example.cinemate.dto.content.*;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.content.ContentNotFoundException;
 import com.example.cinemate.mapper.ContentMapper;
@@ -84,8 +82,8 @@ public class ContentAdminCrudService {
         }
 
         var contentFullAdminDto = contentMapper.toContentFullAdminDto(content);
+        contentFullAdminDto.setGenres(contentGenreService.getIdGenres(content.getId()));  //
         contentFullAdminDto.setActors(contentActorService.getIdActors(content.getId()));
-        contentFullAdminDto.setGenres(contentGenreService.getIdGenres(content.getId()));
         contentFullAdminDto.setWarnings(contentWarningService.getIdWarnings(content.getId()));
 
         return contentFullAdminDto;
@@ -145,14 +143,11 @@ public class ContentAdminCrudService {
             content.setVideoUrl("");
         }
 
-        // обновление actors
+        // обновление данных
         this.updateContentActors(content, contentFullAdminDto.getActors());
-
-        // обновление warnings
         this.updateContentWarnings(content, contentFullAdminDto.getWarnings());
-
-        // обновление genres
         this.updateContentGenres(content, contentFullAdminDto.getGenres());
+        this.updateContent(content, contentFullAdminDto);
     }
 
     @Transactional
@@ -172,7 +167,7 @@ public class ContentAdminCrudService {
     private void updateContentGenres(final Content content, final List<Integer> listUpdatedGenreIds) {
         // получение id жанров для добавления и удаления
         var idsToAddAndRemove = DiffUtil.calculateDiffIds(
-                contentGenreService.getIdGenres(content.getId()),
+                contentGenreService.getIdGenres(content.getId()),  //
                 listUpdatedGenreIds
         );
 
@@ -184,7 +179,7 @@ public class ContentAdminCrudService {
     private void updateContentActors(final Content content, final List<Integer> listUpdatedActorIds) {
         // получение id актеров для добавления и удаления
         var idsToAddAndRemove = DiffUtil.calculateDiffIds(
-                contentActorService.getIdActors(content.getId()),
+                contentActorService.getIdActors(content.getId()),  //
                 listUpdatedActorIds
         );
 
@@ -203,6 +198,15 @@ public class ContentAdminCrudService {
         // обновление в БД
         this.addContentWarnings(content, new ArrayList<>(idsToAddAndRemove.getFirst()));
         this.deleteContentWarnings(content.getId(), new ArrayList<>(idsToAddAndRemove.getSecond()));
+    }
+
+    private void updateContent(final Content content, final ContentFullAdminDto contentFullAdminDto) {
+        Content updateContent = contentMapper.toContent(contentFullAdminDto);
+        updateContent.setId(content.getId());
+        updateContent.setContentType(content.getContentType());
+        updateContent.setCreatedAt(content.getCreatedAt());
+        updateContent.setUpdatedAt(LocalDateTime.now());
+        contentService.update(updateContent);
     }
 
 

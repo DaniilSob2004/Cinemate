@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WarningService {
-    void save(Warning userRole);
+    void save(Warning warning);
     void saveWarningsList(List<Warning> warnings);
-    void update(Warning userRole);
-    void delete(Warning userRole);
+    void update(Warning warning);
+    void delete(Warning warning);
     List<Warning> findAll();
     void deleteAll();
 
