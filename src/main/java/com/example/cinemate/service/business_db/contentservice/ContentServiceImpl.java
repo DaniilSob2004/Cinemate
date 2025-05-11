@@ -53,6 +53,7 @@ public class ContentServiceImpl implements ContentService {
         contentRepository.deleteAll();
     }
 
+
     @Override
     public Page<Content> getContents(ContentSearchParamsDto contentSearchParamsDto) {
         Pageable pageable = PaginationUtil.getPageable(contentSearchParamsDto);
@@ -93,5 +94,10 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public Optional<Content> findByName(String name) {
         return contentRepository.findContentByNameIgnoreCase(name);
+    }
+
+    @Override
+    public List<Content> findByContentTypeId(Integer contentTypeId) {
+        return contentRepository.findContentByContentTypeId(contentTypeId);
     }
 }

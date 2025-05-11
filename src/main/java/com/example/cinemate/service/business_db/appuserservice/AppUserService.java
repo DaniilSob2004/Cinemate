@@ -12,6 +12,7 @@ public interface AppUserService {
     void saveUsersList(List<AppUser> users);
     void update(AppUser user);
     void delete(AppUser user);
+    List<AppUser> findAll();
     void deleteAll();
 
     Page<AppUser> getUsers(UserSearchParamsDto userSearchParamsDto);

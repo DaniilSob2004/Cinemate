@@ -18,4 +18,5 @@ public interface ContentService {
     Page<Content> getContents(ContentSearchParamsDto contentSearchParamsDto);
     Optional<Content> findById(Integer id);
     Optional<Content> findByName(String name);
+    List<Content> findByContentTypeId(Integer contentTypeId);
 }

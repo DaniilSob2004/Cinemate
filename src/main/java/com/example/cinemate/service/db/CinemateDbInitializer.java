@@ -1,6 +1,6 @@
 package com.example.cinemate.service.db;
 
-import com.example.cinemate.dto.user.UserSearchParamsDto;
+import com.example.cinemate.exception.content.ContentNotFoundException;
 import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.business_db.actorservice.ActorService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
@@ -10,11 +10,13 @@ import com.example.cinemate.service.business_db.contentgenreservice.ContentGenre
 import com.example.cinemate.service.business_db.contentservice.ContentService;
 import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeService;
 import com.example.cinemate.service.business_db.contentwarningservice.ContentWarningService;
+import com.example.cinemate.service.business_db.episodeservice.EpisodeService;
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
 import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.service.business_db.roleservice.RoleService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.business_db.warningservice.WarningService;
+import com.example.cinemate.service.business_db.wishlistservice.WishListService;
 import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.TextFileReaderUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,12 +95,14 @@ public class CinemateDbInitializer {
     private final ActorService actorService;
     private final GenreService genreService;
     private final ContentService contentService;
+    private final EpisodeService episodeService;
     private final ContentGenreService contentGenreService;
     private final ContentActorService contentActorService;
     private final ContentWarningService contentWarningService;
+    private final WishListService wishListService;
     private final JdbcTemplate jdbcTemplate;
 
-    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, ActorService actorService, GenreService genreService, ContentService contentService, ContentGenreService contentGenreService, ContentActorService contentActorService, ContentWarningService contentWarningService, JdbcTemplate jdbcTemplate) {
+    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, ActorService actorService, GenreService genreService, ContentService contentService, EpisodeService episodeService, ContentGenreService contentGenreService, ContentActorService contentActorService, ContentWarningService contentWarningService, WishListService wishListService, JdbcTemplate jdbcTemplate) {
         this.appUserService = appUserService;
         this.authProviderService = authProviderService;
         this.externalAuthService = externalAuthService;
@@ -109,9 +113,11 @@ public class CinemateDbInitializer {
         this.actorService = actorService;
         this.genreService = genreService;
         this.contentService = contentService;
+        this.episodeService = episodeService;
         this.contentGenreService = contentGenreService;
         this.contentActorService = contentActorService;
         this.contentWarningService = contentWarningService;
+        this.wishListService = wishListService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -132,14 +138,11 @@ public class CinemateDbInitializer {
 
     public void deleteTables() {
         StringBuilder deleteTablesQuery = new StringBuilder();
-
         for (var currString : DeleteTablesLines) {
             deleteTablesQuery.append(currString);
             deleteTablesQuery.append("\n");
         }
-
-        String sqlStr = deleteTablesQuery.toString();
-        jdbcTemplate.execute(sqlStr);
+        jdbcTemplate.execute(deleteTablesQuery.toString());
 
         Logger.info("Delete all tables successfully...");
     }
@@ -149,10 +152,12 @@ public class CinemateDbInitializer {
         userRoleService.deleteAll();
         appUserService.deleteAll();
 
+        wishListService.deleteAll();
         contentGenreService.deleteAll();
         contentActorService.deleteAll();
         contentTypeService.deleteAll();
         contentWarningService.deleteAll();
+        episodeService.deleteAll();
         contentService.deleteAll();
         warningService.deleteAll();
         actorService.deleteAll();
@@ -171,54 +176,45 @@ public class CinemateDbInitializer {
 
         // записываем роль для админа
         Role adminRole = roleService.findRoleByName(nameAdminRole)
-                .orElseThrow(() -> new RuntimeException(nameAdminRole + " not found..."));
-        UserRole roleForAdmin = new UserRole(null, admin, adminRole);
-        userRoleService.save(roleForAdmin);
+                .orElseThrow(() -> new ContentNotFoundException(nameAdminRole + " not found..."));
+        userRoleService.save(
+                new UserRole(null, admin, adminRole)
+        );
 
         // создаём пользователей
         int countUsers = GenerateUtil.getRandomInteger(5, Math.min(Surnames.size(), Usernames.size()));
         for (int i = 0; i < countUsers; i++) {
             users.add(CreateUser());
         }
-
-        // сохраняем пользователей в БД
         appUserService.saveUsersList(users);
 
         // записываем роли для обычных пользователей
         Role userRole = roleService.findRoleByName(nameUserRole)
                 .orElseThrow(() -> new RuntimeException(nameUserRole + " not found..."));
-        var userSearchParamsDto = UserSearchParamsDto.builder()
-                .page(0)
-                .size(20)
-                .sortBy("id")
-                .isAsc(true)
-                .searchStr("").build();
-        List<AppUser> allUsers = appUserService.getUsers(userSearchParamsDto).getContent();
+
+        List<AppUser> allUsers = appUserService.findAll();
         List<UserRole> userRoles = new ArrayList<>();
-        allUsers.forEach(user -> userRoles.add(new UserRole(null, user, userRole)));
+        for (int i = 1; i < allUsers.size(); i++) {
+            userRoles.add(new UserRole(null, allUsers.get(i), userRole));
+        }
         userRoleService.saveUserRolesList(userRoles);
 
         Logger.info("AppUsers and UserRoles created successfully...");
     }
 
     public void createExternalAuth() {
-        List<ExternalAuth> externalAuths = new ArrayList<>();
-
-        var userSearchParamsDto = UserSearchParamsDto.builder()
-                .page(0)
-                .size(20)
-                .sortBy("id")
-                .isAsc(true)
-                .searchStr("").build();
-        List<AppUser> allUsers = appUserService.getUsers(userSearchParamsDto).getContent();
-
-        int countAuths = GenerateUtil.getRandomInteger(1, 3);
-
         AuthProvider googleProvider = authProviderService.findByName("google")
-                .orElseThrow(() -> new RuntimeException("Auth provider 'google' not found..."));
+                .orElseThrow(() -> new ContentNotFoundException("Auth provider 'google' not found..."));
+
+        List<ExternalAuth> externalAuths = new ArrayList<>();
+        List<AppUser> allUsers = appUserService.findAll();
+        int countAuths = GenerateUtil.getRandomInteger(1, 4);
 
         for (int i = 0; i < countAuths; i++) {
-            externalAuths.add(CreateExternalAuth(allUsers, googleProvider));
+            externalAuths.add(CreateExternalAuth(
+                    allUsers.get(GenerateUtil.getRandomInteger(0, allUsers.size() - 1)),
+                    googleProvider)
+            );
         }
         externalAuthService.saveExternalAuthsList(externalAuths);
 
@@ -227,14 +223,9 @@ public class CinemateDbInitializer {
 
     public void createContentTypes() {
         List<ContentType> contentTypes = new ArrayList<>();
-        ContentTypes.forEach(contentType -> {
-            contentTypes.add(new ContentType(
-                    null,
-                    contentType,
-                    "",
-                    ""
-            ));
-        });
+        ContentTypes.forEach(contentType ->
+            contentTypes.add(new ContentType(null, contentType, "", ""))
+        );
         contentTypeService.saveContentTypesList(contentTypes);
 
         Logger.info("ContentTypes created successfully...");
@@ -242,12 +233,9 @@ public class CinemateDbInitializer {
 
     public void createWarnings() {
         List<Warning> warnings = new ArrayList<>();
-        Warnings.forEach(warning -> {
-            warnings.add(new Warning(
-                    null,
-                    warning
-            ));
-        });
+        Warnings.forEach(warning ->
+            warnings.add(new Warning(null, warning))
+        );
         warningService.saveWarningsList(warnings);
 
         Logger.info("Warnings created successfully...");
@@ -273,14 +261,9 @@ public class CinemateDbInitializer {
 
     public void createGenres() {
         List<Genre> genres = new ArrayList<>();
-        Genres.forEach(genre -> {
-            genres.add(new Genre(
-                   null,
-                   genre,
-                   "Description for " + genre,
-                   ""
-            ));
-        });
+        Genres.forEach(genre ->
+            genres.add(new Genre(null, genre, "Description for " + genre, ""))
+        );
         genreService.saveGenresList(genres);
 
         Logger.info("Genres created successfully...");
@@ -299,7 +282,7 @@ public class CinemateDbInitializer {
                     ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
                     ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
                     "Super film - " + ContentNames.get(i),
-                    GenerateUtil.getRandomInteger(1, 50000),
+                    GenerateUtil.getRandomInteger(1, 5000),
                     "",
                     GenerateUtil.getRandomDate(),
                     true,
@@ -393,6 +376,69 @@ public class CinemateDbInitializer {
         Logger.info("ContentWarnings created successfully...");
     }
 
+    public void createEpisodes() {
+        var serialContentType = contentTypeService.findByName("series")
+            .orElseThrow(() -> new ContentNotFoundException("Content type 'series' not found..."));
+
+        List<Content> serials = contentService.findByContentTypeId(serialContentType.getId());
+        List<Episode> episodes = new ArrayList<>();
+        serials.forEach(serial -> {
+            int countSeason = GenerateUtil.getRandomInteger(3, 10);
+            for (int s = 1; s <= countSeason; s++) {
+                int countEpisodes = GenerateUtil.getRandomInteger(3, 10);
+                for (int e = 1; e <= countEpisodes; e++) {
+                    episodes.add(new Episode(
+                            null,
+                            "Series " + e,
+                            serial,
+                            s,
+                            e,
+                            GenerateUtil.getRandomInteger(30, 90),
+                            "Super episode (season " + s + " series " + e + ")",
+                            ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                            ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                            GenerateUtil.getRandomDate(),
+                            LocalDateTime.now()
+                    ));
+                }
+            }
+        });
+        episodeService.saveEpisodesList(episodes);
+
+        Logger.info("Episodes created successfully...");
+    }
+
+    public void createWishLists() {
+        List<Content> allContents = contentService.findAll();
+        List<AppUser> allUsers = appUserService.findAll();
+        List<Integer> contentsCache = new ArrayList<>();
+        List<WishList> wishLists = new ArrayList<>();
+
+        for (AppUser user : allUsers) {
+            if (!GenerateUtil.getRandomBoolean()) {
+                continue;
+            }
+            int countContents = GenerateUtil.getRandomInteger(3, 10);
+            for (int j = 0; j < countContents; j++) {
+                int contentInd = GenerateUtil.getRandomInteger(0, allContents.size());
+                if (contentsCache.contains(contentInd)) {
+                    continue;
+                }
+                wishLists.add(new WishList(
+                        null,
+                        user,
+                        allContents.get(contentInd),
+                        GenerateUtil.getRandomDateTime()
+                ));
+                contentsCache.add(contentInd);
+            }
+            contentsCache.clear();
+        }
+        wishListService.saveWishListsList(wishLists);
+
+        Logger.info("WishLists created successfully...");
+    }
+
 
     private AppUser CreateAdmin() {
         return new AppUser(
@@ -429,10 +475,10 @@ public class CinemateDbInitializer {
         );
     }
 
-    private ExternalAuth CreateExternalAuth(final List<AppUser> allUsers, final AuthProvider googleProvider) {
+    private ExternalAuth CreateExternalAuth(final AppUser user, final AuthProvider googleProvider) {
         return new ExternalAuth(
                 null,
-                allUsers.get(GenerateUtil.getRandomInteger(0, allUsers.size() - 1)),
+                user,
                 googleProvider,
                 GenerateUtil.getRandomNumberString(),
                 LocalDateTime.now(),

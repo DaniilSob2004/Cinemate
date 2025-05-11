@@ -55,7 +55,7 @@ spring:
 
 security:
   secret_key: "********************"
-  access_token_expiration_time: 5  # 5 min
+  access_token_expiration_time: 10  # 10 min
   refresh_token_expiration_time: 30  # 30 min
   header_auth_name: Authorization
   header_value_auth_prefix: Bearer
@@ -77,6 +77,13 @@ email_data:
 db_data:
   surname: src/main/resources/data/surname.txt
   username: src/main/resources/data/username.txt
+  content_types: src/main/resources/data/content_types.txt
+  warnings: src/main/resources/data/warnings.txt
+  actors: src/main/resources/data/actors.txt
+  genres: src/main/resources/data/genres.txt
+  content_names: src/main/resources/data/content/names.txt
+  content_posters: src/main/resources/data/content/posters.txt
+  content_trailers: src/main/resources/data/content/trailers.txt
   delete_tables_sql: src/main/resources/db_data/delete_tables.sql
 
 admin_data:

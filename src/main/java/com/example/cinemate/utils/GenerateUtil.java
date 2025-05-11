@@ -3,6 +3,7 @@ package com.example.cinemate.utils;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.UUID;
@@ -25,6 +26,14 @@ public class GenerateUtil {
     public static LocalDate getRandomDate() {
         LocalDate start = LocalDate.of(1950, 1, 1);
         LocalDate end = LocalDate.of(2025, 4, 30);
+        long days = ChronoUnit.DAYS.between(start, end);
+        long randomDays = ThreadLocalRandom.current().nextLong(days + 1);
+        return start.plusDays(randomDays);
+    }
+
+    public static LocalDateTime getRandomDateTime() {
+        LocalDateTime start = LocalDateTime.of(1950, 1, 1, 0, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 4, 30, 23, 59, 59);
         long days = ChronoUnit.DAYS.between(start, end);
         long randomDays = ThreadLocalRandom.current().nextLong(days + 1);
         return start.plusDays(randomDays);
@@ -58,6 +67,10 @@ public class GenerateUtil {
                 .map(i -> RAND.nextInt(26) + 'a')
                 .mapToObj(c -> String.valueOf((char) c))
                 .collect(Collectors.joining());
+    }
+
+    public static boolean getRandomBoolean() {
+        return RAND.nextBoolean();
     }
 
     public static double getRandomDouble(final double min, final double max) {

@@ -16,6 +16,7 @@ public class CinemateInitializer {
         try {
             //cinemateDbInitializer.deleteTables();
             //cinemateDbInitializer.deleteAllRowsInDB();
+
             //cinemateDbInitializer.createAppUsers();
             //cinemateDbInitializer.createExternalAuth();
             //cinemateDbInitializer.createContentTypes();
@@ -26,6 +27,8 @@ public class CinemateInitializer {
             //cinemateDbInitializer.createContentGenres();
             //cinemateDbInitializer.createContentActors();
             //cinemateDbInitializer.createContentWarnings();
+            //cinemateDbInitializer.createEpisodes();
+            //cinemateDbInitializer.createWishLists();
         }
         catch (Exception e) {
             Logger.error(e.getMessage());

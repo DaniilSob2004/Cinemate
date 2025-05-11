@@ -42,6 +42,11 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public List<AppUser> findAll() {
+        return (List<AppUser>) appUserRepository.findAll();
+    }
+
+    @Override
     public void deleteAll() {
         appUserRepository.deleteAll();
     }
