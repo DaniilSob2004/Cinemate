@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/cinemate-docker
+    username: sa
+    password: admin
+    driverClassName: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    user: sa
+    password: admin
+    schemas: public
+    url: jdbc:postgresql://db:5432/cinemate-docker
+
+  redis:
+    host: redis
+    port: 6379
+    timeout: 60000  # 60 seconds
+
+base:
+  root_path: /app/
+
+db_data:
+  surname: /app/data/surname.txt
+  username: /app/data/username.txt
+  content_types: /app/data/content_types.txt
+  warnings: /app/data/warnings.txt
+  actors: /app/data/actors.txt
+  genres: /app/data/genres.txt
+  content_names: /app/data/content/names.txt
+  content_posters: /app/data/content/posters.txt
+  content_trailers: /app/data/content/trailers.txt
+  delete_tables_sql: /app/db_data/delete_tables.sql

@@ -1,58 +1,58 @@
-src/main/resources/data/posters/825 Forest Road.jpg
-src/main/resources/data/posters/A Love Too Captivating.jpg
-src/main/resources/data/posters/A Minecraft Movie.jpg
-src/main/resources/data/posters/A Working Man.jpg
-src/main/resources/data/posters/Absolution.jpg
-src/main/resources/data/posters/Alarum.jpg
-src/main/resources/data/posters/Attack on Titan_ THE LAST ATTACK.jpg
-src/main/resources/data/posters/Batman Ninja vs. Yakuza League.jpg
-src/main/resources/data/posters/Black Bag.jpg
-src/main/resources/data/posters/Captain America_ Brave New World.jpg
-src/main/resources/data/posters/Carjackers.jpg
-src/main/resources/data/posters/Chhaava.jpg
-src/main/resources/data/posters/Cleaner.jpg
-src/main/resources/data/posters/Companion.jpg
-src/main/resources/data/posters/Dalia and the Red Book.jpg
-src/main/resources/data/posters/Devara _ Part 1.jpg
-src/main/resources/data/posters/Dog Man.jpg
-src/main/resources/data/posters/Drop.jpg
-src/main/resources/data/posters/Fight or Flight.jpg
-src/main/resources/data/posters/Flight Risk.jpg
-src/main/resources/data/posters/Flow.jpg
-src/main/resources/data/posters/G20.jpg
-src/main/resources/data/posters/Gunslingers.jpg
-src/main/resources/data/posters/Heretic.jpg
-src/main/resources/data/posters/Home Sweet Home_ Rebirth.jpg
-src/main/resources/data/posters/iHostage.jpg
-src/main/resources/data/posters/In the Lost Lands.jpg
-src/main/resources/data/posters/Jaat.jpg
-src/main/resources/data/posters/John Wick_ Chapter 4.jpg
-src/main/resources/data/posters/Memoir of a Snail.jpg
-src/main/resources/data/posters/Mickey 17.jpg
-src/main/resources/data/posters/Mientras Cupido no esta╠Б.jpg
-src/main/resources/data/posters/Ne Zha 2.jpg
-src/main/resources/data/posters/Novocaine.jpg
-src/main/resources/data/posters/Oh, Canada.jpg
-src/main/resources/data/posters/Old Guy.jpg
-src/main/resources/data/posters/Opus.jpg
-src/main/resources/data/posters/Peter Pan's Neverland Nightmare.jpg
-src/main/resources/data/posters/Popeye the Slayer Man.jpg
-src/main/resources/data/posters/Puri for Rent.jpg
-src/main/resources/data/posters/Shrek.jpg
-src/main/resources/data/posters/Sinners.jpg
-src/main/resources/data/posters/Snow White.jpg
-src/main/resources/data/posters/Survive.jpg
-src/main/resources/data/posters/Terrifier 3.jpg
-src/main/resources/data/posters/The Alto Knights.jpg
-src/main/resources/data/posters/The Amateur.jpg
-src/main/resources/data/posters/The Chosen_ Last Supper.jpg
-src/main/resources/data/posters/The Codes of War.jpg
-src/main/resources/data/posters/The King of Kings.jpg
-src/main/resources/data/posters/The Life List.jpg
-src/main/resources/data/posters/The Lord of the Rings_ The Fellowship of the Ring.jpg
-src/main/resources/data/posters/The Monkey.jpg
-src/main/resources/data/posters/The Quiet Ones.jpg
-src/main/resources/data/posters/The Woman in the Yard.jpg
-src/main/resources/data/posters/Titanic_ The Digital Resurrection.jpg
-src/main/resources/data/posters/Warfare.jpg
-src/main/resources/data/posters/Werewolves.jpg
+data/posters/825 Forest Road.jpg
+data/posters/A Love Too Captivating.jpg
+data/posters/A Minecraft Movie.jpg
+data/posters/A Working Man.jpg
+data/posters/Absolution.jpg
+data/posters/Alarum.jpg
+data/posters/Attack on Titan_ THE LAST ATTACK.jpg
+data/posters/Batman Ninja vs. Yakuza League.jpg
+data/posters/Black Bag.jpg
+data/posters/Captain America_ Brave New World.jpg
+data/posters/Carjackers.jpg
+data/posters/Chhaava.jpg
+data/posters/Cleaner.jpg
+data/posters/Companion.jpg
+data/posters/Dalia and the Red Book.jpg
+data/posters/Devara _ Part 1.jpg
+data/posters/Dog Man.jpg
+data/posters/Drop.jpg
+data/posters/Fight or Flight.jpg
+data/posters/Flight Risk.jpg
+data/posters/Flow.jpg
+data/posters/G20.jpg
+data/posters/Gunslingers.jpg
+data/posters/Heretic.jpg
+data/posters/Home Sweet Home_ Rebirth.jpg
+data/posters/iHostage.jpg
+data/posters/In the Lost Lands.jpg
+data/posters/Jaat.jpg
+data/posters/John Wick_ Chapter 4.jpg
+data/posters/Memoir of a Snail.jpg
+data/posters/Mickey 17.jpg
+data/posters/Mientras Cupido no esta╠Б.jpg
+data/posters/Ne Zha 2.jpg
+data/posters/Novocaine.jpg
+data/posters/Oh, Canada.jpg
+data/posters/Old Guy.jpg
+data/posters/Opus.jpg
+data/posters/Peter Pan's Neverland Nightmare.jpg
+data/posters/Popeye the Slayer Man.jpg
+data/posters/Puri for Rent.jpg
+data/posters/Shrek.jpg
+data/posters/Sinners.jpg
+data/posters/Snow White.jpg
+data/posters/Survive.jpg
+data/posters/Terrifier 3.jpg
+data/posters/The Alto Knights.jpg
+data/posters/The Amateur.jpg
+data/posters/The Chosen_ Last Supper.jpg
+data/posters/The Codes of War.jpg
+data/posters/The King of Kings.jpg
+data/posters/The Life List.jpg
+data/posters/The Lord of the Rings_ The Fellowship of the Ring.jpg
+data/posters/The Monkey.jpg
+data/posters/The Quiet Ones.jpg
+data/posters/The Woman in the Yard.jpg
+data/posters/Titanic_ The Digital Resurrection.jpg
+data/posters/Warfare.jpg
+data/posters/Werewolves.jpg

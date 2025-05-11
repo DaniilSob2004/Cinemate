@@ -43,6 +43,9 @@ public class CinemateDbInitializer {
     private static List<String> ContentTrailers;
     private static List<String> DeleteTablesLines;
 
+    @Value("${base.root_path}")
+    private String rootPath;
+
     @Value("${db_data.surname}")
     private String dataSurname;
 
@@ -278,9 +281,9 @@ public class CinemateDbInitializer {
                     null,
                     ContentNames.get(i),
                     contentTypes.get(GenerateUtil.getRandomInteger(0, contentTypes.size())),
-                    ContentPosters.get(i),
-                    ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
-                    ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                    rootPath + ContentPosters.get(i),
+                    rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                    rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
                     "Super film - " + ContentNames.get(i),
                     GenerateUtil.getRandomInteger(1, 5000),
                     "",
@@ -395,8 +398,8 @@ public class CinemateDbInitializer {
                             e,
                             GenerateUtil.getRandomInteger(30, 90),
                             "Super episode (season " + s + " series " + e + ")",
-                            ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
-                            ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                            rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                            rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
                             GenerateUtil.getRandomDate(),
                             LocalDateTime.now()
                     ));

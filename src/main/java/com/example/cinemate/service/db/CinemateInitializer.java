@@ -15,20 +15,20 @@ public class CinemateInitializer {
     public void autoBaseInitialize() {
         try {
             //cinemateDbInitializer.deleteTables();
-            //cinemateDbInitializer.deleteAllRowsInDB();
+            cinemateDbInitializer.deleteAllRowsInDB();
 
-            //cinemateDbInitializer.createAppUsers();
-            //cinemateDbInitializer.createExternalAuth();
-            //cinemateDbInitializer.createContentTypes();
-            //cinemateDbInitializer.createWarnings();
-            //cinemateDbInitializer.createActors();
-            //cinemateDbInitializer.createGenres();
-            //cinemateDbInitializer.createContents();
-            //cinemateDbInitializer.createContentGenres();
-            //cinemateDbInitializer.createContentActors();
-            //cinemateDbInitializer.createContentWarnings();
-            //cinemateDbInitializer.createEpisodes();
-            //cinemateDbInitializer.createWishLists();
+            cinemateDbInitializer.createAppUsers();
+            cinemateDbInitializer.createExternalAuth();
+            cinemateDbInitializer.createContentTypes();
+            cinemateDbInitializer.createWarnings();
+            cinemateDbInitializer.createActors();
+            cinemateDbInitializer.createGenres();
+            cinemateDbInitializer.createContents();
+            cinemateDbInitializer.createContentGenres();
+            cinemateDbInitializer.createContentActors();
+            cinemateDbInitializer.createContentWarnings();
+            cinemateDbInitializer.createEpisodes();
+            cinemateDbInitializer.createWishLists();
         }
         catch (Exception e) {
             Logger.error(e.getMessage());
