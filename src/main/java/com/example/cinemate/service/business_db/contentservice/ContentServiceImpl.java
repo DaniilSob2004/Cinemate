@@ -55,6 +55,11 @@ public class ContentServiceImpl implements ContentService {
 
 
     @Override
+    public long getTotalContents() {
+        return contentRepository.countContentsByIsActiveIsTrue();
+    }
+
+    @Override
     public Page<Content> getContents(ContentSearchParamsDto contentSearchParamsDto) {
         Pageable pageable = PaginationUtil.getPageable(contentSearchParamsDto);
         Specification<Content> specContent = Specification.where(this.searchSpecification(contentSearchParamsDto));

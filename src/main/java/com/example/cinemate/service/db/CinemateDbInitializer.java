@@ -265,7 +265,12 @@ public class CinemateDbInitializer {
     public void createGenres() {
         List<Genre> genres = new ArrayList<>();
         Genres.forEach(genre ->
-            genres.add(new Genre(null, genre, "Description for " + genre, ""))
+            genres.add(new Genre(
+                    null,
+                    genre,
+                    rootPath + "data/genres/" + genre + ".jpg",
+                    "Description for " + genre,
+                    ""))
         );
         genreService.saveGenresList(genres);
 

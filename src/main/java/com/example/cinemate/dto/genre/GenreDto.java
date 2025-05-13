@@ -13,6 +13,7 @@ public class GenreDto {
     @NotBlank(message = "Name should not be blank")
     private String name;
 
+    private String imageUrl;
     private String description;
     private String tags;
 }

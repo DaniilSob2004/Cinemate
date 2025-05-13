@@ -11,6 +11,7 @@ public class GenreMapper {
         return new GenreDto(
                 genre.getId(),
                 genre.getName(),
+                genre.getImageUrl(),
                 genre.getDescription(),
                 genre.getTags()
         );
@@ -20,6 +21,7 @@ public class GenreMapper {
         return new Genre(
                 genreDto.getId(),
                 genreDto.getName(),
+                genreDto.getImageUrl(),
                 genreDto.getDescription(),
                 genreDto.getTags()
         );

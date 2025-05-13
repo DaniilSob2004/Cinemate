@@ -15,7 +15,7 @@ public class CinemateInitializer {
     public void autoBaseInitialize() {
         try {
             //cinemateDbInitializer.deleteTables();
-            cinemateDbInitializer.deleteAllRowsInDB();
+            /*cinemateDbInitializer.deleteAllRowsInDB();
 
             cinemateDbInitializer.createAppUsers();
             cinemateDbInitializer.createExternalAuth();
@@ -28,7 +28,7 @@ public class CinemateInitializer {
             cinemateDbInitializer.createContentActors();
             cinemateDbInitializer.createContentWarnings();
             cinemateDbInitializer.createEpisodes();
-            cinemateDbInitializer.createWishLists();
+            cinemateDbInitializer.createWishLists();*/
         }
         catch (Exception e) {
             Logger.error(e.getMessage());

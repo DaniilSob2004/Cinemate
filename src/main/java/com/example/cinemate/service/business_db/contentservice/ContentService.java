@@ -15,6 +15,7 @@ public interface ContentService {
     List<Content> findAll();
     void deleteAll();
 
+    long getTotalContents();
     Page<Content> getContents(ContentSearchParamsDto contentSearchParamsDto);
     Optional<Content> findById(Integer id);
     Optional<Content> findByName(String name);

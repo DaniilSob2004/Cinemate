@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS public.Episode (
 CREATE TABLE IF NOT EXISTS public.Genre (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
+    img_url VARCHAR(500) NOT NULL,
     description TEXT,
     tags VARCHAR(255)
 );

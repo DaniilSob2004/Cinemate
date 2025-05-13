@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface ContentRepository extends PagingAndSortingRepository<Content, Integer>, JpaSpecificationExecutor<Content> {
+    long countContentsByIsActiveIsTrue();
     Optional<Content> findContentById(Integer id);
     Optional<Content> findContentByNameIgnoreCase(String name);
     List<Content> findContentByContentTypeId(Integer contentTypeId);

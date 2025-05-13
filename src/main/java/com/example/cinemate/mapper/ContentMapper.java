@@ -1,7 +1,6 @@
 package com.example.cinemate.mapper;
 
-import com.example.cinemate.dto.content.ContentFullAdminDto;
-import com.example.cinemate.dto.content.ContentListAdminDto;
+import com.example.cinemate.dto.content.*;
 import com.example.cinemate.model.db.Content;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +9,42 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class ContentMapper {
+
+    public ContentDto toContentDto(final Content content) {
+        return new ContentDto(
+                content.getId(),
+                content.getName(),
+                content.getContentType().getName(),
+                content.getPosterUrl(),
+                content.getTrailerUrl(),
+                content.getVideoUrl(),
+                content.getDescription(),
+                content.getDurationMin(),
+                content.getAgeRating(),
+                content.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                null,
+                null,
+                null
+        );
+    }
+
+    public Content toContent(final ContentDto contentDto) {
+        return new Content(
+                contentDto.getId(),
+                contentDto.getName(),
+                null,
+                contentDto.getPosterUrl(),
+                contentDto.getTrailerUrl(),
+                contentDto.getVideoUrl(),
+                contentDto.getDescription(),
+                contentDto.getDurationMin(),
+                contentDto.getAgeRating(),
+                LocalDate.parse(contentDto.getReleaseDate()),
+                true,
+                null,
+                null
+        );
+    }
 
     public ContentListAdminDto toContentListAdminDto(final Content content) {
         return new ContentListAdminDto(

@@ -4,7 +4,6 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
-import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.content.ContentNotFoundException;
 import com.example.cinemate.service.business.content.ContentAdminCrudService;
@@ -16,7 +15,7 @@ import org.tinylog.Logger;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = Endpoint.API_V1 + Endpoint.CONTENTS)
+@RequestMapping(value = Endpoint.API_V1 + Endpoint.ADMIN + Endpoint.CONTENTS)
 public class ContentAdminController {
 
     private final ContentAdminCrudService contentAdminCrudService;

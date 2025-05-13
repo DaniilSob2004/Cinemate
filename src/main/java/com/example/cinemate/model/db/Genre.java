@@ -17,6 +17,9 @@ public class Genre {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @Column(name = "img_url", nullable = false)
+    private String imageUrl;
+
     @Column(name = "description")
     private String description;
 
