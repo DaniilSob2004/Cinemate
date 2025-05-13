@@ -31,7 +31,7 @@ public class Endpoint {
     // auth users
     public static final String ME = "/me";
     public static final String UPDATE_ACCESS_TOKEN = "/update-access-token";
-    public static final String BY_COUNT = "/{count}";
+    public static final String RANDOM = "/random";
     public static final String LOGOUT = "/logout";
 
     // admin
@@ -54,7 +54,7 @@ public class Endpoint {
                 API_V1 + USER + ME,
                 API_V1 + AUTH + UPDATE_ACCESS_TOKEN,
                 API_V1 + CONTENTS,
-                API_V1 + CONTENTS + BY_COUNT,
+                API_V1 + CONTENTS + RANDOM,
                 API_V1 + AUTH + LOGOUT
         );
     }

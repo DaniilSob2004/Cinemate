@@ -21,8 +21,8 @@ public class ContentController {
         this.contentCrudService = contentCrudService;
     }
 
-    @GetMapping(value = Endpoint.BY_COUNT)
-    public ResponseEntity<?> getRandom(@Valid ContentRandomRequestDto contentRandomRequestDto) {
+    @GetMapping(value = Endpoint.RANDOM)
+    public ResponseEntity<?> getRandom(@Valid @ModelAttribute ContentRandomRequestDto contentRandomRequestDto) {
         ErrorResponseDto errorResponseDto;
         try {
             return ResponseEntity.ok(contentCrudService.getRandom(contentRandomRequestDto));

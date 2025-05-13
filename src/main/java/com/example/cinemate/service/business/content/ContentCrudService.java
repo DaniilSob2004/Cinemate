@@ -42,14 +42,7 @@ public class ContentCrudService {
                 .map(contentMapper::toContentDto)
                 .toList());
         Collections.shuffle(contentsDto);
+        
         return contentsDto;
-
-        /*return new PagedResponse<>(
-                contentsDto,
-                pageContents.getTotalElements(),
-                pageContents.getTotalPages(),
-                pageContents.getNumber() + 1,
-                pageContents.getSize()
-        );*/
     }
 }
