@@ -14,4 +14,5 @@ public interface ContentTypeService {
     void deleteAll();
 
     Optional<ContentType> findByName(String name);
+    Optional<ContentType> findById(Integer id);
 }

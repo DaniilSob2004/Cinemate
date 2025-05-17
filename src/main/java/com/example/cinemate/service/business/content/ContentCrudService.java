@@ -7,6 +7,7 @@ import com.example.cinemate.mapper.content.ContentEnrichMapper;
 import com.example.cinemate.mapper.content.ContentMapper;
 import com.example.cinemate.model.db.Content;
 import com.example.cinemate.service.business_db.contentservice.ContentService;
+import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeService;
 import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.PaginationUtil;
@@ -20,12 +21,14 @@ public class ContentCrudService {
 
     private final ContentService contentService;
     private final GenreService genreService;
+    private final ContentTypeService contentTypeService;
     private final ContentMapper contentMapper;
     private final ContentEnrichMapper contentEnrichMapper;
 
-    public ContentCrudService(ContentService contentService, GenreService genreService, ContentMapper contentMapper, ContentEnrichMapper contentEnrichMapper) {
+    public ContentCrudService(ContentService contentService, GenreService genreService, ContentTypeService contentTypeService, ContentMapper contentMapper, ContentEnrichMapper contentEnrichMapper) {
         this.contentService = contentService;
         this.genreService = genreService;
+        this.contentTypeService = contentTypeService;
         this.contentMapper = contentMapper;
         this.contentEnrichMapper = contentEnrichMapper;
     }
@@ -35,7 +38,7 @@ public class ContentCrudService {
         int maxPage = (int) (totalElements / contentRandomRequestDto.getCount());
 
         var contentSearchParamsDto = ContentSearchParamsDto.builder()
-                .contentTypeId(null)
+                .typeId(null)
                 .genreId(null)
                 .searchStr("")
                 .isActive(true)
@@ -53,24 +56,23 @@ public class ContentCrudService {
         return contentsDto;
     }
 
-    public PagedResponse<ContentDto> getByGenre(final ContentByGenreRequestDto contentByGenreRequestDto) {
-        var genre = genreService.findById(contentByGenreRequestDto.getId()).orElse(null);
-        if (genre == null) {
-            throw new ContentNotFoundException("Genre with id '" + contentByGenreRequestDto.getId() + "' not found");
-        }
+    public PagedResponse<ContentDto> getByGenre(final ContentSearchParamsDto contentSearchParamsDto) {
+        genreService.findById(contentSearchParamsDto.getGenreId())
+                .orElseThrow(() -> new ContentNotFoundException("Genre with id '" + contentSearchParamsDto.getGenreId() + "' not found"));
 
-        var contentSearchParamsDto = ContentSearchParamsDto.builder()
-                .contentTypeId(null)
-                .genreId(contentByGenreRequestDto.getId())
-                .searchStr("")
-                .isActive(true)
-                .page(0)
-                .size(contentByGenreRequestDto.getCount())
-                .sortBy("id")
-                .isAsc(GenerateUtil.getRandomBoolean())
-                .build();
+        return this.getPagedContents(contentSearchParamsDto);
+    }
 
-        Page<Content> pageContents = contentService.getContents(contentSearchParamsDto);
+    public PagedResponse<ContentDto> getByType(final ContentSearchParamsDto contentSearchParamsDto) {
+        contentTypeService.findById(contentSearchParamsDto.getTypeId())
+                .orElseThrow(() -> new ContentNotFoundException("Content type with id '" + contentSearchParamsDto.getTypeId() + "' not found"));
+
+        return this.getPagedContents(contentSearchParamsDto);
+    }
+
+    private PagedResponse<ContentDto> getPagedContents(ContentSearchParamsDto dto) {
+        dto.setPage(dto.getPage() - 1);
+        Page<Content> pageContents = contentService.getContents(dto);
 
         return PaginationUtil.getPagedResponse(
                 this.mapContentToDtoWithDetails(pageContents),

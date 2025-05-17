@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ContentTypeRepository extends JpaRepository<ContentType, Integer> {
     Optional<ContentType> findContentTypeByName(String name);
+    Optional<ContentType> findContentTypeById(Integer id);
 }

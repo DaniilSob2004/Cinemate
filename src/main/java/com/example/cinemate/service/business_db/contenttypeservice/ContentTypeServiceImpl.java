@@ -50,4 +50,9 @@ public class ContentTypeServiceImpl implements ContentTypeService {
     public Optional<ContentType> findByName(String name) {
         return contentTypeRepository.findContentTypeByName(name);
     }
+
+    @Override
+    public Optional<ContentType> findById(Integer id) {
+        return contentTypeRepository.findContentTypeById(id);
+    }
 }

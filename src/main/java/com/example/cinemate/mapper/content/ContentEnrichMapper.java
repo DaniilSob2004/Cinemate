@@ -25,6 +25,7 @@ public class ContentEnrichMapper {
     public void enrichContentDto(final List<ContentDto> contentsDto) {
         List<Integer> contentIds = contentsDto.stream().map(ContentDto::getId).toList();
 
+        // 3 запроса и получаем все genres, actors и warnings для всех контентов
         Map<Integer, List<Integer>> genresMap = contentGenreService.getGenresByContentIds(contentIds);
         Map<Integer, List<Integer>> actorsMap = contentActorService.getActorsByContentIds(contentIds);
         Map<Integer, List<Integer>> warningsMap = contentWarningService.getWarningsByContentIds(contentIds);

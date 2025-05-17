@@ -84,8 +84,8 @@ public class ContentServiceImpl implements ContentService {
             }
 
             // фильтр по типу контента
-            if (contentSearchParamsDto.getContentTypeId() != null) {
-                predicates.add(cb.equal(root.get("contentType"), contentSearchParamsDto.getContentTypeId()));
+            if (contentSearchParamsDto.getTypeId() != null) {
+                predicates.add(cb.equal(root.get("contentType"), contentSearchParamsDto.getTypeId()));
             }
 
             // фильтр по жанру через JOIN с таблицей ContentGenres

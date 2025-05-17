@@ -1,11 +1,11 @@
 package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
-import com.example.cinemate.dto.content.ContentByGenreRequestDto;
 import com.example.cinemate.dto.content.ContentRandomRequestDto;
+import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
-import com.example.cinemate.exception.common.ContentNotFoundException;
 import com.example.cinemate.service.business.content.ContentCrudService;
+import com.example.cinemate.utils.SendResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +18,11 @@ import javax.validation.Valid;
 public class ContentController {
 
     private final ContentCrudService contentCrudService;
+    private final SendResponseUtil sendResponseUtil;
 
-    public ContentController(ContentCrudService contentCrudService) {
+    public ContentController(ContentCrudService contentCrudService, SendResponseUtil sendResponseUtil) {
         this.contentCrudService = contentCrudService;
+        this.sendResponseUtil = sendResponseUtil;
     }
 
     @GetMapping(value = Endpoint.RANDOM)
@@ -37,17 +39,12 @@ public class ContentController {
     }
 
     @GetMapping(value = Endpoint.BY_GENRE)
-    public ResponseEntity<?> getByGenre(@Valid @ModelAttribute ContentByGenreRequestDto contentByGenreRequestDto) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            Logger.info(contentByGenreRequestDto);
-            return ResponseEntity.ok(contentCrudService.getByGenre(contentByGenreRequestDto));
-        } catch (ContentNotFoundException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+    public ResponseEntity<?> getByGenre(@Valid @ModelAttribute ContentSearchParamsDto contentSearchParamsDto) {
+        return sendResponseUtil.handleContentSearch(contentSearchParamsDto, contentCrudService::getByGenre);
+    }
+
+    @GetMapping(value = Endpoint.BY_CONTENT_TYPE)
+    public ResponseEntity<?> getByType(@Valid @ModelAttribute ContentSearchParamsDto contentSearchParamsDto) {
+        return sendResponseUtil.handleContentSearch(contentSearchParamsDto, contentCrudService::getByType);
     }
 }
