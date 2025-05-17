@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 
 @Service
@@ -84,6 +86,12 @@ public class ContentServiceImpl implements ContentService {
             // фильтр по типу контента
             if (contentSearchParamsDto.getContentTypeId() != null) {
                 predicates.add(cb.equal(root.get("contentType"), contentSearchParamsDto.getContentTypeId()));
+            }
+
+            // фильтр по жанру через JOIN с таблицей ContentGenres
+            if (contentSearchParamsDto.getGenreId() != null) {
+                Join<Object, Object> genreJoin = root.join("contentGenres", JoinType.INNER);
+                predicates.add(cb.equal(genreJoin.get("genre").get("id"), contentSearchParamsDto.getGenreId()));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

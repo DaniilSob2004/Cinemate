@@ -1,4 +1,4 @@
-package com.example.cinemate.mapper;
+package com.example.cinemate.mapper.content;
 
 import com.example.cinemate.dto.content.*;
 import com.example.cinemate.model.db.Content;
@@ -23,24 +23,6 @@ public class ContentMapper {
                 content.getAgeRating(),
                 content.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 null,
-                null,
-                null
-        );
-    }
-
-    public Content toContent(final ContentDto contentDto) {
-        return new Content(
-                contentDto.getId(),
-                contentDto.getName(),
-                null,
-                contentDto.getPosterUrl(),
-                contentDto.getTrailerUrl(),
-                contentDto.getVideoUrl(),
-                contentDto.getDescription(),
-                contentDto.getDurationMin(),
-                contentDto.getAgeRating(),
-                LocalDate.parse(contentDto.getReleaseDate()),
-                true,
                 null,
                 null
         );
@@ -72,7 +54,8 @@ public class ContentMapper {
                 LocalDate.parse(contentFullAdminDto.getReleaseDate()),
                 contentFullAdminDto.isActive(),
                 contentFullAdminDto.getCreatedAt(),
-                contentFullAdminDto.getUpdatedAt()
+                contentFullAdminDto.getUpdatedAt(),
+                null
         );
     }
 

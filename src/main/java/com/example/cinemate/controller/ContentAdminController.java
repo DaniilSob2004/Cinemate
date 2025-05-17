@@ -5,7 +5,7 @@ import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
-import com.example.cinemate.exception.content.ContentNotFoundException;
+import com.example.cinemate.exception.common.ContentNotFoundException;
 import com.example.cinemate.service.business.content.ContentAdminCrudService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

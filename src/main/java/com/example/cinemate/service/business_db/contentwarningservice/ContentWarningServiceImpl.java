@@ -9,7 +9,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @CacheConfig(cacheNames = "contentWarning")
@@ -64,8 +66,23 @@ public class ContentWarningServiceImpl implements ContentWarningService {
     }
 
     @Override
+    public List<ContentWarning> findAllByContentIds(List<Integer> ids) {
+        return contentWarningRepository.findAllByContentIds(ids);
+    }
+
+    @Override
     @CacheEvict(key = "#contentId")
     public void deleteByContentIdAndWarningId(Integer contentId, Integer warningId) {
         contentWarningRepository.deleteByContentIdAndWarningId(contentId, warningId);
+    }
+
+    @Override
+    public Map<Integer, List<Integer>> getWarningsByContentIds(List<Integer> contentIds) {
+        var contentWarnings = this.findAllByContentIds(contentIds);
+        return contentWarnings.stream()
+                .collect(Collectors.groupingBy(
+                        cw -> cw.getContent().getId(),
+                        Collectors.mapping(cw -> cw.getWarning().getId(), Collectors.toList())
+                ));
     }
 }

@@ -3,6 +3,7 @@ package com.example.cinemate.service.business_db.contentwarningservice;
 import com.example.cinemate.model.db.ContentWarning;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ContentWarningService {
     void save(ContentWarning contentWarning);
@@ -13,5 +14,8 @@ public interface ContentWarningService {
     void deleteAll();
 
     List<Integer> getIdWarnings(Integer contentId);
+    List<ContentWarning> findAllByContentIds(List<Integer> ids);
     void deleteByContentIdAndWarningId(Integer contentId, Integer warningId);
+
+    Map<Integer, List<Integer>> getWarningsByContentIds(List<Integer> contentIds);
 }

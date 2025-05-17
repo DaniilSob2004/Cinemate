@@ -3,6 +3,7 @@ package com.example.cinemate.service.business_db.contentgenreservice;
 import com.example.cinemate.model.db.ContentGenre;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ContentGenreService {
     void save(ContentGenre contentGenre);
@@ -13,5 +14,8 @@ public interface ContentGenreService {
     void deleteAll();
 
     List<Integer> getIdGenres(Integer contentId);
+    List<ContentGenre> findAllByContentIds(List<Integer> ids);
     void deleteByContentIdAndGenreId(Integer contentId, Integer genreId);
+
+    Map<Integer, List<Integer>> getGenresByContentIds(List<Integer> contentIds);
 }

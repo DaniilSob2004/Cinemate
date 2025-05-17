@@ -1,6 +1,6 @@
 package com.example.cinemate.service.db;
 
-import com.example.cinemate.exception.content.ContentNotFoundException;
+import com.example.cinemate.exception.common.ContentNotFoundException;
 import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.business_db.actorservice.ActorService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
@@ -295,7 +295,8 @@ public class CinemateDbInitializer {
                     GenerateUtil.getRandomDate(),
                     true,
                     LocalDateTime.now(),
-                    LocalDateTime.now()
+                    LocalDateTime.now(),
+                    null
             ));
         }
         contentService.saveContentsList(contents);

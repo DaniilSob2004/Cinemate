@@ -12,7 +12,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContentFullAdminDto {
+@EqualsAndHashCode(callSuper = true)
+public class ContentFullAdminDto extends ContentDto {
     private Integer id;
 
     @NotBlank(message = "Name should not be blank")

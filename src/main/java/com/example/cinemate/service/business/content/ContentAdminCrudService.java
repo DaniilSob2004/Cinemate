@@ -3,8 +3,9 @@ package com.example.cinemate.service.business.content;
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.content.*;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
-import com.example.cinemate.exception.content.ContentNotFoundException;
-import com.example.cinemate.mapper.ContentMapper;
+import com.example.cinemate.exception.common.ContentNotFoundException;
+import com.example.cinemate.mapper.content.ContentEnrichMapper;
+import com.example.cinemate.mapper.content.ContentMapper;
 import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.business_db.actorservice.ActorService;
 import com.example.cinemate.service.business_db.contentactorservice.ContentActorService;
@@ -16,6 +17,7 @@ import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.service.business_db.warningservice.WarningService;
 import com.example.cinemate.utils.DateTimeUtil;
 import com.example.cinemate.utils.DiffUtil;
+import com.example.cinemate.utils.PaginationUtil;
 import com.example.cinemate.validate.common.CommonDataValidate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -36,9 +38,10 @@ public class ContentAdminCrudService {
     private final WarningService warningService;
     private final ContentWarningService contentWarningService;
     private final ContentMapper contentMapper;
+    private final ContentEnrichMapper contentEnrichMapper;
     private final CommonDataValidate commonDataValidate;
 
-    public ContentAdminCrudService(ContentService contentService, ContentTypeService contentTypeService, GenreService genreService, ContentGenreService contentGenreService, ActorService actorService, ContentActorService contentActorService, WarningService warningService, ContentWarningService contentWarningService, ContentMapper contentMapper, CommonDataValidate commonDataValidate) {
+    public ContentAdminCrudService(ContentService contentService, ContentTypeService contentTypeService, GenreService genreService, ContentGenreService contentGenreService, ActorService actorService, ContentActorService contentActorService, WarningService warningService, ContentWarningService contentWarningService, ContentMapper contentMapper, ContentEnrichMapper contentEnrichMapper, CommonDataValidate commonDataValidate) {
         this.contentService = contentService;
         this.contentTypeService = contentTypeService;
         this.genreService = genreService;
@@ -48,6 +51,7 @@ public class ContentAdminCrudService {
         this.warningService = warningService;
         this.contentWarningService = contentWarningService;
         this.contentMapper = contentMapper;
+        this.contentEnrichMapper = contentEnrichMapper;
         this.commonDataValidate = commonDataValidate;
     }
 
@@ -66,25 +70,15 @@ public class ContentAdminCrudService {
                 .map(contentMapper::toContentListAdminDto)
                 .toList();
 
-        return new PagedResponse<>(
-                contentsDto,
-                pageContents.getTotalElements(),
-                pageContents.getTotalPages(),
-                pageContents.getNumber() + 1,
-                pageContents.getSize()
-        );
+        return PaginationUtil.getPagedResponse(contentsDto, pageContents);
     }
 
     public ContentFullAdminDto getById(final Integer id) {
-        Content content = contentService.findById(id).orElse(null);
-        if (content == null) {
-            throw new ContentNotFoundException("Content with id '" + id + "' not found");
-        }
+        Content content = contentService.findById(id)
+                .orElseThrow(() -> new ContentNotFoundException("Content with id '" + id + "' not found"));
 
         var contentFullAdminDto = contentMapper.toContentFullAdminDto(content);
-        contentFullAdminDto.setGenres(contentGenreService.getIdGenres(content.getId()));  //
-        contentFullAdminDto.setActors(contentActorService.getIdActors(content.getId()));
-        contentFullAdminDto.setWarnings(contentWarningService.getIdWarnings(content.getId()));
+        contentEnrichMapper.enrichContentDto(List.of(contentFullAdminDto));
 
         return contentFullAdminDto;
     }
@@ -97,10 +91,9 @@ public class ContentAdminCrudService {
                 });
 
         // есть ли такой тип контента
-        var contentType = contentTypeService.findByName(contentFullAdminDto.getContentType().toLowerCase()).orElse(null);
-        if (contentType == null) {
-            throw new ContentNotFoundException("Content type '" + contentFullAdminDto.getContentType() + "' not found");
-        }
+        String contentTypeName = contentFullAdminDto.getContentType();
+        var contentType = contentTypeService.findByName(contentTypeName.toLowerCase())
+                .orElseThrow(() -> new ContentNotFoundException("Content type '" + contentTypeName + "' not found"));
 
         // сохранение контента
         contentFullAdminDto.setCreatedAt(LocalDateTime.now());
@@ -122,16 +115,13 @@ public class ContentAdminCrudService {
     @Transactional
     public void updateById(final Integer id, final ContentFullAdminDto contentFullAdminDto) {
         // есть ли такой контент
-        var content = contentService.findById(id).orElse(null);
-        if (content == null) {
-            throw new ContentNotFoundException("Content with id '" + id + "' not found");
-        }
+        var content = contentService.findById(id)
+                .orElseThrow(() -> new ContentNotFoundException("Content with id '" + id + "' not found"));
 
         // есть ли такой тип контента
-        var contentType = contentTypeService.findByName(contentFullAdminDto.getContentType().toLowerCase()).orElse(null);
-        if (contentType == null) {
-            throw new ContentNotFoundException("Content type '" + contentFullAdminDto.getContentType() + "' not found");
-        }
+        String contentTypeName = contentFullAdminDto.getContentType().toLowerCase();
+        var contentType = contentTypeService.findByName(contentTypeName)
+                .orElseThrow(() -> new ContentNotFoundException("Content type '" + contentFullAdminDto.getContentType() + "' not found"));
 
         // если ContentType разные
         if (!content.getContentType().getName().equals(contentType.getName())) {
@@ -167,7 +157,7 @@ public class ContentAdminCrudService {
     private void updateContentGenres(final Content content, final List<Integer> listUpdatedGenreIds) {
         // получение id жанров для добавления и удаления
         var idsToAddAndRemove = DiffUtil.calculateDiffIds(
-                contentGenreService.getIdGenres(content.getId()),  //
+                contentGenreService.getIdGenres(content.getId()),
                 listUpdatedGenreIds
         );
 
@@ -179,7 +169,7 @@ public class ContentAdminCrudService {
     private void updateContentActors(final Content content, final List<Integer> listUpdatedActorIds) {
         // получение id актеров для добавления и удаления
         var idsToAddAndRemove = DiffUtil.calculateDiffIds(
-                contentActorService.getIdActors(content.getId()),  //
+                contentActorService.getIdActors(content.getId()),
                 listUpdatedActorIds
         );
 

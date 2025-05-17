@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ContentSearchParamsDto extends PaginationSearchParamsDto {
     private Integer contentTypeId = 1;
+    private Integer genreId;
     private String searchStr = "";
     private Boolean isActive = true;
 }

@@ -1,9 +1,9 @@
 package com.example.cinemate.service.business_db.contentactorservice;
 
-import com.example.cinemate.model.db.Content;
 import com.example.cinemate.model.db.ContentActor;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ContentActorService {
     void save(ContentActor contentActor);
@@ -14,5 +14,8 @@ public interface ContentActorService {
     void deleteAll();
 
     List<Integer> getIdActors(Integer contentId);
+    List<ContentActor> findAllByContentIds(List<Integer> ids);
     void deleteByContentIdAndActorId(Integer contentId, Integer actorId);
+
+    Map<Integer, List<Integer>> getActorsByContentIds(List<Integer> contentIds);
 }

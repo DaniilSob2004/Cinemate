@@ -4,6 +4,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -52,4 +53,7 @@ public class Content {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "content", fetch = FetchType.LAZY)
+    private List<ContentGenre> contentGenres;
 }

@@ -9,7 +9,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @CacheConfig(cacheNames = "contentActor")
@@ -64,8 +66,23 @@ public class ContentActorServiceImpl implements ContentActorService {
     }
 
     @Override
+    public List<ContentActor> findAllByContentIds(List<Integer> ids) {
+        return contentActorRepository.findAllByContentIds(ids);
+    }
+
+    @Override
     @CacheEvict(key = "#contentId")
     public void deleteByContentIdAndActorId(Integer contentId, Integer actorId) {
        contentActorRepository.deleteByContentIdAndActorId(contentId, actorId);
+    }
+
+    @Override
+    public Map<Integer, List<Integer>> getActorsByContentIds(List<Integer> contentIds) {
+        var contentActors = this.findAllByContentIds(contentIds);
+        return contentActors.stream()
+                .collect(Collectors.groupingBy(
+                        ca -> ca.getContent().getId(),
+                        Collectors.mapping(ca -> ca.getActor().getId(), Collectors.toList())
+                ));
     }
 }

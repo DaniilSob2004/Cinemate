@@ -32,6 +32,7 @@ public class Endpoint {
     public static final String ME = "/me";
     public static final String UPDATE_ACCESS_TOKEN = "/update-access-token";
     public static final String RANDOM = "/random";
+    public static final String BY_GENRE = "/genre";
     public static final String LOGOUT = "/logout";
 
     // admin
@@ -55,6 +56,7 @@ public class Endpoint {
                 API_V1 + AUTH + UPDATE_ACCESS_TOKEN,
                 API_V1 + CONTENTS,
                 API_V1 + CONTENTS + RANDOM,
+                API_V1 + CONTENTS + BY_GENRE,
                 API_V1 + AUTH + LOGOUT
         );
     }
