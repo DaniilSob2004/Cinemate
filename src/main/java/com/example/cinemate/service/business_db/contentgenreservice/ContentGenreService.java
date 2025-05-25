@@ -14,7 +14,6 @@ public interface ContentGenreService {
     void deleteAll();
 
     List<Integer> getIdGenres(Integer contentId);
-    List<ContentGenre> findAllByContentIds(List<Integer> ids);
     void deleteByContentIdAndGenreId(Integer contentId, Integer genreId);
 
     Map<Integer, List<Integer>> getGenresByContentIds(List<Integer> contentIds);

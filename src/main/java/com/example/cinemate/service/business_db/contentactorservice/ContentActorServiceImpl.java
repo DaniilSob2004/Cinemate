@@ -66,11 +66,6 @@ public class ContentActorServiceImpl implements ContentActorService {
     }
 
     @Override
-    public List<ContentActor> findAllByContentIds(List<Integer> ids) {
-        return contentActorRepository.findAllByContentIds(ids);
-    }
-
-    @Override
     @CacheEvict(key = "#contentId")
     public void deleteByContentIdAndActorId(Integer contentId, Integer actorId) {
        contentActorRepository.deleteByContentIdAndActorId(contentId, actorId);
@@ -78,11 +73,10 @@ public class ContentActorServiceImpl implements ContentActorService {
 
     @Override
     public Map<Integer, List<Integer>> getActorsByContentIds(List<Integer> contentIds) {
-        var contentActors = this.findAllByContentIds(contentIds);
-        return contentActors.stream()
-                .collect(Collectors.groupingBy(
-                        ca -> ca.getContent().getId(),
-                        Collectors.mapping(ca -> ca.getActor().getId(), Collectors.toList())
+        return contentIds.stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        this::getIdActors  // вызов кэшируемого метода
                 ));
     }
 }

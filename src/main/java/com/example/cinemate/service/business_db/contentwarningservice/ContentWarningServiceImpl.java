@@ -66,11 +66,6 @@ public class ContentWarningServiceImpl implements ContentWarningService {
     }
 
     @Override
-    public List<ContentWarning> findAllByContentIds(List<Integer> ids) {
-        return contentWarningRepository.findAllByContentIds(ids);
-    }
-
-    @Override
     @CacheEvict(key = "#contentId")
     public void deleteByContentIdAndWarningId(Integer contentId, Integer warningId) {
         contentWarningRepository.deleteByContentIdAndWarningId(contentId, warningId);
@@ -78,11 +73,10 @@ public class ContentWarningServiceImpl implements ContentWarningService {
 
     @Override
     public Map<Integer, List<Integer>> getWarningsByContentIds(List<Integer> contentIds) {
-        var contentWarnings = this.findAllByContentIds(contentIds);
-        return contentWarnings.stream()
-                .collect(Collectors.groupingBy(
-                        cw -> cw.getContent().getId(),
-                        Collectors.mapping(cw -> cw.getWarning().getId(), Collectors.toList())
+        return contentIds.stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        this::getIdWarnings  // вызов кэшируемого метода
                 ));
     }
 }

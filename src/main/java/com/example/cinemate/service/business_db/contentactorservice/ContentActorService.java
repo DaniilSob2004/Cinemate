@@ -14,7 +14,6 @@ public interface ContentActorService {
     void deleteAll();
 
     List<Integer> getIdActors(Integer contentId);
-    List<ContentActor> findAllByContentIds(List<Integer> ids);
     void deleteByContentIdAndActorId(Integer contentId, Integer actorId);
 
     Map<Integer, List<Integer>> getActorsByContentIds(List<Integer> contentIds);

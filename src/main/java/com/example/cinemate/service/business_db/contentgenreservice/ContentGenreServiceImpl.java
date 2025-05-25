@@ -66,11 +66,6 @@ public class ContentGenreServiceImpl implements ContentGenreService {
     }
 
     @Override
-    public List<ContentGenre> findAllByContentIds(List<Integer> ids) {
-        return contentGenreRepository.findAllByContentIds(ids);
-    }
-
-    @Override
     @CacheEvict(key = "#contentId")
     public void deleteByContentIdAndGenreId(Integer contentId, Integer genreId) {
         contentGenreRepository.deleteByContentIdAndGenreId(contentId, genreId);
@@ -78,11 +73,10 @@ public class ContentGenreServiceImpl implements ContentGenreService {
 
     @Override
     public Map<Integer, List<Integer>> getGenresByContentIds(List<Integer> contentIds) {
-        var contentGenres = this.findAllByContentIds(contentIds);
-        return contentGenres.stream()
-                .collect(Collectors.groupingBy(
-                        cg -> cg.getContent().getId(),
-                        Collectors.mapping(cg -> cg.getGenre().getId(), Collectors.toList())
+        return contentIds.stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        this::getIdGenres  // вызов кэшируемого метода
                 ));
     }
 }
