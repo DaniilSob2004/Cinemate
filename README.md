@@ -73,6 +73,8 @@
  - ![Image](https://github.com/user-attachments/assets/da7aa7e4-1fe4-4a5c-a648-c377762428d6)
  - ![Image](https://github.com/user-attachments/assets/4a57c38e-c6ea-4aca-8d80-b77de4efb4b3)
  - ![Image](https://github.com/user-attachments/assets/855d9650-0c12-4500-a7fe-7405aaf37c8b)
+ -------------------- Content View Histories --------------------
+ - ![Image](https://github.com/user-attachments/assets/1f048bca-5b4b-4d17-9729-ea11eb5b69f0)
  -------------------- Roles / Providers --------------------
  - ![Image](https://github.com/user-attachments/assets/ee4f1642-84d6-4009-83a4-aa07baf41743)
  - ![Image](https://github.com/user-attachments/assets/ac40ed47-ab36-4a09-82d0-ed23f8d8d8d3)

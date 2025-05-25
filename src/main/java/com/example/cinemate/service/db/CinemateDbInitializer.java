@@ -9,6 +9,7 @@ import com.example.cinemate.service.business_db.contentactorservice.ContentActor
 import com.example.cinemate.service.business_db.contentgenreservice.ContentGenreService;
 import com.example.cinemate.service.business_db.contentservice.ContentService;
 import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeService;
+import com.example.cinemate.service.business_db.contentviewhistoryservice.ContentViewHistoryService;
 import com.example.cinemate.service.business_db.contentwarningservice.ContentWarningService;
 import com.example.cinemate.service.business_db.episodeservice.EpisodeService;
 import com.example.cinemate.service.business_db.externalauthservice.ExternalAuthService;
@@ -103,9 +104,10 @@ public class CinemateDbInitializer {
     private final ContentActorService contentActorService;
     private final ContentWarningService contentWarningService;
     private final WishListService wishListService;
+    private final ContentViewHistoryService contentViewHistoryService;
     private final JdbcTemplate jdbcTemplate;
 
-    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, ActorService actorService, GenreService genreService, ContentService contentService, EpisodeService episodeService, ContentGenreService contentGenreService, ContentActorService contentActorService, ContentWarningService contentWarningService, WishListService wishListService, JdbcTemplate jdbcTemplate) {
+    public CinemateDbInitializer(AppUserService appUserService, AuthProviderService authProviderService, ExternalAuthService externalAuthService, RoleService roleService, UserRoleService userRoleService, ContentTypeService contentTypeService, WarningService warningService, ActorService actorService, GenreService genreService, ContentService contentService, EpisodeService episodeService, ContentGenreService contentGenreService, ContentActorService contentActorService, ContentWarningService contentWarningService, WishListService wishListService, ContentViewHistoryService contentViewHistoryService, JdbcTemplate jdbcTemplate) {
         this.appUserService = appUserService;
         this.authProviderService = authProviderService;
         this.externalAuthService = externalAuthService;
@@ -121,6 +123,7 @@ public class CinemateDbInitializer {
         this.contentActorService = contentActorService;
         this.contentWarningService = contentWarningService;
         this.wishListService = wishListService;
+        this.contentViewHistoryService = contentViewHistoryService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -282,22 +285,8 @@ public class CinemateDbInitializer {
         List<Content> contents = new ArrayList<>();
 
         for (int i = 0; i < ContentNames.size(); i++) {
-            contents.add(new Content(
-                    null,
-                    ContentNames.get(i),
-                    contentTypes.get(GenerateUtil.getRandomInteger(0, contentTypes.size())),
-                    rootPath + ContentPosters.get(i),
-                    rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
-                    rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
-                    "Super film - " + ContentNames.get(i),
-                    GenerateUtil.getRandomInteger(1, 5000),
-                    "",
-                    GenerateUtil.getRandomDate(),
-                    true,
-                    LocalDateTime.now(),
-                    LocalDateTime.now(),
-                    null
-            ));
+            var contentType = contentTypes.get(GenerateUtil.getRandomInteger(0, contentTypes.size()));
+            contents.add(this.CreateContent(i, contentType));
         }
         contentService.saveContentsList(contents);
 
@@ -448,6 +437,34 @@ public class CinemateDbInitializer {
         Logger.info("WishLists created successfully...");
     }
 
+    public void createContentViewHistories() {
+        var users = appUserService.findAll();
+        var contents = contentService.findAll();
+        List<ContentViewHistory> contentViewHistories = new ArrayList<>();
+        List<Integer> contentCache = new ArrayList<>();
+
+        for (var user : users) {
+            int countContents = GenerateUtil.getRandomInteger(8, 20);
+            for (int j = 0; j < countContents; j++) {
+                int contentInd = GenerateUtil.getRandomInteger(0, contents.size());
+                if (contentCache.contains(contentInd)) {
+                    continue;
+                }
+                contentViewHistories.add(new ContentViewHistory(
+                        null,
+                        user,
+                        contents.get(contentInd),
+                        GenerateUtil.getRandomDateTime()
+                ));
+                contentCache.add(contentInd);
+            }
+            contentCache.clear();
+        }
+        contentViewHistoryService.saveContentViewHistories(contentViewHistories);
+
+        Logger.info("ContentViewHistories created successfully...");
+    }
+
 
     private AppUser CreateAdmin() {
         return new AppUser(
@@ -492,6 +509,25 @@ public class CinemateDbInitializer {
                 GenerateUtil.getRandomNumberString(),
                 LocalDateTime.now(),
                 GenerateUtil.getRandomString()
+        );
+    }
+
+    private Content CreateContent(final int ind, final ContentType contentType) {
+        return new Content(
+                null,
+                ContentNames.get(ind),
+                contentType,
+                rootPath + ContentPosters.get(ind),
+                rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                "Super film - " + ContentNames.get(ind),
+                GenerateUtil.getRandomInteger(1, 5000),
+                "",
+                GenerateUtil.getRandomDate(),
+                true,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null
         );
     }
 }

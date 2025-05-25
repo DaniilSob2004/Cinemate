@@ -2,10 +2,10 @@ package com.example.cinemate.mapper.content;
 
 import com.example.cinemate.dto.content.*;
 import com.example.cinemate.model.db.Content;
+import com.example.cinemate.utils.DateTimeUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Component
 public class ContentMapper {
@@ -21,7 +21,7 @@ public class ContentMapper {
                 content.getDescription(),
                 content.getDurationMin(),
                 content.getAgeRating(),
-                content.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                DateTimeUtil.formatDate(content.getReleaseDate()),
                 null,
                 null,
                 null
@@ -70,7 +70,7 @@ public class ContentMapper {
                 content.getDescription(),
                 content.getDurationMin(),
                 content.getAgeRating(),
-                content.getReleaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                DateTimeUtil.formatDate(content.getReleaseDate()),
                 null,
                 null,
                 null,

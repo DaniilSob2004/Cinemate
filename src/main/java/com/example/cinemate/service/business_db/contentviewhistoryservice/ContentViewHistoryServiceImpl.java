@@ -1,9 +1,16 @@
 package com.example.cinemate.service.business_db.contentviewhistoryservice;
 
 import com.example.cinemate.dao.contentviewhistory.ContentViewHistoryRepository;
+import com.example.cinemate.dto.contentviewhistory.ContentHistoryParamsDto;
 import com.example.cinemate.model.db.ContentViewHistory;
+import com.example.cinemate.utils.PaginationUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,11 +44,37 @@ public class ContentViewHistoryServiceImpl implements ContentViewHistoryService 
 
     @Override
     public List<ContentViewHistory> findAll() {
-        return contentViewHistoryRepository.findAll();
+        return (List<ContentViewHistory>) contentViewHistoryRepository.findAll();
     }
 
     @Override
     public void deleteAll() {
         contentViewHistoryRepository.deleteAll();
+    }
+
+
+    @Override
+    public Page<ContentViewHistory> getContentViewHistories(ContentHistoryParamsDto contentHistoryParamsDto) {
+        Pageable pageable = PaginationUtil.getPageable(contentHistoryParamsDto);
+        Specification<ContentViewHistory> specContentHistory = Specification.where(this.searchSpecification(contentHistoryParamsDto));
+        return contentViewHistoryRepository.findAll(specContentHistory, pageable);
+    }
+
+    private Specification<ContentViewHistory> searchSpecification(final ContentHistoryParamsDto contentHistoryParamsDto) {
+        return (root, cq, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // фильтр по id пользователя
+            if (contentHistoryParamsDto.getUserId() != null) {
+                predicates.add(cb.equal(root.get("user").get("id"), contentHistoryParamsDto.getUserId()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    @Override
+    public List<ContentViewHistory> findByUserId(int userId) {
+        return contentViewHistoryRepository.findContentViewHistoryByUserId(userId);
     }
 }

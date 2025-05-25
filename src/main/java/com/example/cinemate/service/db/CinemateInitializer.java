@@ -28,7 +28,8 @@ public class CinemateInitializer {
             cinemateDbInitializer.createContentActors();
             cinemateDbInitializer.createContentWarnings();
             cinemateDbInitializer.createEpisodes();
-            cinemateDbInitializer.createWishLists();*/
+            cinemateDbInitializer.createWishLists();
+            cinemateDbInitializer.createContentViewHistories();*/
         }
         catch (Exception e) {
             Logger.error(e.getMessage());
