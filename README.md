@@ -2,6 +2,7 @@
  - A service for viewing video content. Thesis on backend. IT Step(2021-2025).
 
 -------------------------------------------------------
+
  - Redis for:
     - data from db: Role, UserRole, AuthProvider, UserProvider, Actor, Genre, Warning, ContentActor, ContentGenre, ContentWarning
     - access/refresh token
@@ -12,11 +13,21 @@
  - ![Image](https://github.com/user-attachments/assets/bc4f834c-9f5e-4093-94f3-45ff3872aae8)
 
 -------------------------------------------------------
+
+ - DOCKER
+ - 
+ - ![Image](https://github.com/user-attachments/assets/3e11fb82-49dd-4558-840b-3c2c81bc751b)
+ - ![Image](https://github.com/user-attachments/assets/5a5de679-ae9e-48f5-bd5d-fcb1520fdfcd)
+ - ![Image](https://github.com/user-attachments/assets/95f7a787-86bc-4cfd-a8f9-6066f41e0945)
+
+-------------------------------------------------------
+
  - Send email for url reset password
  -
  - ![Image](https://github.com/user-attachments/assets/012d8adc-2b6a-4751-a07b-1fe82f64e3ee)
 
 -------------------------------------------------------
+
  - Google authorization
  - 
  - ![Image](https://github.com/user-attachments/assets/e6a011ff-4ef6-4eb2-a51c-2a5e967ab347)
