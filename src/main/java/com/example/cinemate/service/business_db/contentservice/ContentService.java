@@ -1,5 +1,6 @@
 package com.example.cinemate.service.business_db.contentservice;
 
+import com.example.cinemate.dto.content.ContentRecSearchParamsDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.model.db.Content;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ public interface ContentService {
 
     long getTotalContents();
     Page<Content> getContents(ContentSearchParamsDto contentSearchParamsDto);
+    Page<Content> getRecommendedContents(ContentRecSearchParamsDto contentSearchParamsDto);
     Optional<Content> findById(Integer id);
     Optional<Content> findByName(String name);
     List<Content> findByContentTypeId(Integer contentTypeId);

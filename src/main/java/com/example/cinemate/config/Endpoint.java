@@ -35,6 +35,7 @@ public class Endpoint {
     public static final String RANDOM = "/random";
     public static final String BY_GENRE = "/genre";
     public static final String BY_CONTENT_TYPE = "/type";
+    public static final String BY_RECOMMENDATIONS = "/recommendations";
     public static final String LOGOUT = "/logout";
 
     // admin
@@ -60,6 +61,7 @@ public class Endpoint {
                 API_V1 + CONTENTS + RANDOM,
                 API_V1 + CONTENTS + BY_GENRE,
                 API_V1 + CONTENTS + BY_CONTENT_TYPE,
+                API_V1 + CONTENTS + BY_RECOMMENDATIONS,
                 API_V1 + AUTH + LOGOUT
         );
     }

@@ -11,4 +11,6 @@ public interface WishListService {
     void delete(WishList wishList);
     List<WishList> findAll();
     void deleteAll();
+
+    List<WishList> findByUserId(Integer userId);
 }

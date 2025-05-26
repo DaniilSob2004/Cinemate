@@ -1,6 +1,7 @@
 package com.example.cinemate.service.business_db.contentservice;
 
 import com.example.cinemate.dao.content.ContentRepository;
+import com.example.cinemate.dto.content.ContentRecSearchParamsDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.model.db.Content;
 import com.example.cinemate.utils.PaginationUtil;
@@ -68,8 +69,17 @@ public class ContentServiceImpl implements ContentService {
         return contentRepository.findAll(specContent, pageable);
     }
 
+    @Override
+    public Page<Content> getRecommendedContents(ContentRecSearchParamsDto contentRecSearchParamsDto) {
+        Pageable pageable = PaginationUtil.getPageable(contentRecSearchParamsDto);
+        Specification<Content> specContent = Specification.where(this.searchRecSpecification(contentRecSearchParamsDto));
+        return contentRepository.findAll(specContent, pageable);
+    }
+
     private Specification<Content> searchSpecification(final ContentSearchParamsDto contentSearchParamsDto) {
         return (root, cq, cb) -> {
+            cq.distinct(true);
+
             List<Predicate> predicates = new ArrayList<>();
 
             // фильтр по активности
@@ -98,6 +108,29 @@ public class ContentServiceImpl implements ContentService {
         };
     }
 
+    private Specification<Content> searchRecSpecification(final ContentRecSearchParamsDto contentSearchParamsDto) {
+        return (root, cq, cb) -> {
+            cq.distinct(true);
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            // фильтр по активности
+            predicates.add(cb.equal(root.get("isActive"), true));
+
+            // фильтр по списку типа контента
+            if (contentSearchParamsDto.getContentTypeIds() != null && !contentSearchParamsDto.getContentTypeIds().isEmpty()) {
+                predicates.add(root.get("contentType").get("id").in(contentSearchParamsDto.getContentTypeIds()));
+            }
+
+            // фильтр по списку жанров через JOIN с таблицей ContentGenres
+            if (contentSearchParamsDto.getGenreIds() != null && !contentSearchParamsDto.getGenreIds().isEmpty()) {
+                Join<Object, Object> genreJoin = root.join("contentGenres", JoinType.INNER);
+                predicates.add(genreJoin.get("genre").get("id").in(contentSearchParamsDto.getGenreIds()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 
     @Override
     public Optional<Content> findById(Integer id) {

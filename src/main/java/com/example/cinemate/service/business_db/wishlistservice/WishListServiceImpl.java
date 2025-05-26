@@ -44,4 +44,9 @@ public class WishListServiceImpl implements WishListService {
     public void deleteAll() {
         wishListRepository.deleteAll();
     }
+
+    @Override
+    public List<WishList> findByUserId(Integer userId) {
+        return wishListRepository.findWishListsByUserId(userId);
+    }
 }
