@@ -76,6 +76,8 @@
  - ![Image](https://github.com/user-attachments/assets/855d9650-0c12-4500-a7fe-7405aaf37c8b)
  -------------------- Content View Histories --------------------
  - ![Image](https://github.com/user-attachments/assets/1f048bca-5b4b-4d17-9729-ea11eb5b69f0)
+ -------------------- Wishlist --------------------
+ - ![Image](https://github.com/user-attachments/assets/b896e62a-ea0f-48d0-b145-63276310c283)
  -------------------- Roles / Providers --------------------
  - ![Image](https://github.com/user-attachments/assets/ee4f1642-84d6-4009-83a4-aa07baf41743)
  - ![Image](https://github.com/user-attachments/assets/ac40ed47-ab36-4a09-82d0-ed23f8d8d8d3)

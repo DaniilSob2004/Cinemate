@@ -73,6 +73,7 @@ public class ContentViewHistoryServiceImpl implements ContentViewHistoryService 
         };
     }
 
+
     @Override
     public List<ContentViewHistory> findByUserId(int userId) {
         return contentViewHistoryRepository.findContentViewHistoryByUserId(userId);

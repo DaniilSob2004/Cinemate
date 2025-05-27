@@ -21,6 +21,7 @@ public class Endpoint {
     public static final String ACTORS = "/actors";
     public static final String GENRES = "/genres";
     public static final String CONTENT_VIEWS = "/content-views";
+    public static final String WISHLISTS = "/wishlists";
 
     // all
     public static final String LOGIN = "/login";
@@ -62,6 +63,8 @@ public class Endpoint {
                 API_V1 + CONTENTS + BY_GENRE,
                 API_V1 + CONTENTS + BY_CONTENT_TYPE,
                 API_V1 + CONTENTS + BY_RECOMMENDATIONS,
+                API_V1 + CONTENT_VIEWS + ME,
+                API_V1 + WISHLISTS + ME,
                 API_V1 + AUTH + LOGOUT
         );
     }
