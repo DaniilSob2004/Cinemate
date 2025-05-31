@@ -25,16 +25,9 @@ public class WarningController {
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        try {
-            List<WarningDto> warnings = warningCrudService.getAll();
-            Logger.info("Successfully retrieved " + warnings.size() + " warnings");
-            return ResponseEntity.ok(warnings);
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value())
-            );
-        }
+        List<WarningDto> warnings = warningCrudService.getAll();
+        Logger.info("Successfully retrieved " + warnings.size() + " warnings");
+        return ResponseEntity.ok(warnings);
     }
 
     @PostMapping
@@ -45,10 +38,7 @@ public class WarningController {
             return ResponseEntity.ok("Warning added successfully");
         } catch (ContentAlreadyExists e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 }

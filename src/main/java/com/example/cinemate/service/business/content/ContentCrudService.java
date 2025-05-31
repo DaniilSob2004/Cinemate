@@ -52,7 +52,6 @@ public class ContentCrudService {
         this.accessJwtTokenService = accessJwtTokenService;
     }
 
-
     public PagedResponse<ContentDto> getByRecommend(final ContentRecSearchParamsDto contentRecSearchParamsDto, final HttpServletRequest request) {
         String token = jwtTokenService.getValidateTokenFromHeader(request)
                 .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));

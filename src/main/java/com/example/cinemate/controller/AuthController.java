@@ -48,18 +48,14 @@ public class AuthController {
             ResponseAuthDto responseAuthDto = loginService.loginUser(request);
             Logger.info("User authenticated!");
             return ResponseEntity.ok(responseAuthDto);  // отправляем два токена
-
         } catch (BadRequestException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (BadCredentialsException | InternalAuthenticationServiceException e) {
-            errorResponseDto = HandleErrorUtil.handleUserInactiveException(e);  // обработка ошибки
+            errorResponseDto = HandleErrorUtil.handleUserInactiveException(e);
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PostMapping(value = Endpoint.REGISTER)
@@ -71,18 +67,14 @@ public class AuthController {
             ResponseAuthDto responseAuthDto = registerService.registerUser(registerRequestDto);
             Logger.info("User registered!");
             return ResponseEntity.ok(responseAuthDto);  // отправляем два токена
-
         } catch (UserAlreadyExistsException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
         } catch (BadCredentialsException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PostMapping(value = Endpoint.UPDATE_ACCESS_TOKEN)
@@ -95,11 +87,8 @@ public class AuthController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (UnauthorizedException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PostMapping(value = Endpoint.LOGOUT)
@@ -110,11 +99,8 @@ public class AuthController {
             return ResponseEntity.ok("Logout successful");
         } catch (UnauthorizedException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PostMapping(value = Endpoint.FORGOT_PASSWORD)
@@ -131,11 +117,8 @@ public class AuthController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
         } catch (EmailSendException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PostMapping(value = Endpoint.RESET_PASSWORD)
@@ -150,10 +133,7 @@ public class AuthController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
         } catch (BadRequestException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 }

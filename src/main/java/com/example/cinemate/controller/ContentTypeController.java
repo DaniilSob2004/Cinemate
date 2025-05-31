@@ -25,16 +25,9 @@ public class ContentTypeController {
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        try {
-            List<ContentTypeDto> contentTypes = contentTypeCrudService.getAll();
-            Logger.info("Successfully retrieved " + contentTypes.size() + " content types");
-            return ResponseEntity.ok(contentTypes);
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value())
-            );
-        }
+        List<ContentTypeDto> contentTypes = contentTypeCrudService.getAll();
+        Logger.info("Successfully retrieved " + contentTypes.size() + " content types");
+        return ResponseEntity.ok(contentTypes);
     }
 
     @PostMapping
@@ -45,10 +38,7 @@ public class ContentTypeController {
             return ResponseEntity.ok("Content type added successfully");
         } catch (ContentAlreadyExists e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 }

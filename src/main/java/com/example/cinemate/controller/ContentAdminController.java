@@ -45,9 +45,6 @@ public class ContentAdminController {
             return ResponseEntity.ok(contentFullAdminDto);
         } catch (ContentNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
@@ -62,9 +59,6 @@ public class ContentAdminController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
         } catch (ContentAlreadyExists e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
@@ -77,9 +71,6 @@ public class ContentAdminController {
             return ResponseEntity.ok("Content updated successfully");
         } catch (ContentNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
@@ -92,9 +83,6 @@ public class ContentAdminController {
             return ResponseEntity.ok("Content deleted successfully");
         } catch (ContentNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }

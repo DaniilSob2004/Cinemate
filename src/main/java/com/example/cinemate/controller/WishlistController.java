@@ -8,7 +8,6 @@ import com.example.cinemate.service.business.wishlist.WishlistCrudService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -30,9 +29,6 @@ public class WishlistController {
             return ResponseEntity.ok(wishlistCrudService.getByUserId(wishlistParamsDto, request));
         } catch (UnauthorizedException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }

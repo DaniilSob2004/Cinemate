@@ -44,7 +44,7 @@
  - add_content_type / get_all_warnings / add_warning / get_all_actors / add_actor / get_all_genres / add_genre
  - add_content / update_content / delete_content / get_contents (page, size, sortBy, isAsc, filters)
  - get_contents_by_recommends / get_content_by_id / get_random_contents / get_contents_by_genre / get_contents_by_type / 
- - 
+ - get_user_wishlist / get_Userr_view_histories / 
  -------------------- Admin User --------------------
  - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
  - ![Image](https://github.com/user-attachments/assets/1cc6d172-a20b-47fe-ac35-470bcdd58d2b)

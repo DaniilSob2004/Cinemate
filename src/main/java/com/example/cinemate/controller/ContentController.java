@@ -1,13 +1,9 @@
 package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
-import com.example.cinemate.dto.content.ContentRandomRequestDto;
-import com.example.cinemate.dto.content.ContentRecSearchParamsDto;
-import com.example.cinemate.dto.content.ContentSearchParamsDto;
-import com.example.cinemate.dto.error.ErrorResponseDto;
+import com.example.cinemate.dto.content.*;
 import com.example.cinemate.service.business.content.ContentCrudService;
 import com.example.cinemate.utils.SendResponseUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -29,28 +25,14 @@ public class ContentController {
 
     @GetMapping(value = Endpoint.BY_RECOMMENDATIONS)
     public ResponseEntity<?> getByRecommendations(@Valid @ModelAttribute ContentRecSearchParamsDto contentRecSearchParamsDto, HttpServletRequest request) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            Logger.info(contentRecSearchParamsDto);
-            return ResponseEntity.ok(contentCrudService.getByRecommend(contentRecSearchParamsDto, request));
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info(contentRecSearchParamsDto);
+        return ResponseEntity.ok(contentCrudService.getByRecommend(contentRecSearchParamsDto, request));
     }
 
     @GetMapping(value = Endpoint.RANDOM)
     public ResponseEntity<?> getRandom(@Valid @ModelAttribute ContentRandomRequestDto contentRandomRequestDto) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            Logger.info(contentRandomRequestDto);
-            return ResponseEntity.ok(contentCrudService.getRandom(contentRandomRequestDto));
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info(contentRandomRequestDto);
+        return ResponseEntity.ok(contentCrudService.getRandom(contentRandomRequestDto));
     }
 
     @GetMapping(value = Endpoint.BY_GENRE)

@@ -12,7 +12,6 @@ import com.example.cinemate.service.business.user.CurrentUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -37,11 +36,8 @@ public class UserController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.UNAUTHORIZED.value());
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PutMapping(value = Endpoint.ME)
@@ -58,10 +54,7 @@ public class UserController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
         } catch (BadRequestException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 }

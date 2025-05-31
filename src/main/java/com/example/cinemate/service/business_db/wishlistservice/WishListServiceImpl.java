@@ -73,7 +73,6 @@ public class WishListServiceImpl implements WishListService {
         };
     }
 
-
     @Override
     public List<WishList> findByUserId(Integer userId) {
         return wishListRepository.findWishListsByUserId(userId);

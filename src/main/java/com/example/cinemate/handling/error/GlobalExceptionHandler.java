@@ -10,13 +10,23 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.validation.BindException;
+import org.tinylog.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
 // Для глобальной обработки исключений
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // метод будет обрабатывать исключения типа Exception
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponseDto> handleAllExceptions(Exception ex, HttpServletRequest request) {
+        Logger.error("Unhandled exception at {} {}: {}", request.getMethod(), request.getRequestURI(), ex.getMessage(), ex);
+        ErrorResponseDto error = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
 
     // метод будет обрабатывать исключения типа NoHandlerFoundException (404)
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -38,7 +48,7 @@ public class GlobalExceptionHandler {
         return this.sendBadRequestError(ex.getBindingResult().getFieldErrors());
     }
 
-    private ResponseEntity<ErrorResponseDto> sendBadRequestError(List<FieldError> fieldErrors) {
+    private ResponseEntity<ErrorResponseDto> sendBadRequestError(final List<FieldError> fieldErrors) {
         String errorMessage = fieldErrors
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)

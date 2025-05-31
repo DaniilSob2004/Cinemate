@@ -2,10 +2,7 @@ package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.error.ErrorResponseDto;
-import com.example.cinemate.dto.user.UserAddDto;
-import com.example.cinemate.dto.user.UserDto;
-import com.example.cinemate.dto.user.UserSearchParamsDto;
-import com.example.cinemate.dto.user.UserUpdateAdminDto;
+import com.example.cinemate.dto.user.*;
 import com.example.cinemate.exception.auth.UserAlreadyExistsException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.exception.common.BadRequestException;
@@ -35,11 +32,8 @@ public class UserAdminController {
             return ResponseEntity.ok(crudUserService.getUsers(userSearchParamsDto));
         } catch (BadRequestException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PostMapping(value = Endpoint.ADD_USER)
@@ -52,11 +46,8 @@ public class UserAdminController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
         } catch (BadRequestException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @GetMapping(value = Endpoint.BY_ID)
@@ -67,11 +58,8 @@ public class UserAdminController {
             return ResponseEntity.ok(userDto);
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @PutMapping(value = Endpoint.BY_ID)
@@ -86,11 +74,8 @@ public class UserAdminController {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
         } catch (BadRequestException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @DeleteMapping(value = Endpoint.BY_ID)
@@ -101,10 +86,7 @@ public class UserAdminController {
             return ResponseEntity.ok("User deleted successfully");
         } catch (UserNotFoundException e) {
             errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);  // отправка ошибки
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 }
