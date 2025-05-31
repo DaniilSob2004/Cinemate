@@ -1,16 +1,14 @@
 package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.dto.common.PagedResponse;
-import com.example.cinemate.dto.user.UserAddDto;
-import com.example.cinemate.dto.user.UserAdminDto;
-import com.example.cinemate.dto.user.UserSearchParamsDto;
-import com.example.cinemate.dto.user.UserUpdateAdminDto;
+import com.example.cinemate.dto.user.*;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserProviderStorage;
+import com.example.cinemate.utils.PaginationUtil;
 import com.example.cinemate.validate.common.CommonDataValidate;
 import com.example.cinemate.validate.user.UserDataValidate;
 import org.springframework.data.domain.Page;
@@ -65,13 +63,7 @@ public class CrudUserService {
                             ))
                 .toList();
 
-        return new PagedResponse<>(
-                usersAdminDto,
-                pageUsers.getTotalElements(),
-                pageUsers.getTotalPages(),
-                pageUsers.getNumber() + 1,
-                pageUsers.getSize()
-        );
+        return PaginationUtil.getPagedResponse(usersAdminDto, pageUsers);
     }
 
     public UserAdminDto getById(final Integer id) {

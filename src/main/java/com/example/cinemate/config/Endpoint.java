@@ -35,6 +35,7 @@ public class Endpoint {
     public static final String UPDATE_ACCESS_TOKEN = "/update-access-token";
     public static final String RANDOM = "/random";
     public static final String BY_GENRE = "/genre";
+    public static final String BY_RECOMMENDATIONS_TEST = "/rec-test";
     public static final String BY_CONTENT_TYPE = "/type";
     public static final String BY_RECOMMENDATIONS = "/recommendations";
     public static final String LOGOUT = "/logout";
@@ -65,6 +66,7 @@ public class Endpoint {
                 API_V1 + CONTENTS + BY_RECOMMENDATIONS,
                 API_V1 + CONTENT_VIEWS + ME,
                 API_V1 + WISHLISTS + ME,
+                API_V1 + GENRES + BY_RECOMMENDATIONS_TEST,
                 API_V1 + AUTH + LOGOUT
         );
     }

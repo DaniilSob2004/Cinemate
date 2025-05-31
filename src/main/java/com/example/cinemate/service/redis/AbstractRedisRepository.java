@@ -13,7 +13,12 @@ public abstract class AbstractRedisRepository<T> {
     protected final RedisTemplate<String, T> redisTemplate;
 
     protected void save(String key, T value, long timeout, TimeUnit unit) {
-        redisTemplate.opsForValue().set(key, value, timeout, unit);
+        if (timeout <= 0) {
+            redisTemplate.opsForValue().set(key, value);  // бессрочно
+        }
+        else {
+            redisTemplate.opsForValue().set(key, value, timeout, unit);  // с TTL
+        }
     }
 
     protected void saveToSet(String key, T value, long ttl, TimeUnit unit) {
@@ -44,7 +49,7 @@ public abstract class AbstractRedisRepository<T> {
     }
 
     protected boolean exists(String key) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+        return redisTemplate.hasKey(key);
     }
 
     protected int getSizeToSet(String key) {

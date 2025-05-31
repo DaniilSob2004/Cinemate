@@ -3,12 +3,10 @@ package com.example.cinemate.service.business.user;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.user.UserUpdateDto;
-import com.example.cinemate.exception.auth.UnauthorizedException;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.AppUserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
-import com.example.cinemate.service.auth.jwt.JwtTokenService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
 import com.example.cinemate.validate.user.UserDataValidate;
@@ -22,16 +20,14 @@ import javax.transaction.Transactional;
 public class CurrentUserService {
 
     private final AppUserService appUserService;
-    private final JwtTokenService jwtTokenService;
     private final AccessJwtTokenService accessJwtTokenService;
     private final UserDetailsCacheService userDetailsCacheService;
     private final UpdateUserService updateUserService;
     private final UserDataValidate userDataValidate;
     private final AppUserMapper appUserMapper;
 
-    public CurrentUserService(AppUserService appUserService, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, UpdateUserService updateUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
+    public CurrentUserService(AppUserService appUserService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, UpdateUserService updateUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
         this.appUserService = appUserService;
-        this.jwtTokenService = jwtTokenService;
         this.accessJwtTokenService = accessJwtTokenService;
         this.userDetailsCacheService = userDetailsCacheService;
         this.updateUserService = updateUserService;
@@ -40,10 +36,7 @@ public class CurrentUserService {
     }
 
     public UserDto getUser(final HttpServletRequest request) {
-        String token = jwtTokenService.getValidateTokenFromHeader(request)
-                .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));
-
-        var appUserJwtDto = accessJwtTokenService.extractAllData(token);
+        var appUserJwtDto = accessJwtTokenService.extractAllDataByRequest(request);
 
         AppUser appUser = appUserService.findById(appUserJwtDto.getId())
                 .orElseThrow(() -> new UserNotFoundException("User with id '" + appUserJwtDto.getId() + "' was not found..."));
@@ -55,11 +48,8 @@ public class CurrentUserService {
     public void updateUser(final UserUpdateDto userUpdateDto, final HttpServletRequest request) {
         Logger.info("User update: " + userUpdateDto);
 
-        // получить токен и данные пользователя из токена
-        String token = jwtTokenService.getValidateTokenFromHeader(request)
-                .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));
-
-        AppUserJwtDto appUserJwtDto = accessJwtTokenService.extractAllData(token);
+        // получить данные пользователя из токена
+        AppUserJwtDto appUserJwtDto = accessJwtTokenService.extractAllDataByRequest(request);
 
         // найти пользователя в БД
         AppUser appUser = appUserService.findById(appUserJwtDto.getId())

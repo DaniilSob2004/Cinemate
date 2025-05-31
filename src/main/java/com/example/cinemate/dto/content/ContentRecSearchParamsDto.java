@@ -12,6 +12,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 public class ContentRecSearchParamsDto extends PaginationSearchParamsDto {
+    private Boolean isAuto;
     private List<Integer> genreIds;
     private List<Integer> contentTypeIds;
 }

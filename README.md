@@ -43,8 +43,9 @@
  - get_users (page, size, sortBy, isAsc, searchStr), get_all_roles / get_all_providers / get_all_content_types
  - add_content_type / get_all_warnings / add_warning / get_all_actors / add_actor / get_all_genres / add_genre
  - add_content / update_content / delete_content / get_contents (page, size, sortBy, isAsc, filters)
- - get_contents_by_recommends / get_content_by_id / get_random_contents / get_contents_by_genre / get_contents_by_type / 
- - get_user_wishlist / get_Userr_view_histories / 
+ - get_contents_by_recommends / get_content_by_id / get_random_contents / get_contents_by_genre / get_contents_by_type
+ - get_user_wishlist / get_Userr_view_histories
+ - set_genres_user_test_rec / 
  -------------------- Admin User --------------------
  - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
  - ![Image](https://github.com/user-attachments/assets/1cc6d172-a20b-47fe-ac35-470bcdd58d2b)
@@ -74,6 +75,8 @@
  - ![Image](https://github.com/user-attachments/assets/da7aa7e4-1fe4-4a5c-a648-c377762428d6)
  - ![Image](https://github.com/user-attachments/assets/4a57c38e-c6ea-4aca-8d80-b77de4efb4b3)
  - ![Image](https://github.com/user-attachments/assets/855d9650-0c12-4500-a7fe-7405aaf37c8b)
+ -------------------- Contents (For Users) --------------------
+ - ![Image](https://github.com/user-attachments/assets/661315ae-eb5f-409d-a9ed-25f68147110f)
  -------------------- Content View Histories --------------------
  - ![Image](https://github.com/user-attachments/assets/1f048bca-5b4b-4d17-9729-ea11eb5b69f0)
  -------------------- Wishlist --------------------

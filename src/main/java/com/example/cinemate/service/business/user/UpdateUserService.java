@@ -3,6 +3,7 @@ package com.example.cinemate.service.business.user;
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
+import com.example.cinemate.service.redis.GenresTestStorage;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
 import com.example.cinemate.service.redis.token.AccessTokenRedisStorage;
 import com.example.cinemate.service.redis.token.RefreshTokenRedisStorage;
@@ -20,14 +21,16 @@ public class UpdateUserService {
     private final UserDetailsCacheService userDetailsCacheService;
     private final AccessTokenRedisStorage accessTokenRedisStorage;
     private final RefreshTokenRedisStorage refreshTokenRedisStorage;
+    private final GenresTestStorage genresTestStorage;
     private final UserDataValidate userDataValidate;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UpdateUserService(UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, AccessTokenRedisStorage accessTokenRedisStorage, RefreshTokenRedisStorage refreshTokenRedisStorage, UserDataValidate userDataValidate, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UpdateUserService(UserRoleService userRoleService, UserDetailsCacheService userDetailsCacheService, AccessTokenRedisStorage accessTokenRedisStorage, RefreshTokenRedisStorage refreshTokenRedisStorage, GenresTestStorage genresTestStorage, UserDataValidate userDataValidate, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRoleService = userRoleService;
         this.userDetailsCacheService = userDetailsCacheService;
         this.accessTokenRedisStorage = accessTokenRedisStorage;
         this.refreshTokenRedisStorage = refreshTokenRedisStorage;
+        this.genresTestStorage = genresTestStorage;
         this.userDataValidate = userDataValidate;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -83,6 +86,7 @@ public class UpdateUserService {
         accessTokenRedisStorage.removeByUserId(userId);
         refreshTokenRedisStorage.removeByUserId(userId);
         userDetailsCacheService.remove(userId);
+        genresTestStorage.remove(userId);
     }
 
     public void saveUserData(final AppUser appUser, final UserUpdateDto userUpdateDto) {

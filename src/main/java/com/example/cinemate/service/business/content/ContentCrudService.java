@@ -3,18 +3,18 @@ package com.example.cinemate.service.business.content;
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.common.PaginationSearchParamsDto;
 import com.example.cinemate.dto.content.*;
-import com.example.cinemate.exception.auth.UnauthorizedException;
 import com.example.cinemate.exception.common.ContentNotFoundException;
+import com.example.cinemate.exception.genre.GenresTestDataNotFoundException;
 import com.example.cinemate.mapper.content.*;
 import com.example.cinemate.model.db.Content;
 import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
-import com.example.cinemate.service.auth.jwt.JwtTokenService;
 import com.example.cinemate.service.business_db.contentgenreservice.ContentGenreService;
 import com.example.cinemate.service.business_db.contentservice.ContentService;
 import com.example.cinemate.service.business_db.contenttypeservice.ContentTypeService;
 import com.example.cinemate.service.business_db.contentviewhistoryservice.ContentViewHistoryService;
 import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.service.business_db.wishlistservice.WishListService;
+import com.example.cinemate.service.redis.GenresTestStorage;
 import com.example.cinemate.utils.GenerateUtil;
 import com.example.cinemate.utils.PaginationUtil;
 import org.springframework.data.domain.Page;
@@ -34,54 +34,59 @@ public class ContentCrudService {
     private final ContentGenreService contentGenreService;
     private final WishListService wishListService;
     private final ContentViewHistoryService contentViewHistoryService;
+    private final GenresTestStorage genresTestStorage;
     private final ContentMapper contentMapper;
     private final ContentEnrichMapper contentEnrichMapper;
-    private final JwtTokenService jwtTokenService;
     private final AccessJwtTokenService accessJwtTokenService;
 
-    public ContentCrudService(ContentService contentService, GenreService genreService, ContentTypeService contentTypeService, ContentGenreService contentGenreService, WishListService wishListService, ContentViewHistoryService contentViewHistoryService, ContentMapper contentMapper, ContentEnrichMapper contentEnrichMapper, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService) {
+    public ContentCrudService(ContentService contentService, GenreService genreService, ContentTypeService contentTypeService, ContentGenreService contentGenreService, WishListService wishListService, ContentViewHistoryService contentViewHistoryService, GenresTestStorage genresTestStorage, ContentMapper contentMapper, ContentEnrichMapper contentEnrichMapper, AccessJwtTokenService accessJwtTokenService) {
         this.contentService = contentService;
         this.genreService = genreService;
         this.contentTypeService = contentTypeService;
         this.contentGenreService = contentGenreService;
         this.wishListService = wishListService;
         this.contentViewHistoryService = contentViewHistoryService;
+        this.genresTestStorage = genresTestStorage;
         this.contentMapper = contentMapper;
         this.contentEnrichMapper = contentEnrichMapper;
-        this.jwtTokenService = jwtTokenService;
         this.accessJwtTokenService = accessJwtTokenService;
     }
 
     public PagedResponse<ContentDto> getByRecommend(final ContentRecSearchParamsDto contentRecSearchParamsDto, final HttpServletRequest request) {
-        String token = jwtTokenService.getValidateTokenFromHeader(request)
-                .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));
-
-        var appUserJwtDto = accessJwtTokenService.extractAllData(token);
-
-        // id пользователя
+        var appUserJwtDto = accessJwtTokenService.extractAllDataByRequest(request);
         var userId = appUserJwtDto.getId();
 
-        // список желаний
-        var userWishList = wishListService.findByUserId(userId);
+        List<Integer> genreIds;
+        List<Integer> contentTypeIds = null;
 
-        // просмотренный контент
-        var viewHistories = contentViewHistoryService.findByUserId(userId);
+        // автоматический расчёт рекоммендации
+        if (contentRecSearchParamsDto.getIsAuto()) {
+            // список желаний
+            var userWishList = wishListService.findByUserId(userId);
 
-        // список genreIds по "WishList" и "ContentViewHistory"
-        List<Integer> allContentIds = Stream.concat(
-                userWishList.stream().map(w -> w.getContent().getId()),
-                viewHistories.stream().map(vh -> vh.getContent().getId())
-        ).distinct().toList();
-        List<Integer> genreIds = contentGenreService.getGenresByContentIds(allContentIds).values().stream()
-                .flatMap(List::stream)
-                .distinct()
-                .toList();
+            // просмотренный контент
+            var viewHistories = contentViewHistoryService.findByUserId(userId);
 
-        // список contentTypeIds по "WishList" и "ContentViewHistory"
-        List<Integer> contentTypeIds = Stream.concat(
-                userWishList.stream().map(w -> w.getContent().getContentType().getId()),
-                viewHistories.stream().map(vh -> vh.getContent().getContentType().getId())
-        ).distinct().toList();
+            // список genreIds по "WishList" и "ContentViewHistory"
+            List<Integer> allContentIds = Stream.concat(
+                    userWishList.stream().map(w -> w.getContent().getId()),
+                    viewHistories.stream().map(vh -> vh.getContent().getId())
+            ).distinct().toList();
+            genreIds = contentGenreService.getGenresByContentIds(allContentIds).values().stream()
+                    .flatMap(List::stream)
+                    .distinct()
+                    .toList();
+
+            // список contentTypeIds по "WishList" и "ContentViewHistory"
+            contentTypeIds = Stream.concat(
+                    userWishList.stream().map(w -> w.getContent().getContentType().getId()),
+                    viewHistories.stream().map(vh -> vh.getContent().getContentType().getId())
+            ).distinct().toList();
+        }
+        else {
+            genreIds = genresTestStorage.getGenreIds(userId.toString())
+                    .orElseThrow(() -> new GenresTestDataNotFoundException("No genres test data found for user " + userId));
+        }
 
         contentRecSearchParamsDto.setGenreIds(genreIds);
         contentRecSearchParamsDto.setContentTypeIds(contentTypeIds);

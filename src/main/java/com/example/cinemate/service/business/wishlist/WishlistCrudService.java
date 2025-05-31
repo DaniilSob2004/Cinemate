@@ -3,11 +3,9 @@ package com.example.cinemate.service.business.wishlist;
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.wishlist.WishlistDto;
 import com.example.cinemate.dto.wishlist.WishlistParamsDto;
-import com.example.cinemate.exception.auth.UnauthorizedException;
 import com.example.cinemate.mapper.WishlistMapper;
 import com.example.cinemate.model.db.WishList;
 import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
-import com.example.cinemate.service.auth.jwt.JwtTokenService;
 import com.example.cinemate.service.business_db.wishlistservice.WishListService;
 import com.example.cinemate.utils.PaginationUtil;
 import org.springframework.data.domain.Page;
@@ -19,22 +17,17 @@ import javax.servlet.http.HttpServletRequest;
 public class WishlistCrudService {
 
     private final WishListService wishListService;
-    private final JwtTokenService jwtTokenService;
     private final AccessJwtTokenService accessJwtTokenService;
     private final WishlistMapper wishlistMapper;
 
-    public WishlistCrudService(WishListService wishListService, JwtTokenService jwtTokenService, AccessJwtTokenService accessJwtTokenService, WishlistMapper wishlistMapper) {
+    public WishlistCrudService(WishListService wishListService, AccessJwtTokenService accessJwtTokenService, WishlistMapper wishlistMapper) {
         this.wishListService = wishListService;
-        this.jwtTokenService = jwtTokenService;
         this.accessJwtTokenService = accessJwtTokenService;
         this.wishlistMapper = wishlistMapper;
     }
 
     public PagedResponse<WishlistDto> getByUserId(final WishlistParamsDto wishlistParamsDto, final HttpServletRequest request) {
-        String token = jwtTokenService.getValidateTokenFromHeader(request)
-                .orElseThrow(() -> new UnauthorizedException("Invalid or missing token"));
-
-        var appUserJwtDto = accessJwtTokenService.extractAllData(token);
+        var appUserJwtDto = accessJwtTokenService.extractAllDataByRequest(request);
 
         wishlistParamsDto.setPage(wishlistParamsDto.getPage() - 1);
         wishlistParamsDto.setUserId(appUserJwtDto.getId());

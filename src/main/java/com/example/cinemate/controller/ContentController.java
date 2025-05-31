@@ -2,8 +2,11 @@ package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.content.*;
+import com.example.cinemate.dto.error.ErrorResponseDto;
+import com.example.cinemate.exception.genre.GenresTestDataNotFoundException;
 import com.example.cinemate.service.business.content.ContentCrudService;
 import com.example.cinemate.utils.SendResponseUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -25,8 +28,14 @@ public class ContentController {
 
     @GetMapping(value = Endpoint.BY_RECOMMENDATIONS)
     public ResponseEntity<?> getByRecommendations(@Valid @ModelAttribute ContentRecSearchParamsDto contentRecSearchParamsDto, HttpServletRequest request) {
-        Logger.info(contentRecSearchParamsDto);
-        return ResponseEntity.ok(contentCrudService.getByRecommend(contentRecSearchParamsDto, request));
+        ErrorResponseDto errorResponseDto;
+        try {
+            Logger.info(contentRecSearchParamsDto);
+            return ResponseEntity.ok(contentCrudService.getByRecommend(contentRecSearchParamsDto, request));
+        } catch (GenresTestDataNotFoundException e) {
+            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
+        }
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
     @GetMapping(value = Endpoint.RANDOM)

@@ -18,6 +18,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.List;
 
 @Configuration
 @EnableCaching
@@ -64,6 +65,12 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisResetPasswordTokenConnectionFactory() {
         return createRedisConnectionFactory(3);
+    }
+
+    // фабрика соединения для genres_test (БД 4)
+    @Bean
+    public RedisConnectionFactory redisGenresTestConnectionFactory() {
+        return createRedisConnectionFactory(4);
     }
 
 
@@ -115,6 +122,16 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, String> redisResetPasswordTokenTemplate(RedisConnectionFactory redisResetPasswordTokenConnectionFactory) {
         return this.getStringsRedisTemplate(redisResetPasswordTokenConnectionFactory);
+    }
+
+    // для работы с genres_test для тестирования рекоммендаций пользователя (БД 4)
+    @Bean
+    public RedisTemplate<String, List<Integer>> redisGenresTestTemplate(RedisConnectionFactory redisGenresTestConnectionFactory) {
+        RedisTemplate<String, List<Integer>> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisGenresTestConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(List.class));
+        return template;
     }
 
     // по дефолту (БД 0)

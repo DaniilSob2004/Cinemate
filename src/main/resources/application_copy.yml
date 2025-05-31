@@ -57,8 +57,10 @@ redis_data:
   token_user_id_key_prefix: "user_id_tokens::"
   reset_token_key_prefix: "reset_token::"
   user_provider_key_prefix: "user_provider::"
+  genres_test_key_prefix: "genres_test_user_id"
   user_details_expiration_time: 3600  # 3600 60 min
   reset_token_expiration_time: 600  # 600 10 min
+  genres_test_expiration_time: 24  # 24 hours
   base_redis_expiration_time: 3600  # 3600 60 min
 
 email_data:
