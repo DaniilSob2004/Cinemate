@@ -18,6 +18,7 @@ public class Endpoint {
     public static final String CONTENT_TYPES = "/content-types";
     public static final String WARNINGS = "/warnings";
     public static final String CONTENTS = "/contents";
+    public static final String EPISODES = "/episodes";
     public static final String ACTORS = "/actors";
     public static final String GENRES = "/genres";
     public static final String CONTENT_VIEWS = "/content-views";
@@ -38,6 +39,7 @@ public class Endpoint {
     public static final String BY_RECOMMENDATIONS_TEST = "/rec-test";
     public static final String BY_CONTENT_TYPE = "/type";
     public static final String BY_RECOMMENDATIONS = "/recommendations";
+    public static final String BY_CONTENT_ID = "/{contentId}";
     public static final String LOGOUT = "/logout";
 
     // admin
@@ -64,6 +66,7 @@ public class Endpoint {
                 API_V1 + CONTENTS + BY_GENRE,
                 API_V1 + CONTENTS + BY_CONTENT_TYPE,
                 API_V1 + CONTENTS + BY_RECOMMENDATIONS,
+                API_V1 + EPISODES + BY_CONTENT_ID,
                 API_V1 + CONTENT_VIEWS + ME,
                 API_V1 + WISHLISTS + ME,
                 API_V1 + GENRES + BY_RECOMMENDATIONS_TEST,

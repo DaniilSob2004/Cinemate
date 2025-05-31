@@ -44,4 +44,9 @@ public class EpisodeServiceImpl implements EpisodeService {
     public void deleteAll() {
         episodeRepository.deleteAll();
     }
+
+    @Override
+    public List<Episode> getByContentId(Integer contentId) {
+        return episodeRepository.getEpisodesByContentId(contentId);
+    }
 }

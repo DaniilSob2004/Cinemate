@@ -44,8 +44,10 @@
  - add_content_type / get_all_warnings / add_warning / get_all_actors / add_actor / get_all_genres / add_genre
  - add_content / update_content / delete_content / get_contents (page, size, sortBy, isAsc, filters)
  - get_contents_by_recommends / get_content_by_id / get_random_contents / get_contents_by_genre / get_contents_by_type
- - get_user_wishlist / get_Userr_view_histories
+ - get_episodes_by_content_id / 
+ - get_user_wishlist / get_Userr_view_histories /
  - set_genres_user_test_rec / 
+ - 
  -------------------- Admin User --------------------
  - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
  - ![Image](https://github.com/user-attachments/assets/1cc6d172-a20b-47fe-ac35-470bcdd58d2b)
@@ -75,8 +77,10 @@
  - ![Image](https://github.com/user-attachments/assets/da7aa7e4-1fe4-4a5c-a648-c377762428d6)
  - ![Image](https://github.com/user-attachments/assets/4a57c38e-c6ea-4aca-8d80-b77de4efb4b3)
  - ![Image](https://github.com/user-attachments/assets/855d9650-0c12-4500-a7fe-7405aaf37c8b)
- -------------------- Contents (For Users) --------------------
- - ![Image](https://github.com/user-attachments/assets/661315ae-eb5f-409d-a9ed-25f68147110f)
+ -------------------- Episodes (For Users) --------------------
+ - ![Image](https://github.com/user-attachments/assets/5e3e1ad8-9296-4a8a-8451-b37efa438092)
+ -------------------- Set Genres For Users Test --------------------
+ - ![Image](https://github.com/user-attachments/assets/2c16fd7e-eb1e-47fc-9c65-d3fe8c2c020a)
  -------------------- Content View Histories --------------------
  - ![Image](https://github.com/user-attachments/assets/1f048bca-5b4b-4d17-9729-ea11eb5b69f0)
  -------------------- Wishlist --------------------

@@ -11,4 +11,6 @@ public interface EpisodeService {
     void delete(Episode episode);
     List<Episode> findAll();
     void deleteAll();
+
+    List<Episode> getByContentId(Integer contentId);
 }
