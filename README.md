@@ -78,7 +78,7 @@
  - ![Image](https://github.com/user-attachments/assets/4a57c38e-c6ea-4aca-8d80-b77de4efb4b3)
  - ![Image](https://github.com/user-attachments/assets/855d9650-0c12-4500-a7fe-7405aaf37c8b)
  -------------------- Episodes (For Users) --------------------
- - ![Image](https://github.com/user-attachments/assets/5e3e1ad8-9296-4a8a-8451-b37efa438092)
+ - ![Image](https://github.com/user-attachments/assets/371bfeef-6b9a-4339-8503-345b0786a3bc)
  -------------------- Set Genres For Users Test --------------------
  - ![Image](https://github.com/user-attachments/assets/2c16fd7e-eb1e-47fc-9c65-d3fe8c2c020a)
  -------------------- Content View Histories --------------------
