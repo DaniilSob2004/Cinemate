@@ -66,7 +66,6 @@ public class Endpoint {
                 API_V1 + CONTENTS + BY_GENRE,
                 API_V1 + CONTENTS + BY_CONTENT_TYPE,
                 API_V1 + CONTENTS + BY_RECOMMENDATIONS,
-                API_V1 + EPISODES + BY_CONTENT_ID,
                 API_V1 + CONTENT_VIEWS + ME,
                 API_V1 + WISHLISTS + ME,
                 API_V1 + GENRES + BY_RECOMMENDATIONS_TEST,
@@ -84,8 +83,15 @@ public class Endpoint {
                 API_V1 + WARNINGS,
                 API_V1 + ADMIN + CONTENTS,
                 API_V1 + ADMIN + CONTENTS + BY_ID,
+                API_V1 + ADMIN + EPISODES,
                 API_V1 + ACTORS,
                 API_V1 + GENRES
+        );
+    }
+
+    static public List<String> getEndpointForAuthUsersAndAdmin() {
+        return List.of(
+                API_V1 + EPISODES + BY_CONTENT_ID
         );
     }
 }

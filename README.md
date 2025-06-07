@@ -44,7 +44,7 @@
  - add_content_type / get_all_warnings / add_warning / get_all_actors / add_actor / get_all_genres / add_genre
  - add_content / update_content / delete_content / get_contents (page, size, sortBy, isAsc, filters)
  - get_contents_by_recommends / get_content_by_id / get_random_contents / get_contents_by_genre / get_contents_by_type
- - get_episodes_by_content_id / 
+ - get_episodes_by_content_id / add_episode / delete_episode / update_episode / 
  - get_user_wishlist / get_Userr_view_histories /
  - set_genres_user_test_rec / 
  - 
@@ -78,7 +78,10 @@
  - ![Image](https://github.com/user-attachments/assets/4a57c38e-c6ea-4aca-8d80-b77de4efb4b3)
  - ![Image](https://github.com/user-attachments/assets/855d9650-0c12-4500-a7fe-7405aaf37c8b)
  -------------------- Episodes (For Users) --------------------
- - ![Image](https://github.com/user-attachments/assets/371bfeef-6b9a-4339-8503-345b0786a3bc)
+ - ![Image](https://github.com/user-attachments/assets/6b1d8119-4e38-49f3-8150-55c207d8c671)
+ - ![Image](https://github.com/user-attachments/assets/6953b422-1b63-4577-9d57-9720423c069b)
+ - ![Image](https://github.com/user-attachments/assets/97989025-f01b-4628-b02d-f461ed21e91f)
+ - ![Image](https://github.com/user-attachments/assets/d69cb70e-cce7-47d1-8a85-3051d61dea6a)
  -------------------- Set Genres For Users Test --------------------
  - ![Image](https://github.com/user-attachments/assets/2c16fd7e-eb1e-47fc-9c65-d3fe8c2c020a)
  -------------------- Content View Histories --------------------

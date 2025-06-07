@@ -34,6 +34,7 @@ public class RedisConfig {
     private long expirationTime;
 
 
+
     // создание фабрики соединения по указанному index db
     private RedisConnectionFactory createRedisConnectionFactory(int indexDb) {
         var configuration = new RedisStandaloneConfiguration();
@@ -89,6 +90,7 @@ public class RedisConfig {
                 .cacheDefaults(config)
                 .build();
     }
+
 
     // для кэширования UserDetails (БД 0)
     @Bean

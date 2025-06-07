@@ -6,7 +6,6 @@ import com.example.cinemate.handling.error.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -72,6 +71,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         for (String endpoint : Endpoint.getEndpointForAdmin()) {
             http.authorizeRequests().mvcMatchers(endpoint)
                     .access(String.format("hasAnyRole('%s')", adminRole));
+        }
+
+        // для авторизованных пользователей и админов
+        for (String endpoint : Endpoint.getEndpointForAuthUsersAndAdmin()) {
+            http.authorizeRequests().mvcMatchers(endpoint)
+                    .access(String.format("hasAnyRole('%s','%s')", userRole, adminRole));
         }
 
         http
