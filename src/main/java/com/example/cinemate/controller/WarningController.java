@@ -1,11 +1,8 @@
 package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
-import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.dto.warning.WarningDto;
-import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.service.business.warning.WarningCrudService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -32,13 +29,8 @@ public class WarningController {
 
     @PostMapping
     public ResponseEntity<?> add(@Valid @RequestBody WarningDto warningDto) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            warningCrudService.add(warningDto);
-            return ResponseEntity.ok("Warning added successfully");
-        } catch (ContentAlreadyExists e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info("-------- Add warning (" + warningDto + ") --------");
+        warningCrudService.add(warningDto);
+        return ResponseEntity.ok("Warning added successfully");
     }
 }

@@ -3,11 +3,7 @@ package com.example.cinemate.controller;
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
-import com.example.cinemate.dto.error.ErrorResponseDto;
-import com.example.cinemate.exception.common.ContentAlreadyExists;
-import com.example.cinemate.exception.common.ContentNotFoundException;
 import com.example.cinemate.service.business.content.ContentAdminCrudService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -26,64 +22,35 @@ public class ContentAdminController {
 
     @GetMapping
     public ResponseEntity<?> get(@Valid ContentSearchParamsDto contentSearchParamsDto) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            Logger.info(contentSearchParamsDto);
-            return ResponseEntity.ok(contentAdminCrudService.getListContents(contentSearchParamsDto));
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
-            errorResponseDto = new ErrorResponseDto("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info("-------- Get contents for admin (" + contentSearchParamsDto + ") --------");
+        return ResponseEntity.ok(contentAdminCrudService.getListContents(contentSearchParamsDto));
     }
 
     @GetMapping(value = Endpoint.BY_ID)
     public ResponseEntity<?> getById(@PathVariable Integer id) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            var contentFullAdminDto = contentAdminCrudService.getById(id);
-            return ResponseEntity.ok(contentFullAdminDto);
-        } catch (ContentNotFoundException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info("Get content for admin by id: " + id);
+        var contentFullAdminDto = contentAdminCrudService.getById(id);
+        return ResponseEntity.ok(contentFullAdminDto);
     }
 
     @PostMapping
     public ResponseEntity<?> add(@Valid @RequestBody ContentFullAdminDto contentFullAdminDto) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            contentAdminCrudService.add(contentFullAdminDto);
-            return ResponseEntity.ok("Content added successfully");
-        } catch (ContentNotFoundException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        } catch (ContentAlreadyExists e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info("-------- Add content for admin (" + contentFullAdminDto + ") --------");
+        contentAdminCrudService.add(contentFullAdminDto);
+        return ResponseEntity.ok("Content added successfully");
     }
 
     @PutMapping(value = Endpoint.BY_ID)
     public ResponseEntity<?> updateById(@PathVariable Integer id, @Valid @RequestBody ContentFullAdminDto contentFullAdminDto) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            contentAdminCrudService.updateById(id, contentFullAdminDto);
-            return ResponseEntity.ok("Content updated successfully");
-        } catch (ContentNotFoundException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info("-------- Update content for admin by id: " + id + " - (" + contentFullAdminDto + ") --------");
+        contentAdminCrudService.updateById(id, contentFullAdminDto);
+        return ResponseEntity.ok("Content updated successfully");
     }
 
     @DeleteMapping(value = Endpoint.BY_ID)
     public ResponseEntity<?> deleteById(@PathVariable Integer id) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            contentAdminCrudService.delete(id);
-            return ResponseEntity.ok("Content deleted successfully");
-        } catch (ContentNotFoundException e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.NOT_FOUND.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info("Delete content for admin by id: " + id);
+        contentAdminCrudService.delete(id);
+        return ResponseEntity.ok("Content deleted successfully");
     }
 }

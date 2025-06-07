@@ -2,10 +2,7 @@ package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.contenttype.ContentTypeDto;
-import com.example.cinemate.dto.error.ErrorResponseDto;
-import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.service.business.contenttype.ContentTypeCrudService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -32,13 +29,8 @@ public class ContentTypeController {
 
     @PostMapping
     public ResponseEntity<?> add(@Valid @RequestBody ContentTypeDto contentTypeDto) {
-        ErrorResponseDto errorResponseDto;
-        try {
-            contentTypeCrudService.add(contentTypeDto);
-            return ResponseEntity.ok("Content type added successfully");
-        } catch (ContentAlreadyExists e) {
-            errorResponseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.CONFLICT.value());
-        }
-        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
+        Logger.info("-------- Add ContentType (" + contentTypeDto + ") --------");
+        contentTypeCrudService.add(contentTypeDto);
+        return ResponseEntity.ok("Content type added successfully");
     }
 }

@@ -18,7 +18,7 @@ public class EpisodeController {
 
     @GetMapping(value = Endpoint.BY_CONTENT_ID)
     public ResponseEntity<?> getByContentId(@PathVariable Integer contentId) {
-        Logger.info("Content id: " + contentId);
+        Logger.info("Get episode by content id: " + contentId);
         return ResponseEntity.ok(episodeCrudService.getByContentId(contentId));
     }
 }
