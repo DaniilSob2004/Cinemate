@@ -1,6 +1,6 @@
 package com.example.cinemate.service.amazon;
 
-import com.example.cinemate.dto.content.files.TempContentFile;
+import com.example.cinemate.dto.common.TempContentFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;

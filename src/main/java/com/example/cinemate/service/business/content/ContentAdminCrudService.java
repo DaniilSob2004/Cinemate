@@ -2,7 +2,7 @@ package com.example.cinemate.service.business.content;
 
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.content.*;
-import com.example.cinemate.dto.content.files.ContentFilesBufferDto;
+import com.example.cinemate.dto.content.file.ContentFilesBufferDto;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.common.ContentNotFoundException;
 import com.example.cinemate.mapper.content.*;

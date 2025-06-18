@@ -1,4 +1,4 @@
-package com.example.cinemate.dto.content;
+package com.example.cinemate.dto.content.file;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;

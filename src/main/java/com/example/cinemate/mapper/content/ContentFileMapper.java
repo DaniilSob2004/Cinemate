@@ -1,32 +1,31 @@
 package com.example.cinemate.mapper.content;
 
-import com.example.cinemate.dto.content.ContentFilesDto;
-import com.example.cinemate.dto.content.files.*;
+import com.example.cinemate.dto.content.file.ContentFilesBufferDto;
+import com.example.cinemate.dto.content.file.ContentFilesDto;
+import com.example.cinemate.mapper.common.TempContentFileMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 @Component
 public class ContentFileMapper {
 
-    // преобразования MultipartFile в TempContentFile
+    private final TempContentFileMapper tempContentFileMapper;
+
+    public ContentFileMapper(TempContentFileMapper tempContentFileMapper) {
+        this.tempContentFileMapper = tempContentFileMapper;
+    }
+
+    // преобразования MultipartFile в ContentFilesBufferDto (TempContentFile)
     public ContentFilesBufferDto toContentFilesBufferDto(final ContentFilesDto contentFilesDto) {
         try {
             return new ContentFilesBufferDto(
-                    toTempContentFile(contentFilesDto.getPoster()),
-                    toTempContentFile(contentFilesDto.getTrailer()),
-                    toTempContentFile(contentFilesDto.getVideo())
+                    tempContentFileMapper.toTempContentFile(contentFilesDto.getPoster()),
+                    tempContentFileMapper.toTempContentFile(contentFilesDto.getTrailer()),
+                    tempContentFileMapper.toTempContentFile(contentFilesDto.getVideo())
             );
         } catch (IOException e) {
             throw new RuntimeException("Failed to read multipart file: " + e.getMessage());
         }
-    }
-
-    private TempContentFile toTempContentFile(final MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-        return new TempContentFile(file.getBytes(), file.getOriginalFilename(), file.getContentType());
     }
 }

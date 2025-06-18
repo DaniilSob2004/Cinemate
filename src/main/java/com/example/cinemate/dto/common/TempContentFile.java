@@ -1,4 +1,4 @@
-package com.example.cinemate.dto.content.files;
+package com.example.cinemate.dto.common;
 
 import lombok.*;
 

@@ -1,7 +1,7 @@
 package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
-import com.example.cinemate.dto.content.ContentFilesDto;
+import com.example.cinemate.dto.content.file.ContentFilesDto;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.mapper.content.ContentFileMapper;
@@ -50,8 +50,8 @@ public class ContentAdminController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> add(
-            @RequestPart("metadata") String metadataStr,
+    public ResponseEntity<?> add(
+            @RequestPart(value = "metadata") String metadataStr,
             @RequestPart(value = "poster") MultipartFile poster,
             @RequestPart(value = "trailer") MultipartFile trailer,
             @RequestPart(value = "video") MultipartFile video

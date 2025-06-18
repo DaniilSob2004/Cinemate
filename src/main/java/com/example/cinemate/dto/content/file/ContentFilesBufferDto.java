@@ -1,5 +1,6 @@
-package com.example.cinemate.dto.content.files;
+package com.example.cinemate.dto.content.file;
 
+import com.example.cinemate.dto.common.TempContentFile;
 import lombok.*;
 
 // для хранения файлов в байтах
