@@ -24,9 +24,9 @@ public class SaveUserService {
         this.userDataValidate = userDataValidate;
     }
 
-    public void createUser(final AppUser user) {
+    public AppUser createUser(final AppUser user) {
         this.prepareUserDataForSave(user);
-        appUserService.save(user);
+        return appUserService.save(user);
     }
 
     public void createUserRoles(final AppUser user, List<String> rolesName) {

@@ -4,7 +4,7 @@ import com.example.cinemate.dto.auth.ResponseAuthDto;
 import com.example.cinemate.dto.auth.OAuthUserDto;
 import com.example.cinemate.exception.auth.OAuthException;
 import com.example.cinemate.exception.auth.UserInactiveException;
-import com.example.cinemate.mapper.AppUserMapper;
+import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.mapper.OAuthUserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.auth.RegisterService;
@@ -20,14 +20,14 @@ public class RegisterOAuthService {
     private final AppUserService appUserService;
     private final ExternalAuthService externalAuthService;
     private final RegisterService registerService;
-    private final AppUserMapper appUserMapper;
+    private final UserMapper userMapper;
     private final OAuthUserMapper oAuthUserMapper;
 
-    public RegisterOAuthService(AppUserService appUserService, ExternalAuthService externalAuthService, RegisterService registerService, AppUserMapper appUserMapper, OAuthUserMapper oAuthUserMapper) {
+    public RegisterOAuthService(AppUserService appUserService, ExternalAuthService externalAuthService, RegisterService registerService, UserMapper userMapper, OAuthUserMapper oAuthUserMapper) {
         this.appUserService = appUserService;
         this.externalAuthService = externalAuthService;
         this.registerService = registerService;
-        this.appUserMapper = appUserMapper;
+        this.userMapper = userMapper;
         this.oAuthUserMapper = oAuthUserMapper;
     }
 
@@ -57,7 +57,7 @@ public class RegisterOAuthService {
             externalAuth.setAccessToken(oAuthUserDto.getAccessToken());
             externalAuthService.update(externalAuth);
         }
-        else {  // если пользователь нет, то создаём
+        else {  // если пользователя нет, то создаём
             user = this.createNewUserFromOAuth(oAuthUserDto);
         }
 
@@ -65,7 +65,7 @@ public class RegisterOAuthService {
     }
 
     private AppUser createNewUserFromOAuth(final OAuthUserDto oAuthUserDto) {
-        AppUser user = appUserMapper.toAppUser(oAuthUserDto);
+        AppUser user = userMapper.toAppUser(oAuthUserDto);
         registerService.createUser(user);
         this.createExternalAuth(oAuthUserDto, user);
         return user;

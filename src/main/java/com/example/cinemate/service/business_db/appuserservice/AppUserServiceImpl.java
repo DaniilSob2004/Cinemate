@@ -22,8 +22,8 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public void save(AppUser user) {
-        appUserRepository.save(user);
+    public AppUser save(AppUser user) {
+        return appUserRepository.save(user);
     }
 
     @Override

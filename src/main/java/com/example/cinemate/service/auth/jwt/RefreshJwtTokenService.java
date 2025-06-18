@@ -1,7 +1,7 @@
 package com.example.cinemate.service.auth.jwt;
 
 import com.example.cinemate.dto.auth.RefreshTokenDto;
-import com.example.cinemate.mapper.AppUserMapper;
+import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.service.redis.token.RefreshTokenRedisStorage;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,16 +17,16 @@ public class RefreshJwtTokenService {
 
     private final RefreshTokenRedisStorage refreshTokenRedisStorage;
     private final JwtTokenService jwtTokenService;
-    private final AppUserMapper appUserMapper;
+    private final UserMapper userMapper;
 
-    public RefreshJwtTokenService(RefreshTokenRedisStorage refreshTokenRedisStorage, JwtTokenService jwtTokenService, AppUserMapper appUserMapper) {
+    public RefreshJwtTokenService(RefreshTokenRedisStorage refreshTokenRedisStorage, JwtTokenService jwtTokenService, UserMapper userMapper) {
         this.refreshTokenRedisStorage = refreshTokenRedisStorage;
         this.jwtTokenService = jwtTokenService;
-        this.appUserMapper = appUserMapper;
+        this.userMapper = userMapper;
     }
 
     public String generateToken(final RefreshTokenDto refreshTokenDto) {
-        Map<String, Object> claims = appUserMapper.toClaimsJwt(refreshTokenDto);  // получаем данные польз.
+        Map<String, Object> claims = userMapper.toClaimsJwt(refreshTokenDto);  // получаем данные польз.
         return jwtTokenService.generateToken(claims, refreshTokenDto.getId().toString(), expirationTime);
     }
 
@@ -39,6 +39,6 @@ public class RefreshJwtTokenService {
 
     public RefreshTokenDto extractAllData(final String token) {
         Claims claims = jwtTokenService.getClaims(token);
-        return appUserMapper.toRefreshTokenDto(claims);  // получаем данные польз. из claims
+        return userMapper.toRefreshTokenDto(claims);  // получаем данные польз. из claims
     }
 }

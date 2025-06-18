@@ -2,7 +2,7 @@ package com.example.cinemate.service.auth;
 
 import com.example.cinemate.dto.auth.ResponseAuthDto;
 import com.example.cinemate.dto.auth.RefreshTokenDto;
-import com.example.cinemate.mapper.AppUserMapper;
+import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.model.AuthenticationRequest;
@@ -28,20 +28,20 @@ public class AuthService {
     private final RefreshJwtTokenService refreshJwtTokenService;
     private final UserDetailsServiceImpl userDetailsService;
     private final UserProviderStorage userProviderStorage;
-    private final AppUserMapper appUserMapper;
+    private final UserMapper userMapper;
 
     public AuthService(
             @Lazy AuthenticationManager authenticationManager,
             AccessJwtTokenService accessJwtTokenService,
             RefreshJwtTokenService refreshJwtTokenService,
             UserDetailsServiceImpl userDetailsService, UserProviderStorage userProviderStorage,
-            AppUserMapper appUserMapper) {
+            UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.accessJwtTokenService = accessJwtTokenService;
         this.refreshJwtTokenService = refreshJwtTokenService;
         this.userDetailsService = userDetailsService;
         this.userProviderStorage = userProviderStorage;
-        this.appUserMapper = appUserMapper;
+        this.userMapper = userMapper;
     }
 
     public void authorizationUserByToken(final String token) {
@@ -68,7 +68,7 @@ public class AuthService {
 
         // после успешной аутентификации добавляем в кэш и генерируем два токена
         if (this.addUserDetailsToCache(userDetails, authRequest.getProvider())) {
-            var appUserJwtDto = appUserMapper.toAppUserJwtDto(userDetails, authRequest.getProvider());
+            var appUserJwtDto = userMapper.toAppUserJwtDto(userDetails, authRequest.getProvider());
             var refreshTokenDto = new RefreshTokenDto(appUserJwtDto.getId());
             return new ResponseAuthDto(
                     accessJwtTokenService.generateAndSaveToken(appUserJwtDto),

@@ -2,16 +2,20 @@ package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.user.*;
+import com.example.cinemate.dto.user.file.UserFilesBufferDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
-import com.example.cinemate.mapper.AppUserMapper;
+import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.model.db.AppUser;
+import com.example.cinemate.service.amazon.AmazonS3Service;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserProviderStorage;
 import com.example.cinemate.utils.PaginationUtil;
 import com.example.cinemate.validate.common.CommonDataValidate;
 import com.example.cinemate.validate.user.UserDataValidate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
@@ -22,6 +26,10 @@ import java.util.Map;
 @Service
 public class CrudUserService {
 
+    @Value("${amazon_s3.avatar_root_path_prefix}")
+    private String avatarRootPathPrefix;
+
+    private final AmazonS3Service amazonS3Service;
     private final AppUserService appUserService;
     private final UserRoleService userRoleService;
     private final UpdateUserService updateUserService;
@@ -29,9 +37,10 @@ public class CrudUserService {
     private final UserProviderStorage userProviderStorage;
     private final UserDataValidate userDataValidate;
     private final CommonDataValidate commonDataValidate;
-    private final AppUserMapper appUserMapper;
+    private final UserMapper userMapper;
 
-    public CrudUserService(AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, CommonDataValidate commonDataValidate, AppUserMapper appUserMapper) {
+    public CrudUserService(AmazonS3Service amazonS3Service, AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, CommonDataValidate commonDataValidate, UserMapper userMapper) {
+        this.amazonS3Service = amazonS3Service;
         this.appUserService = appUserService;
         this.userRoleService = userRoleService;
         this.updateUserService = updateUserService;
@@ -39,7 +48,7 @@ public class CrudUserService {
         this.userProviderStorage = userProviderStorage;
         this.userDataValidate = userDataValidate;
         this.commonDataValidate = commonDataValidate;
-        this.appUserMapper = appUserMapper;
+        this.userMapper = userMapper;
     }
 
     public PagedResponse<UserAdminDto> getUsers(final UserSearchParamsDto userSearchParamsDto) {
@@ -56,7 +65,7 @@ public class CrudUserService {
         List<Integer> userIds = pageUsers.get().map(AppUser::getId).toList();
         Map<Integer, String> providers = userProviderStorage.getProviders(userIds);  // bulk-запрос
         List<UserAdminDto> usersAdminDto = pageUsers.get()
-                .map(user -> appUserMapper.toUserAdminDto(
+                .map(user -> userMapper.toUserAdminDto(
                                 user,
                                 providers.get(user.getId()),
                                 userRoleService.getRoleNames(user.getId())
@@ -74,7 +83,7 @@ public class CrudUserService {
 
         List<String> roles = userRoleService.getRoleNames(appUser.getId());
 
-        return appUserMapper.toUserAdminDto(appUser, provider, roles);
+        return userMapper.toUserAdminDto(appUser, provider, roles);
     }
 
     @Transactional
@@ -117,14 +126,29 @@ public class CrudUserService {
     }
 
     @Transactional
-    public void add(final UserAddDto userAddDto) {
+    public AppUser add(final UserAddDto userAddDto) {
         // валидация (если ошибка, то исключение)
         userDataValidate.validateUserExistence(userAddDto.getEmail());
 
         // добавление пользователя
-        AppUser newUser = appUserMapper.toAppUser(userAddDto);
-        saveUserService.createUser(newUser);
+        AppUser newUser = userMapper.toAppUser(userAddDto);
+        AppUser savedUser = saveUserService.createUser(newUser);
         saveUserService.createUserRoles(newUser, userAddDto.getRoles());
+
+        return savedUser;
+    }
+
+    @Async
+    public void uploadFilesAndUpdate(final AppUser user, final UserFilesBufferDto userFilesBufferDto) {
+        // загружаем картинку в s3
+        String avatarUrl = amazonS3Service.uploadAndGenerateKey(userFilesBufferDto.getAvatar(), avatarRootPathPrefix);
+
+        // сохранение пользователя
+        user.setAvatar(avatarUrl);
+
+        appUserService.update(user);
+
+        Logger.info("S3 files have been successfully uploaded and user has been updated: " + user.getId());
     }
 
     @Transactional

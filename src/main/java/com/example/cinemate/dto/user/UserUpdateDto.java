@@ -18,5 +18,4 @@ public class UserUpdateDto {
     private String email;
 
     private String phoneNum;
-    private String avatar;
 }

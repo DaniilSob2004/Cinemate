@@ -4,21 +4,17 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.content.file.ContentFilesDto;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
+import com.example.cinemate.mapper.common.CommonMapper;
 import com.example.cinemate.mapper.content.ContentFileMapper;
 import com.example.cinemate.service.business.content.ContentAdminCrudService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.tinylog.Logger;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import javax.validation.Validator;
 import java.io.IOException;
-import java.util.Set;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.ADMIN + Endpoint.CONTENTS)
@@ -26,14 +22,12 @@ public class ContentAdminController {
 
     private final ContentAdminCrudService contentAdminCrudService;
     private final ContentFileMapper contentFileMapper;
-    private final ObjectMapper objectMapper;
-    private final Validator validator;
+    private final CommonMapper commonMapper;
 
-    public ContentAdminController(ContentAdminCrudService contentAdminCrudService, ContentFileMapper contentFileMapper, ObjectMapper objectMapper, Validator validator) {
+    public ContentAdminController(ContentAdminCrudService contentAdminCrudService, ContentFileMapper contentFileMapper, CommonMapper commonMapper) {
         this.contentAdminCrudService = contentAdminCrudService;
         this.contentFileMapper = contentFileMapper;
-        this.objectMapper = objectMapper;
-        this.validator = validator;
+        this.commonMapper = commonMapper;
     }
 
     @GetMapping
@@ -58,11 +52,7 @@ public class ContentAdminController {
     ) throws IOException {
 
         // получение dto и проверка валидности
-        var contentFullAdminDto = objectMapper.readValue(metadataStr, ContentFullAdminDto.class);
-        Set<ConstraintViolation<ContentFullAdminDto>> violations = validator.validate(contentFullAdminDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        var contentFullAdminDto = commonMapper.toDtoAndValidation(metadataStr, ContentFullAdminDto.class);
 
         var contentFilesDto = new ContentFilesDto(poster, trailer, video);
         var contentFilesBufferDto = contentFileMapper.toContentFilesBufferDto(contentFilesDto);

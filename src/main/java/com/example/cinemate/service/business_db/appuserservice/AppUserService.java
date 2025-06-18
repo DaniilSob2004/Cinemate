@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AppUserService {
-    void save(AppUser user);
+    AppUser save(AppUser user);
     void saveUsersList(List<AppUser> users);
     void update(AppUser user);
     void delete(AppUser user);

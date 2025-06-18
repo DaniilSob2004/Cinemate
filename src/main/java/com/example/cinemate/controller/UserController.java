@@ -4,6 +4,7 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.service.business.user.CurrentUserService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -28,7 +29,7 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
-    @PutMapping(value = Endpoint.ME)
+    @PutMapping(value = Endpoint.ME, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateCurrentUser(@Valid @RequestBody UserUpdateDto userUpdateDto, HttpServletRequest request) {
         Logger.info("-------- Update current user (" + userUpdateDto + ") --------");
         currentUserService.updateUser(userUpdateDto, request);

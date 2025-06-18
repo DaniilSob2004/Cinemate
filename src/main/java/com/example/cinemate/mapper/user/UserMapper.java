@@ -1,11 +1,13 @@
-package com.example.cinemate.mapper;
+package com.example.cinemate.mapper.user;
 
 import com.example.cinemate.dto.auth.*;
 import com.example.cinemate.dto.user.UserAddDto;
 import com.example.cinemate.dto.user.UserAdminDto;
 import com.example.cinemate.dto.user.UserDto;
+import com.example.cinemate.mapper.GrantedAuthorityMapper;
 import com.example.cinemate.model.CustomUserDetails;
 import com.example.cinemate.model.db.AppUser;
+import com.example.cinemate.service.amazon.AmazonS3Service;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,11 +17,13 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
-public class AppUserMapper {
+public class UserMapper {
 
+    private final AmazonS3Service amazonS3Service;
     private final GrantedAuthorityMapper grantedAuthorityMapper;
 
-    public AppUserMapper(GrantedAuthorityMapper grantedAuthorityMapper) {
+    public UserMapper(AmazonS3Service amazonS3Service, GrantedAuthorityMapper grantedAuthorityMapper) {
+        this.amazonS3Service = amazonS3Service;
         this.grantedAuthorityMapper = grantedAuthorityMapper;
     }
 
@@ -101,7 +105,7 @@ public class AppUserMapper {
                 userAddDto.getEmail(),
                 userAddDto.getPhoneNum(),
                 userAddDto.getPassword(),
-                userAddDto.getAvatar(),
+                "",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 userAddDto.isActive()
@@ -116,7 +120,7 @@ public class AppUserMapper {
                 appUser.getSurname(),
                 appUser.getEmail(),
                 appUser.getPhoneNum(),
-                appUser.getAvatar(),
+                amazonS3Service.getCloudFrontUrl(appUser.getAvatar()),
                 provider
         );
     }
@@ -129,7 +133,7 @@ public class AppUserMapper {
                 .surname(appUser.getSurname())
                 .email(appUser.getEmail())
                 .phoneNum(appUser.getPhoneNum())
-                .avatar(appUser.getAvatar())
+                .avatar(amazonS3Service.getCloudFrontUrl(appUser.getAvatar()))
                 .provider(provider)
                 .roles(roles)
                 .createdAt(appUser.getCreatedAt())

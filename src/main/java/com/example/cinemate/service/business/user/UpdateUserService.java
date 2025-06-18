@@ -95,7 +95,6 @@ public class UpdateUserService {
         appUser.setSurname(userUpdateDto.getSurname());
         appUser.setEmail(userUpdateDto.getEmail());
         appUser.setPhoneNum(userUpdateDto.getPhoneNum());
-        appUser.setAvatar(userUpdateDto.getAvatar());
         appUser.setUpdatedAt(LocalDateTime.now());
     }
 }

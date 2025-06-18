@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -43,6 +44,7 @@ public class GenreCrudService {
                 .toList();
     }
 
+    @Transactional
     public Genre add(final GenreDto genreDto) {
         genreDto.setName(genreDto.getName().toLowerCase());
 

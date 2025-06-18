@@ -3,9 +3,9 @@ package com.example.cinemate.controller;
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.genre.*;
 import com.example.cinemate.dto.genre.file.GenreFilesDto;
+import com.example.cinemate.mapper.common.CommonMapper;
 import com.example.cinemate.mapper.genre.GenreFileMapper;
 import com.example.cinemate.service.business.genre.GenreCrudService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.GENRES)
@@ -26,14 +22,12 @@ public class GenreController {
 
     private final GenreCrudService genreCrudService;
     private final GenreFileMapper genreFileMapper;
-    private final ObjectMapper objectMapper;
-    private final Validator validator;
+    private final CommonMapper commonMapper;
 
-    public GenreController(GenreCrudService genreCrudService, GenreFileMapper genreFileMapper, ObjectMapper objectMapper, Validator validator) {
+    public GenreController(GenreCrudService genreCrudService, GenreFileMapper genreFileMapper, CommonMapper commonMapper) {
         this.genreCrudService = genreCrudService;
         this.genreFileMapper = genreFileMapper;
-        this.objectMapper = objectMapper;
-        this.validator = validator;
+        this.commonMapper = commonMapper;
     }
 
     @GetMapping
@@ -48,12 +42,9 @@ public class GenreController {
             @RequestPart(value = "metadata") String metadataStr,
             @RequestPart(value = "image") MultipartFile image
     ) throws IOException {
+
         // получение dto и проверка валидности
-        var genreDto = objectMapper.readValue(metadataStr, GenreDto.class);
-        Set<ConstraintViolation<GenreDto>> violations = validator.validate(genreDto);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        var genreDto = commonMapper.toDtoAndValidation(metadataStr, GenreDto.class);
 
         var genreFilesDto = new GenreFilesDto(image);
         var genreFilesBufferDto = genreFileMapper.toGenreFilesBufferDto(genreFilesDto);

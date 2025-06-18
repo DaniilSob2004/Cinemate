@@ -2,7 +2,7 @@ package com.example.cinemate.service.auth.jwt;
 
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.exception.auth.UnauthorizedException;
-import com.example.cinemate.mapper.AppUserMapper;
+import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.service.redis.token.AccessTokenRedisStorage;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,16 +19,16 @@ public class AccessJwtTokenService {
 
     private final AccessTokenRedisStorage accessTokenRedisStorage;
     private final JwtTokenService jwtTokenService;
-    private final AppUserMapper appUserMapper;
+    private final UserMapper userMapper;
 
-    public AccessJwtTokenService(AccessTokenRedisStorage accessTokenRedisStorage, JwtTokenService jwtTokenService, AppUserMapper appUserMapper) {
+    public AccessJwtTokenService(AccessTokenRedisStorage accessTokenRedisStorage, JwtTokenService jwtTokenService, UserMapper userMapper) {
         this.accessTokenRedisStorage = accessTokenRedisStorage;
         this.jwtTokenService = jwtTokenService;
-        this.appUserMapper = appUserMapper;
+        this.userMapper = userMapper;
     }
 
     public String generateToken(final AppUserJwtDto appUserJwtDto) {
-        Map<String, Object> claims = appUserMapper.toClaimsJwt(appUserJwtDto);  // получаем данные польз.
+        Map<String, Object> claims = userMapper.toClaimsJwt(appUserJwtDto);  // получаем данные польз.
         return jwtTokenService.generateToken(claims, appUserJwtDto.getId().toString(), expirationTime);
     }
 
@@ -41,7 +41,7 @@ public class AccessJwtTokenService {
 
     public AppUserJwtDto extractAllData(final String token) {
         Claims claims = jwtTokenService.getClaims(token);
-        return appUserMapper.toAppUserJwtDto(claims);  // получаем данные польз. из claims
+        return userMapper.toAppUserJwtDto(claims);  // получаем данные польз. из claims
     }
 
     public AppUserJwtDto extractAllDataByRequest(final HttpServletRequest request) {
@@ -52,6 +52,6 @@ public class AccessJwtTokenService {
 
     public AppUserJwtDto extractAllDataWithExpiration(final String token) {
         Claims claims = jwtTokenService.getClaimsFromExpired(token);
-        return appUserMapper.toAppUserJwtDto(claims);  // получаем данные польз. из claims
+        return userMapper.toAppUserJwtDto(claims);  // получаем данные польз. из claims
     }
 }

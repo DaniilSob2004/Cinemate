@@ -4,7 +4,7 @@ import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
-import com.example.cinemate.mapper.AppUserMapper;
+import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
@@ -24,15 +24,15 @@ public class CurrentUserService {
     private final UserDetailsCacheService userDetailsCacheService;
     private final UpdateUserService updateUserService;
     private final UserDataValidate userDataValidate;
-    private final AppUserMapper appUserMapper;
+    private final UserMapper userMapper;
 
-    public CurrentUserService(AppUserService appUserService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, UpdateUserService updateUserService, UserDataValidate userDataValidate, AppUserMapper appUserMapper) {
+    public CurrentUserService(AppUserService appUserService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, UpdateUserService updateUserService, UserDataValidate userDataValidate, UserMapper userMapper) {
         this.appUserService = appUserService;
         this.accessJwtTokenService = accessJwtTokenService;
         this.userDetailsCacheService = userDetailsCacheService;
         this.updateUserService = updateUserService;
         this.userDataValidate = userDataValidate;
-        this.appUserMapper = appUserMapper;
+        this.userMapper = userMapper;
     }
 
     public UserDto getUser(final HttpServletRequest request) {
@@ -41,7 +41,7 @@ public class CurrentUserService {
         AppUser appUser = appUserService.findById(appUserJwtDto.getId())
                 .orElseThrow(() -> new UserNotFoundException("User with id '" + appUserJwtDto.getId() + "' was not found..."));
 
-        return appUserMapper.toUserDto(appUser, appUserJwtDto.getProvider());
+        return userMapper.toUserDto(appUser, appUserJwtDto.getProvider());
     }
 
     @Transactional

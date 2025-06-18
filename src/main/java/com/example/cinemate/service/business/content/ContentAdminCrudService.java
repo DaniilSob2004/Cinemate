@@ -96,6 +96,7 @@ public class ContentAdminCrudService {
     }
 
 
+    @Transactional
     public Content addInitial(final ContentFullAdminDto contentFullAdminDto, final ContentFilesBufferDto contentFilesBufferDto) {
         // есть ли такой контент
         contentService.findByName(contentFullAdminDto.getName().toLowerCase())
