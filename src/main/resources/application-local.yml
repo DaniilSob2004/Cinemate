@@ -17,9 +17,6 @@ spring:
     port: 6379
     timeout: 60000  # 60 seconds
 
-base:
-  root_path: src/main/resources/
-
 db_data:
   surname: src/main/resources/data/surname.txt
   username: src/main/resources/data/username.txt
@@ -28,6 +25,5 @@ db_data:
   actors: src/main/resources/data/actors.txt
   genres: src/main/resources/data/genres.txt
   content_names: src/main/resources/data/content/names.txt
-  content_posters: src/main/resources/data/content/posters.txt
-  content_trailers: src/main/resources/data/content/trailers.txt
+  avatars_path: src/main/resources/data/avatars
   delete_tables_sql: src/main/resources/db_data/delete_tables.sql

@@ -51,6 +51,15 @@ security:
   header_value_auth_prefix: Bearer
   header_value_basic_auth_prefix: Basic
 
+amazon_s3:
+  storage_name: "cinemate-storage"
+  credential_name: "s3-uploader"
+  dns_cloudfront_url: "https://****************.cloudfront.net/"
+  poster_root_path_prefix: "posters"
+  trailer_root_path_prefix: "trailers"
+  avatar_root_path_prefix: "avatars"
+  genre_root_path_prefix: "genres"
+
 redis_data:
   user_details_key_prefix: "user::details::"
   token_key_prefix: "token::"

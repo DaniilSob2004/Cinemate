@@ -2,6 +2,9 @@ package com.example.cinemate.utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @UtilityClass
 public class StringUtil {
 
@@ -37,6 +40,10 @@ public class StringUtil {
             return "";
         }
         return str.substring(0, 1);
+    }
+
+    public static String encodeStrForPath(final String str) {
+        return URLEncoder.encode(str, StandardCharsets.UTF_8);
     }
 }
 

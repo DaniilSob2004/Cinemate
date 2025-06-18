@@ -18,7 +18,9 @@ import com.example.cinemate.service.business_db.roleservice.RoleService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.business_db.warningservice.WarningService;
 import com.example.cinemate.service.business_db.wishlistservice.WishListService;
+import com.example.cinemate.utils.FileWorkUtil;
 import com.example.cinemate.utils.GenerateUtil;
+import com.example.cinemate.utils.StringUtil;
 import com.example.cinemate.utils.TextFileReaderUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,12 +42,20 @@ public class CinemateDbInitializer {
     private static List<String> Actors;
     private static List<String> Genres;
     private static List<String> ContentNames;
-    private static List<String> ContentPosters;
-    private static List<String> ContentTrailers;
+    private static List<String> UserAvatars;
     private static List<String> DeleteTablesLines;
 
-    @Value("${base.root_path}")
-    private String rootPath;
+    @Value("${amazon_s3.poster_root_path_prefix}")
+    private String posterRootPathPrefix;
+
+    @Value("${amazon_s3.trailer_root_path_prefix}")
+    private String trailerRootPathPrefix;
+
+    @Value("${amazon_s3.avatar_root_path_prefix}")
+    private String avatarRootPathPrefix;
+
+    @Value("${amazon_s3.genre_root_path_prefix}")
+    private String genreRootPathPrefix;
 
     @Value("${db_data.surname}")
     private String dataSurname;
@@ -68,11 +78,8 @@ public class CinemateDbInitializer {
     @Value("${db_data.content_names}")
     private String dataContentNames;
 
-    @Value("${db_data.content_posters}")
-    private String dataContentPosters;
-
-    @Value("${db_data.content_trailers}")
-    private String dataContentTrailers;
+    @Value("${db_data.avatars_path}")
+    private String avatarsPath;
 
     @Value("${db_data.delete_tables_sql}")
     private String deleteTablesSql;
@@ -137,8 +144,7 @@ public class CinemateDbInitializer {
         Actors = TextFileReaderUtil.ReadTextFile(dataActors);
         Genres = TextFileReaderUtil.ReadTextFile(dataGenres);
         ContentNames = TextFileReaderUtil.ReadTextFile(dataContentNames);
-        ContentPosters = TextFileReaderUtil.ReadTextFile(dataContentPosters);
-        ContentTrailers = TextFileReaderUtil.ReadTextFile(dataContentTrailers);
+        UserAvatars = FileWorkUtil.getFileNames(avatarsPath, "");
         DeleteTablesLines = TextFileReaderUtil.ReadTextFile(deleteTablesSql);
     }
 
@@ -271,7 +277,7 @@ public class CinemateDbInitializer {
             genres.add(new Genre(
                     null,
                     genre,
-                    rootPath + "data/genres/" + genre + ".jpg",
+                    genreRootPathPrefix + "/" + StringUtil.encodeStrForPath(genre) + ".jpg",
                     "Description for " + genre,
                     ""))
         );
@@ -393,8 +399,8 @@ public class CinemateDbInitializer {
                             e,
                             GenerateUtil.getRandomInteger(30, 90),
                             "Super episode (season " + s + " series " + e + ")",
-                            rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
-                            rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                            trailerRootPathPrefix + "/" + StringUtil.encodeStrForPath(ContentNames.get(GenerateUtil.getRandomInteger(0, ContentNames.size()))) + ".mp4",
+                            trailerRootPathPrefix + "/" + StringUtil.encodeStrForPath(ContentNames.get(GenerateUtil.getRandomInteger(0, ContentNames.size()))) + ".mp4",
                             GenerateUtil.getRandomDate(),
                             LocalDateTime.now()
                     ));
@@ -485,6 +491,7 @@ public class CinemateDbInitializer {
     private AppUser CreateUser() {
         String randUserName = Usernames.get(GenerateUtil.getRandomInteger(0, Usernames.size() - 1));
         String randSurname = Surnames.get(GenerateUtil.getRandomInteger(0, Surnames.size() - 1));
+        String randAvatar = UserAvatars.get(GenerateUtil.getRandomInteger(0, UserAvatars.size() - 1));
 
         return new AppUser(
                 null,
@@ -494,7 +501,7 @@ public class CinemateDbInitializer {
                 GenerateUtil.getEmailByName(randUserName).toLowerCase(),
                 GenerateUtil.getRandomNumTel(),
                 userPassword,
-                "",
+                avatarRootPathPrefix + "/" + StringUtil.encodeStrForPath(randAvatar),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 true
@@ -517,9 +524,9 @@ public class CinemateDbInitializer {
                 null,
                 ContentNames.get(ind),
                 contentType,
-                rootPath + ContentPosters.get(ind),
-                rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
-                rootPath + ContentTrailers.get(GenerateUtil.getRandomInteger(0, ContentTrailers.size())),
+                posterRootPathPrefix + "/" + StringUtil.encodeStrForPath(ContentNames.get(ind)) + ".jpg",
+                trailerRootPathPrefix + "/" + StringUtil.encodeStrForPath(ContentNames.get(ind)) + ".mp4",
+                trailerRootPathPrefix + "/" + StringUtil.encodeStrForPath(ContentNames.get(ind)) + ".mp4",
                 "Super film - " + ContentNames.get(ind),
                 GenerateUtil.getRandomInteger(1, 5000),
                 "",
