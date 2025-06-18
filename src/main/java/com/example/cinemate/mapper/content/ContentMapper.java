@@ -2,6 +2,7 @@ package com.example.cinemate.mapper.content;
 
 import com.example.cinemate.dto.content.*;
 import com.example.cinemate.model.db.Content;
+import com.example.cinemate.service.amazon.AmazonS3Service;
 import com.example.cinemate.utils.DateTimeUtil;
 import org.springframework.stereotype.Component;
 
@@ -10,14 +11,20 @@ import java.time.LocalDate;
 @Component
 public class ContentMapper {
 
+    private final AmazonS3Service amazonS3Service;
+
+    public ContentMapper(AmazonS3Service amazonS3Service) {
+        this.amazonS3Service = amazonS3Service;
+    }
+
     public ContentDto toContentDto(final Content content) {
         return new ContentDto(
                 content.getId(),
                 content.getName(),
                 content.getContentType().getName(),
-                content.getPosterUrl(),
-                content.getTrailerUrl(),
-                content.getVideoUrl(),
+                amazonS3Service.getCloudFrontUrl(content.getPosterUrl()),
+                amazonS3Service.getCloudFrontUrl(content.getTrailerUrl()),
+                amazonS3Service.getCloudFrontUrl(content.getVideoUrl()),
                 content.getDescription(),
                 content.getDurationMin(),
                 content.getAgeRating(),
@@ -33,7 +40,7 @@ public class ContentMapper {
                 content.getId(),
                 content.getName(),
                 content.getContentType().getName(),
-                content.getPosterUrl(),
+                amazonS3Service.getCloudFrontUrl(content.getPosterUrl()),
                 content.getAgeRating(),
                 content.isActive(),
                 content.getCreatedAt()
@@ -45,9 +52,9 @@ public class ContentMapper {
                 contentFullAdminDto.getId(),
                 contentFullAdminDto.getName(),
                 null,
-                contentFullAdminDto.getPosterUrl(),
-                contentFullAdminDto.getTrailerUrl(),
-                contentFullAdminDto.getVideoUrl(),
+                amazonS3Service.extractKeyFromUrl(contentFullAdminDto.getPosterUrl()),
+                amazonS3Service.extractKeyFromUrl(contentFullAdminDto.getTrailerUrl()),
+                amazonS3Service.extractKeyFromUrl(contentFullAdminDto.getVideoUrl()),
                 contentFullAdminDto.getDescription(),
                 contentFullAdminDto.getDurationMin(),
                 contentFullAdminDto.getAgeRating(),
@@ -64,9 +71,9 @@ public class ContentMapper {
                 content.getId(),
                 content.getName(),
                 content.getContentType().getName(),
-                content.getPosterUrl(),
-                content.getTrailerUrl(),
-                content.getVideoUrl(),
+                amazonS3Service.getCloudFrontUrl(content.getPosterUrl()),
+                amazonS3Service.getCloudFrontUrl(content.getTrailerUrl()),
+                amazonS3Service.getCloudFrontUrl(content.getVideoUrl()),
                 content.getDescription(),
                 content.getDurationMin(),
                 content.getAgeRating(),

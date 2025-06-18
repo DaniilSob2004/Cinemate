@@ -1,13 +1,11 @@
 package com.example.cinemate;
 
+import com.example.cinemate.service.amazon.AmazonS3Service;
 import com.example.cinemate.service.db.CinemateInitializer;
-import com.example.cinemate.utils.FileWorkUtil;
 import org.tinylog.Logger;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration
 public class AppStarter {

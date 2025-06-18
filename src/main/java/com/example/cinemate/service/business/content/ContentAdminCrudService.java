@@ -2,10 +2,12 @@ package com.example.cinemate.service.business.content;
 
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.content.*;
+import com.example.cinemate.dto.content.files.ContentFilesBufferDto;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.common.ContentNotFoundException;
 import com.example.cinemate.mapper.content.*;
 import com.example.cinemate.model.db.*;
+import com.example.cinemate.service.amazon.AmazonS3Service;
 import com.example.cinemate.service.business_db.actorservice.ActorService;
 import com.example.cinemate.service.business_db.contentactorservice.ContentActorService;
 import com.example.cinemate.service.business_db.contentgenreservice.ContentGenreService;
@@ -18,8 +20,11 @@ import com.example.cinemate.utils.DateTimeUtil;
 import com.example.cinemate.utils.DiffUtil;
 import com.example.cinemate.utils.PaginationUtil;
 import com.example.cinemate.validate.common.CommonDataValidate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.tinylog.Logger;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -28,6 +33,13 @@ import java.util.*;
 @Service
 public class ContentAdminCrudService {
 
+    @Value("${amazon_s3.poster_root_path_prefix}")
+    private String posterRootPathPrefix;
+
+    @Value("${amazon_s3.trailer_root_path_prefix}")
+    private String trailerRootPathPrefix;
+
+    private final AmazonS3Service amazonS3Service;
     private final ContentService contentService;
     private final ContentTypeService contentTypeService;
     private final GenreService genreService;
@@ -40,7 +52,8 @@ public class ContentAdminCrudService {
     private final ContentEnrichMapper contentEnrichMapper;
     private final CommonDataValidate commonDataValidate;
 
-    public ContentAdminCrudService(ContentService contentService, ContentTypeService contentTypeService, GenreService genreService, ContentGenreService contentGenreService, ActorService actorService, ContentActorService contentActorService, WarningService warningService, ContentWarningService contentWarningService, ContentMapper contentMapper, ContentEnrichMapper contentEnrichMapper, CommonDataValidate commonDataValidate) {
+    public ContentAdminCrudService(AmazonS3Service amazonS3Service, ContentService contentService, ContentTypeService contentTypeService, GenreService genreService, ContentGenreService contentGenreService, ActorService actorService, ContentActorService contentActorService, WarningService warningService, ContentWarningService contentWarningService, ContentMapper contentMapper, ContentEnrichMapper contentEnrichMapper, CommonDataValidate commonDataValidate) {
+        this.amazonS3Service = amazonS3Service;
         this.contentService = contentService;
         this.contentTypeService = contentTypeService;
         this.genreService = genreService;
@@ -82,7 +95,8 @@ public class ContentAdminCrudService {
         return contentFullAdminDto;
     }
 
-    public void add(final ContentFullAdminDto contentFullAdminDto) {
+
+    public Content addInitial(final ContentFullAdminDto contentFullAdminDto, final ContentFilesBufferDto contentFilesBufferDto) {
         // есть ли такой контент
         contentService.findByName(contentFullAdminDto.getName().toLowerCase())
                 .ifPresent(content -> {
@@ -94,22 +108,41 @@ public class ContentAdminCrudService {
         var contentType = contentTypeService.findByName(contentTypeName.toLowerCase())
                 .orElseThrow(() -> new ContentNotFoundException("Content type '" + contentTypeName + "' not found"));
 
+        // загружаем постер в s3
+        String posterKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getPoster(), posterRootPathPrefix);
+
         // сохранение контента
+        contentFullAdminDto.setPosterUrl(posterKey);
         contentFullAdminDto.setCreatedAt(LocalDateTime.now());
         contentFullAdminDto.setUpdatedAt(LocalDateTime.now());
         Content content = contentMapper.toContent(contentFullAdminDto);
         content.setContentType(contentType);
         Content newContent = contentService.save(content);
 
-        // добавление жанров
+        // добавление жанров, актеров, warnings
         this.addContentGenres(newContent, contentFullAdminDto.getGenres());
-
-        // добавление актеров
         this.addContentActors(newContent, contentFullAdminDto.getActors());
-
-        // добавление warnings
         this.addContentWarnings(newContent, contentFullAdminDto.getWarnings());
+
+        return newContent;
     }
+
+    @Async
+    public void uploadFilesAndUpdate(final Content content, final ContentFilesBufferDto contentFilesBufferDto) {
+        // загружаем трейлер и видео в s3
+        String trailerKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getTrailer(), trailerRootPathPrefix);
+        String videoKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getVideo(), trailerRootPathPrefix);
+
+        // сохранение контента
+        content.setTrailerUrl(trailerKey);
+        content.setVideoUrl(videoKey);
+        content.setUpdatedAt(LocalDateTime.now());
+
+        contentService.save(content);
+
+        Logger.info("S3 files have been successfully uploaded and content has been updated: " + content.getId());
+    }
+
 
     @Transactional
     public void updateById(final Integer id, final ContentFullAdminDto contentFullAdminDto) {

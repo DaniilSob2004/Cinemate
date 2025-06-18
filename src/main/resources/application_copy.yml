@@ -43,6 +43,11 @@ spring:
             redirect-uri: "{baseUrl}/login/oauth2/code/facebook"
             authorization-grant-type: authorization_code
 
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
 security:
   secret_key: "********************"
   access_token_expiration_time: 10  # 10 min

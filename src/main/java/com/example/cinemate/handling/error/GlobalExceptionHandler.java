@@ -21,6 +21,8 @@ import org.tinylog.Logger;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -144,6 +146,7 @@ public class GlobalExceptionHandler {
         );
     }
 
+
     // обработка исключения по валидации данных типа MethodArgumentNotValidException / (@RequestBody)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationException(MethodArgumentNotValidException ex) {
@@ -156,6 +159,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleBindException(BindException ex) {
         Logger.warn(ex.getMessage());
         return this.sendBadRequestErrorWithFields(ex.getBindingResult().getFieldErrors());
+    }
+
+    // обработка исключения по валидации данных типа ConstraintViolationException
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handleConstraintViolationException(ConstraintViolationException ex) {
+        String errorMessage = ex.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining("; "));
+
+        Logger.warn(errorMessage);
+
+        var errorResponseDto = new ErrorResponseDto(
+                errorMessage,
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        return ResponseEntity.status(errorResponseDto.getStatus()).body(errorResponseDto);
     }
 
 
