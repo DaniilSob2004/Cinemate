@@ -8,6 +8,7 @@ import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import javax.annotation.PostConstruct;
@@ -75,5 +76,20 @@ public class AmazonS3Service {
         String fileKey = rootPathPrefix + "/" + file.getOriginalFilename() + "_" + UUID.randomUUID();
         this.uploadToS3(file, fileKey);
         return fileKey;
+    }
+
+    public void deleteFromS3(final String keyName) {
+        try {
+            DeleteObjectRequest request = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(keyName)
+                    .build();
+
+            s3Client.deleteObject(request);
+
+            Logger.info("Deleted successfully: " + keyName);
+        } catch (Exception e) {
+            Logger.error(e.getClass() + " - " + e.getMessage());
+        }
     }
 }

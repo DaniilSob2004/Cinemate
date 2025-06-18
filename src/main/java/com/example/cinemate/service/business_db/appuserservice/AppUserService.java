@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface AppUserService {
     AppUser save(AppUser user);
     void saveUsersList(List<AppUser> users);
-    void update(AppUser user);
+    AppUser update(AppUser user);
     void delete(AppUser user);
     List<AppUser> findAll();
     void deleteAll();

@@ -130,18 +130,26 @@ public class ContentAdminCrudService {
 
     @Async
     public void uploadFilesAndUpdate(final Content content, final ContentFilesBufferDto contentFilesBufferDto) {
+        boolean isUpdated = false;
+
         // загружаем трейлер и видео в s3
-        String trailerKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getTrailer(), trailerRootPathPrefix);
-        String videoKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getVideo(), trailerRootPathPrefix);
+        if (contentFilesBufferDto.getTrailer() != null) {
+            String trailerKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getTrailer(), trailerRootPathPrefix);
+            content.setTrailerUrl(trailerKey);
+            isUpdated = true;
+        }
+        if (contentFilesBufferDto.getVideo() != null) {
+            String videoKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getVideo(), trailerRootPathPrefix);
+            content.setVideoUrl(videoKey);
+            isUpdated = true;
+        }
 
-        // сохранение контента
-        content.setTrailerUrl(trailerKey);
-        content.setVideoUrl(videoKey);
-        content.setUpdatedAt(LocalDateTime.now());
-
-        contentService.save(content);
-
-        Logger.info("S3 files have been successfully uploaded and content has been updated: " + content.getId());
+        // если изменили
+        if (isUpdated) {
+            content.setUpdatedAt(LocalDateTime.now());
+            contentService.save(content);
+            Logger.info("S3 files have been successfully uploaded and content has been updated: " + content.getId());
+        }
     }
 
 

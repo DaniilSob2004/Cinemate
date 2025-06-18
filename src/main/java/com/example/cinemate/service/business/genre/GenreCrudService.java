@@ -59,6 +59,9 @@ public class GenreCrudService {
     @Async
     public void uploadFilesAndUpdate(final Genre genre, final GenreFilesBufferDto genreFilesBufferDto) {
         // загружаем картинку в s3
+        if (genreFilesBufferDto.getImage() == null) {
+            return;
+        }
         String imageUrl = amazonS3Service.uploadAndGenerateKey(genreFilesBufferDto.getImage(), genreRootPathPrefix);
 
         // сохранение жанра

@@ -6,7 +6,6 @@ import com.example.cinemate.dto.user.file.UserFilesBufferDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.model.db.AppUser;
-import com.example.cinemate.service.amazon.AmazonS3Service;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserProviderStorage;
@@ -29,7 +28,6 @@ public class CrudUserService {
     @Value("${amazon_s3.avatar_root_path_prefix}")
     private String avatarRootPathPrefix;
 
-    private final AmazonS3Service amazonS3Service;
     private final AppUserService appUserService;
     private final UserRoleService userRoleService;
     private final UpdateUserService updateUserService;
@@ -39,8 +37,7 @@ public class CrudUserService {
     private final CommonDataValidate commonDataValidate;
     private final UserMapper userMapper;
 
-    public CrudUserService(AmazonS3Service amazonS3Service, AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, CommonDataValidate commonDataValidate, UserMapper userMapper) {
-        this.amazonS3Service = amazonS3Service;
+    public CrudUserService(AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, CommonDataValidate commonDataValidate, UserMapper userMapper) {
         this.appUserService = appUserService;
         this.userRoleService = userRoleService;
         this.updateUserService = updateUserService;
@@ -141,14 +138,7 @@ public class CrudUserService {
     @Async
     public void uploadFilesAndUpdate(final AppUser user, final UserFilesBufferDto userFilesBufferDto) {
         // загружаем картинку в s3
-        String avatarUrl = amazonS3Service.uploadAndGenerateKey(userFilesBufferDto.getAvatar(), avatarRootPathPrefix);
-
-        // сохранение пользователя
-        user.setAvatar(avatarUrl);
-
-        appUserService.update(user);
-
-        Logger.info("S3 files have been successfully uploaded and user has been updated: " + user.getId());
+        saveUserService.uploadFilesAndUpdate(user, userFilesBufferDto, avatarRootPathPrefix);
     }
 
     @Transactional

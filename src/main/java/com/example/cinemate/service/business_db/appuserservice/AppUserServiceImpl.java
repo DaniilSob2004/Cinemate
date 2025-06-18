@@ -32,8 +32,8 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public void update(AppUser user) {
-        appUserRepository.save(user);
+    public AppUser update(AppUser user) {
+        return appUserRepository.save(user);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.example.cinemate.service.business.user;
 import com.example.cinemate.dto.auth.AppUserJwtDto;
 import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.user.UserUpdateDto;
+import com.example.cinemate.dto.user.file.UserFilesBufferDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.model.db.AppUser;
@@ -10,6 +11,8 @@ import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.redis.UserDetailsCacheService;
 import com.example.cinemate.validate.user.UserDataValidate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
@@ -19,17 +22,22 @@ import javax.transaction.Transactional;
 @Service
 public class CurrentUserService {
 
+    @Value("${amazon_s3.avatar_root_path_prefix}")
+    private String avatarRootPathPrefix;
+
     private final AppUserService appUserService;
     private final AccessJwtTokenService accessJwtTokenService;
     private final UserDetailsCacheService userDetailsCacheService;
+    private final SaveUserService saveUserService;
     private final UpdateUserService updateUserService;
     private final UserDataValidate userDataValidate;
     private final UserMapper userMapper;
 
-    public CurrentUserService(AppUserService appUserService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, UpdateUserService updateUserService, UserDataValidate userDataValidate, UserMapper userMapper) {
+    public CurrentUserService(AppUserService appUserService, AccessJwtTokenService accessJwtTokenService, UserDetailsCacheService userDetailsCacheService, SaveUserService saveUserService, UpdateUserService updateUserService, UserDataValidate userDataValidate, UserMapper userMapper) {
         this.appUserService = appUserService;
         this.accessJwtTokenService = accessJwtTokenService;
         this.userDetailsCacheService = userDetailsCacheService;
+        this.saveUserService = saveUserService;
         this.updateUserService = updateUserService;
         this.userDataValidate = userDataValidate;
         this.userMapper = userMapper;
@@ -45,7 +53,7 @@ public class CurrentUserService {
     }
 
     @Transactional
-    public void updateUser(final UserUpdateDto userUpdateDto, final HttpServletRequest request) {
+    public AppUser updateUser(final UserUpdateDto userUpdateDto, final HttpServletRequest request) {
         Logger.info("User update: " + userUpdateDto);
 
         // получить данные пользователя из токена
@@ -68,6 +76,12 @@ public class CurrentUserService {
         // обновляем данные
         updateUserService.saveUserData(appUser, userUpdateDto);
 
-        appUserService.save(appUser);
+        return appUserService.update(appUser);
+    }
+
+    @Async
+    public void uploadFilesAndUpdate(final AppUser user, final UserFilesBufferDto userFilesBufferDto) {
+        // загружаем картинку в s3
+        saveUserService.uploadFilesAndUpdate(user, userFilesBufferDto, avatarRootPathPrefix);
     }
 }
