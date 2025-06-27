@@ -6,6 +6,7 @@ import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.mapper.common.CommonMapper;
 import com.example.cinemate.mapper.content.ContentFileMapper;
+import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business.content.ContentAdminCrudService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +22,13 @@ import java.io.IOException;
 public class ContentAdminController {
 
     private final ContentAdminCrudService contentAdminCrudService;
+    private final UploadFilesAsyncService uploadFilesAsyncService;
     private final ContentFileMapper contentFileMapper;
     private final CommonMapper commonMapper;
 
-    public ContentAdminController(ContentAdminCrudService contentAdminCrudService, ContentFileMapper contentFileMapper, CommonMapper commonMapper) {
+    public ContentAdminController(ContentAdminCrudService contentAdminCrudService, UploadFilesAsyncService uploadFilesAsyncService, ContentFileMapper contentFileMapper, CommonMapper commonMapper) {
         this.contentAdminCrudService = contentAdminCrudService;
+        this.uploadFilesAsyncService = uploadFilesAsyncService;
         this.contentFileMapper = contentFileMapper;
         this.commonMapper = commonMapper;
     }
@@ -61,7 +64,7 @@ public class ContentAdminController {
 
         // сохраняем в БД и в отдельном потоке загружаем трейлер видео
         var savedContent = contentAdminCrudService.addInitial(contentFullAdminDto, contentFilesBufferDto);
-        contentAdminCrudService.uploadFilesAndUpdate(savedContent, contentFilesBufferDto);
+        uploadFilesAsyncService.uploadContentFilesAndUpdate(savedContent, contentFilesBufferDto);
 
         return ResponseEntity.ok("Content added successfully. Videos are loading...");
     }

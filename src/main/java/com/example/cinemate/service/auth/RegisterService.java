@@ -52,8 +52,9 @@ public class RegisterService {
         return authService.authenticateAndGenerateToken(authRequest);
     }
 
-    public void createUser(final AppUser user) {
-        saveUserService.createUser(user);
+    public AppUser createUser(final AppUser user) {
+        var savedUser = saveUserService.createUser(user);
         saveUserService.createUserRoles(user, List.of(nameUserRole));
+        return savedUser;
     }
 }

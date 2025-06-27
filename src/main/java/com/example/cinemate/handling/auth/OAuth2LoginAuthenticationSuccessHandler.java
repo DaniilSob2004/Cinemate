@@ -63,8 +63,7 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
                             oauthToken.getAuthorizedClientRegistrationId(),
                             oauthToken.getName()
                     );
-                    String accessToken = (authorizedClient != null)
-                            ? authorizedClient.getAccessToken().getTokenValue() : "";
+                    String accessToken = (authorizedClient != null) ? authorizedClient.getAccessToken().getTokenValue() : "";
 
                     // вызываем событие (в publisher отправляется ответ токен)
                     var startOAuthEvent = new StartOAuthEvent(this, oauthUser, accessToken, provider, response);

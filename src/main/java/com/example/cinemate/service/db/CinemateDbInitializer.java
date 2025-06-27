@@ -495,7 +495,7 @@ public class CinemateDbInitializer {
 
         return new AppUser(
                 null,
-                randUserName.toUpperCase(),
+                "@" + randUserName.toLowerCase(),
                 randUserName,
                 randSurname,
                 GenerateUtil.getEmailByName(randUserName).toLowerCase(),

@@ -56,22 +56,6 @@ public class GenreCrudService {
         return genreService.save(genreMapper.toGenre(genreDto));
     }
 
-    @Async
-    public void uploadFilesAndUpdate(final Genre genre, final GenreFilesBufferDto genreFilesBufferDto) {
-        // загружаем картинку в s3
-        if (genreFilesBufferDto.getImage() == null) {
-            return;
-        }
-        String imageUrl = amazonS3Service.uploadAndGenerateKey(genreFilesBufferDto.getImage(), genreRootPathPrefix);
-
-        // сохранение жанра
-        genre.setImageUrl(imageUrl);
-
-        genreService.update(genre);
-
-        Logger.info("S3 files have been successfully uploaded and genre has been updated: " + genre.getId());
-    }
-
     public void addGenresTest(final GenreRecTestDto genreRecTestDto, final HttpServletRequest request) {
         var genreIds = genreRecTestDto.getGenreIds();
         if (genreIds.isEmpty()) {

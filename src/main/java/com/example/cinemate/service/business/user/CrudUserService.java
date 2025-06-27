@@ -2,7 +2,6 @@ package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.user.*;
-import com.example.cinemate.dto.user.file.UserFilesBufferDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.model.db.AppUser;
@@ -12,9 +11,7 @@ import com.example.cinemate.service.redis.UserProviderStorage;
 import com.example.cinemate.utils.PaginationUtil;
 import com.example.cinemate.validate.common.CommonDataValidate;
 import com.example.cinemate.validate.user.UserDataValidate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
 
@@ -24,9 +21,6 @@ import java.util.Map;
 
 @Service
 public class CrudUserService {
-
-    @Value("${amazon_s3.avatar_root_path_prefix}")
-    private String avatarRootPathPrefix;
 
     private final AppUserService appUserService;
     private final UserRoleService userRoleService;
@@ -133,12 +127,6 @@ public class CrudUserService {
         saveUserService.createUserRoles(newUser, userAddDto.getRoles());
 
         return savedUser;
-    }
-
-    @Async
-    public void uploadFilesAndUpdate(final AppUser user, final UserFilesBufferDto userFilesBufferDto) {
-        // загружаем картинку в s3
-        saveUserService.uploadFilesAndUpdate(user, userFilesBufferDto, avatarRootPathPrefix);
     }
 
     @Transactional

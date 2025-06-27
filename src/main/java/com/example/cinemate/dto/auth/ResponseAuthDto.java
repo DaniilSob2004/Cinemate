@@ -2,7 +2,7 @@ package com.example.cinemate.dto.auth;
 
 import lombok.*;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseAuthDto {

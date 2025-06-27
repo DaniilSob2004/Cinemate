@@ -6,6 +6,7 @@ import com.example.cinemate.dto.user.UserDto;
 import com.example.cinemate.dto.user.file.UserFilesDto;
 import com.example.cinemate.mapper.common.CommonMapper;
 import com.example.cinemate.mapper.user.UserFileMapper;
+import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business.user.CurrentUserService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +22,13 @@ import java.io.IOException;
 public class UserController {
 
     private final CurrentUserService currentUserService;
+    private final UploadFilesAsyncService uploadFilesAsyncService;
     private final UserFileMapper userFileMapper;
     private final CommonMapper commonMapper;
 
-    public UserController(CurrentUserService currentUserService, UserFileMapper userFileMapper, CommonMapper commonMapper) {
+    public UserController(CurrentUserService currentUserService, UploadFilesAsyncService uploadFilesAsyncService, UserFileMapper userFileMapper, CommonMapper commonMapper) {
         this.currentUserService = currentUserService;
+        this.uploadFilesAsyncService = uploadFilesAsyncService;
         this.userFileMapper = userFileMapper;
         this.commonMapper = commonMapper;
     }
@@ -53,7 +56,7 @@ public class UserController {
 
         // сохраняем в БД и в отдельном потоке загружаем аватарку (если она есть)
         var updatedUser = currentUserService.updateUser(userUpdateDto, request);
-        currentUserService.uploadFilesAndUpdate(updatedUser, userFilesBufferDto);
+        uploadFilesAsyncService.uploadUserFilesAndUpdate(updatedUser, userFilesBufferDto);
 
         return ResponseEntity.ok("User updated successfully. Avatar are loading...");
     }

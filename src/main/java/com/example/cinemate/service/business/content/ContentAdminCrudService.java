@@ -22,9 +22,7 @@ import com.example.cinemate.utils.PaginationUtil;
 import com.example.cinemate.validate.common.CommonDataValidate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.tinylog.Logger;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -35,9 +33,6 @@ public class ContentAdminCrudService {
 
     @Value("${amazon_s3.poster_root_path_prefix}")
     private String posterRootPathPrefix;
-
-    @Value("${amazon_s3.trailer_root_path_prefix}")
-    private String trailerRootPathPrefix;
 
     private final AmazonS3Service amazonS3Service;
     private final ContentService contentService;
@@ -127,31 +122,6 @@ public class ContentAdminCrudService {
 
         return newContent;
     }
-
-    @Async
-    public void uploadFilesAndUpdate(final Content content, final ContentFilesBufferDto contentFilesBufferDto) {
-        boolean isUpdated = false;
-
-        // загружаем трейлер и видео в s3
-        if (contentFilesBufferDto.getTrailer() != null) {
-            String trailerKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getTrailer(), trailerRootPathPrefix);
-            content.setTrailerUrl(trailerKey);
-            isUpdated = true;
-        }
-        if (contentFilesBufferDto.getVideo() != null) {
-            String videoKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getVideo(), trailerRootPathPrefix);
-            content.setVideoUrl(videoKey);
-            isUpdated = true;
-        }
-
-        // если изменили
-        if (isUpdated) {
-            content.setUpdatedAt(LocalDateTime.now());
-            contentService.save(content);
-            Logger.info("S3 files have been successfully uploaded and content has been updated: " + content.getId());
-        }
-    }
-
 
     @Transactional
     public void updateById(final Integer id, final ContentFullAdminDto contentFullAdminDto) {

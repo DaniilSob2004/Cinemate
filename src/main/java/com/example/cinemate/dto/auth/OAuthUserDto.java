@@ -12,6 +12,7 @@ public class OAuthUserDto {
     private String username;
     private String firstname;
     private String surname;
+    private String picture;
     private AuthProvider provider;
     private String accessToken;
 }

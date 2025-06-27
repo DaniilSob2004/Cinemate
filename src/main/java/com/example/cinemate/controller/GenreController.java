@@ -6,6 +6,7 @@ import com.example.cinemate.dto.genre.file.GenreFilesDto;
 import com.example.cinemate.mapper.common.CommonMapper;
 import com.example.cinemate.mapper.genre.GenreFileMapper;
 import com.example.cinemate.service.business.genre.GenreCrudService;
+import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +22,13 @@ import java.util.List;
 public class GenreController {
 
     private final GenreCrudService genreCrudService;
+    private final UploadFilesAsyncService uploadFilesAsyncService;
     private final GenreFileMapper genreFileMapper;
     private final CommonMapper commonMapper;
 
-    public GenreController(GenreCrudService genreCrudService, GenreFileMapper genreFileMapper, CommonMapper commonMapper) {
+    public GenreController(GenreCrudService genreCrudService, UploadFilesAsyncService uploadFilesAsyncService, GenreFileMapper genreFileMapper, CommonMapper commonMapper) {
         this.genreCrudService = genreCrudService;
+        this.uploadFilesAsyncService = uploadFilesAsyncService;
         this.genreFileMapper = genreFileMapper;
         this.commonMapper = commonMapper;
     }
@@ -52,7 +55,7 @@ public class GenreController {
 
         // сохраняем в БД и в отдельном потоке загружаем картинку
         var savedGenre = genreCrudService.add(genreDto);
-        genreCrudService.uploadFilesAndUpdate(savedGenre, genreFilesBufferDto);
+        uploadFilesAsyncService.uploadGenreFilesAndUpdate(savedGenre, genreFilesBufferDto);
 
         return ResponseEntity.ok("Genre added successfully. Image are loading...");
     }
