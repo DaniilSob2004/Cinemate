@@ -1,1 +1,0 @@
-ALTER TABLE public.Genre ALTER COLUMN img_url DROP NOT NULL;

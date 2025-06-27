@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS public.ExternalAuth (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES AppUser(id) ON DELETE CASCADE,
     provider_id INT NOT NULL REFERENCES AuthProvider(id) ON DELETE CASCADE,
-    access_token VARCHAR(255),
+    access_token TEXT,
     external_id VARCHAR(255) NOT NULL,  -- уникальный ID пользователя во внешнем сервисе
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(provider_id, external_id)

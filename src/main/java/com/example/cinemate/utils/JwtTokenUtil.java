@@ -1,19 +1,23 @@
 package com.example.cinemate.utils;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
 
 @Component
 public class JwtTokenUtil {
 
-    @Value("${security.secret_key}")
-    private String secretKey;
+    private final SecretKey jwtSecretKey;
+
+    public JwtTokenUtil(@Value("${security.secret_key}") String secretKey) {
+        this.jwtSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));  // получение ключа
+    }
 
     // Генерация токена
     public String generateToken(final Map<String, Object> claims, final String subject, final long expirationTimeMin) {
@@ -22,13 +26,13 @@ public class JwtTokenUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMin * 60 * 1000))
                 .setSubject(subject)  // id
                 .setIssuedAt(new Date())
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(this.jwtSecretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     // Проверка токена
     public boolean validateToken(final String token) {
-        if (token.isEmpty()) {
+        if (token == null || token.isEmpty()) {
             return false;
         }
         try {
@@ -50,20 +54,10 @@ public class JwtTokenUtil {
         }
     }
 
-    // Извлечение sub
-    public String getSubject(final String token) {
-        return Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-    }
-
     // Извлечение всех claims
     public Claims getClaims(final String token) {
         Jws<Claims> jws = Jwts.parser()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(this.jwtSecretKey)
                 .build()
                 .parseSignedClaims(token);
         return jws.getPayload();
@@ -72,7 +66,7 @@ public class JwtTokenUtil {
     public Claims getClaimsFromExpiredToken(final String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(getSigningKey())
+                    .setSigningKey(this.jwtSecretKey)
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
@@ -85,11 +79,6 @@ public class JwtTokenUtil {
     public Date getExpirationDateFromToken(final String token) {
         Claims claims = getClaims(token);
         return claims.getExpiration();
-    }
-
-    // Получение ключа
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
     // Проверка истечения срока токена

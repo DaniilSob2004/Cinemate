@@ -25,5 +25,5 @@ db_data:
   actors: /app/data/actors.txt
   genres: /app/data/genres.txt
   content_names: /app/data/content/names.txt
-  avatars_path: app/data/avatars
+  avatars_path: /app/data/avatars
   delete_tables_sql: /app/db_data/delete_tables.sql
