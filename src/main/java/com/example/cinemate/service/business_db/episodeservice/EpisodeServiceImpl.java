@@ -19,8 +19,8 @@ public class EpisodeServiceImpl implements EpisodeService {
     }
 
     @Override
-    public void save(Episode episode) {
-        episodeRepository.save(episode);
+    public Episode save(Episode episode) {
+        return episodeRepository.save(episode);
     }
 
     @Override

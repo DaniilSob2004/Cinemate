@@ -4,8 +4,6 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.user.*;
 import com.example.cinemate.dto.user.file.UserFilesDto;
 import com.example.cinemate.mapper.common.CommonMapper;
-import com.example.cinemate.mapper.user.UserFileMapper;
-import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business.user.CrudUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,14 +25,10 @@ import java.io.IOException;
 public class UserAdminController {
 
     private final CrudUserService crudUserService;
-    private final UploadFilesAsyncService uploadFilesAsyncService;
-    private final UserFileMapper userFileMapper;
     private final CommonMapper commonMapper;
 
-    public UserAdminController(CrudUserService crudUserService, UploadFilesAsyncService uploadFilesAsyncService, UserFileMapper userFileMapper, CommonMapper commonMapper) {
+    public UserAdminController(CrudUserService crudUserService, CommonMapper commonMapper) {
         this.crudUserService = crudUserService;
-        this.uploadFilesAsyncService = uploadFilesAsyncService;
-        this.userFileMapper = userFileMapper;
         this.commonMapper = commonMapper;
     }
 
@@ -53,7 +47,7 @@ public class UserAdminController {
                     {
                         "username": "@dan",
                         "firstname": "Daniil",
-                        "surname": "Soboliev",
+                        "surname": "Sobolev",
                         "email": "dansob@gmail.com",
                         "password": "12345",
                         "phoneNum": "+380682354332",
@@ -66,14 +60,11 @@ public class UserAdminController {
 
         // получение dto и проверка валидности
         var userAddDto = commonMapper.toDtoAndValidation(metadataStr, UserAddDto.class);
-
         var userFilesDto = new UserFilesDto(avatar);
-        var userFilesBufferDto = userFileMapper.toUserFilesBufferDto(userFilesDto);
         Logger.info("-------- Add user for admin (" + userAddDto + ") " + " (" + userFilesDto + ") --------");
 
         // сохраняем в БД и в отдельном потоке загружаем аватарку
-        var savedUser = crudUserService.add(userAddDto);
-        uploadFilesAsyncService.uploadUserFilesAndUpdate(savedUser, userFilesBufferDto);
+        crudUserService.add(userAddDto, userFilesDto);
 
         return ResponseEntity.ok("User added successfully. Avatar are loading...");
     }

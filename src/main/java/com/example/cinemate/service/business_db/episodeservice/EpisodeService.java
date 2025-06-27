@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EpisodeService {
-    void save(Episode episode);
+    Episode save(Episode episode);
     void saveEpisodesList(List<Episode> episodes);
     void update(Episode episode);
     void delete(Episode episode);

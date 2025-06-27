@@ -2,9 +2,12 @@ package com.example.cinemate.service.business.user;
 
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.user.*;
+import com.example.cinemate.dto.user.file.UserFilesDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
+import com.example.cinemate.mapper.user.UserFileMapper;
 import com.example.cinemate.mapper.user.UserMapper;
 import com.example.cinemate.model.db.AppUser;
+import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.userroleservice.UserRoleService;
 import com.example.cinemate.service.redis.UserProviderStorage;
@@ -22,6 +25,7 @@ import java.util.Map;
 @Service
 public class CrudUserService {
 
+    private final UploadFilesAsyncService uploadFilesAsyncService;
     private final AppUserService appUserService;
     private final UserRoleService userRoleService;
     private final UpdateUserService updateUserService;
@@ -30,8 +34,10 @@ public class CrudUserService {
     private final UserDataValidate userDataValidate;
     private final CommonDataValidate commonDataValidate;
     private final UserMapper userMapper;
+    private final UserFileMapper userFileMapper;
 
-    public CrudUserService(AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, CommonDataValidate commonDataValidate, UserMapper userMapper) {
+    public CrudUserService(UploadFilesAsyncService uploadFilesAsyncService, AppUserService appUserService, UserRoleService userRoleService, UpdateUserService updateUserService, SaveUserService saveUserService, UserProviderStorage userProviderStorage, UserDataValidate userDataValidate, CommonDataValidate commonDataValidate, UserMapper userMapper, UserFileMapper userFileMapper) {
+        this.uploadFilesAsyncService = uploadFilesAsyncService;
         this.appUserService = appUserService;
         this.userRoleService = userRoleService;
         this.updateUserService = updateUserService;
@@ -40,6 +46,7 @@ public class CrudUserService {
         this.userDataValidate = userDataValidate;
         this.commonDataValidate = commonDataValidate;
         this.userMapper = userMapper;
+        this.userFileMapper = userFileMapper;
     }
 
     public PagedResponse<UserAdminDto> getUsers(final UserSearchParamsDto userSearchParamsDto) {
@@ -117,7 +124,7 @@ public class CrudUserService {
     }
 
     @Transactional
-    public AppUser add(final UserAddDto userAddDto) {
+    public void add(final UserAddDto userAddDto, final UserFilesDto userFilesDto) {
         // валидация (если ошибка, то исключение)
         userDataValidate.validateUserExistence(userAddDto.getEmail());
 
@@ -126,7 +133,9 @@ public class CrudUserService {
         AppUser savedUser = saveUserService.createUser(newUser);
         saveUserService.createUserRoles(newUser, userAddDto.getRoles());
 
-        return savedUser;
+        // в отдельном потоке загружаем аватарку
+        var userFilesBufferDto = userFileMapper.toUserFilesBufferDto(userFilesDto);
+        uploadFilesAsyncService.uploadUserFilesAndUpdate(savedUser, userFilesBufferDto);
     }
 
     @Transactional

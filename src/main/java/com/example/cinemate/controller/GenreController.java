@@ -4,9 +4,7 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.genre.*;
 import com.example.cinemate.dto.genre.file.GenreFilesDto;
 import com.example.cinemate.mapper.common.CommonMapper;
-import com.example.cinemate.mapper.genre.GenreFileMapper;
 import com.example.cinemate.service.business.genre.GenreCrudService;
-import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,14 +26,10 @@ import java.util.List;
 public class GenreController {
 
     private final GenreCrudService genreCrudService;
-    private final UploadFilesAsyncService uploadFilesAsyncService;
-    private final GenreFileMapper genreFileMapper;
     private final CommonMapper commonMapper;
 
-    public GenreController(GenreCrudService genreCrudService, UploadFilesAsyncService uploadFilesAsyncService, GenreFileMapper genreFileMapper, CommonMapper commonMapper) {
+    public GenreController(GenreCrudService genreCrudService, CommonMapper commonMapper) {
         this.genreCrudService = genreCrudService;
-        this.uploadFilesAsyncService = uploadFilesAsyncService;
-        this.genreFileMapper = genreFileMapper;
         this.commonMapper = commonMapper;
     }
 
@@ -63,14 +57,11 @@ public class GenreController {
 
         // получение dto и проверка валидности
         var genreDto = commonMapper.toDtoAndValidation(metadataStr, GenreDto.class);
-
         var genreFilesDto = new GenreFilesDto(image);
-        var genreFilesBufferDto = genreFileMapper.toGenreFilesBufferDto(genreFilesDto);
         Logger.info("-------- Add genre for admin (" + genreDto + ") " + " (" + genreFilesDto + ") --------");
 
         // сохраняем в БД и в отдельном потоке загружаем картинку
-        var savedGenre = genreCrudService.add(genreDto);
-        uploadFilesAsyncService.uploadGenreFilesAndUpdate(savedGenre, genreFilesBufferDto);
+        genreCrudService.add(genreDto, genreFilesDto);
 
         return ResponseEntity.ok("Genre added successfully. Image are loading...");
     }

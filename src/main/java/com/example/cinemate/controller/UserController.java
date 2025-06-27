@@ -4,8 +4,6 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.user.UserUpdateDto;
 import com.example.cinemate.dto.user.file.UserFilesDto;
 import com.example.cinemate.mapper.common.CommonMapper;
-import com.example.cinemate.mapper.user.UserFileMapper;
-import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business.user.CurrentUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,14 +25,10 @@ import java.io.IOException;
 public class UserController {
 
     private final CurrentUserService currentUserService;
-    private final UploadFilesAsyncService uploadFilesAsyncService;
-    private final UserFileMapper userFileMapper;
     private final CommonMapper commonMapper;
 
-    public UserController(CurrentUserService currentUserService, UploadFilesAsyncService uploadFilesAsyncService, UserFileMapper userFileMapper, CommonMapper commonMapper) {
+    public UserController(CurrentUserService currentUserService, CommonMapper commonMapper) {
         this.currentUserService = currentUserService;
-        this.uploadFilesAsyncService = uploadFilesAsyncService;
-        this.userFileMapper = userFileMapper;
         this.commonMapper = commonMapper;
     }
 
@@ -64,14 +58,11 @@ public class UserController {
 
         // получение dto и проверка валидности
         var userUpdateDto = commonMapper.toDtoAndValidation(metadataStr, UserUpdateDto.class);
-
         var userFilesDto = new UserFilesDto(avatar);
-        var userFilesBufferDto = userFileMapper.toUserFilesBufferDto(userFilesDto);
         Logger.info("-------- Update user (" + userUpdateDto + ") " + " (" + userFilesDto + ") --------");
 
         // сохраняем в БД и в отдельном потоке загружаем аватарку (если она есть)
-        var updatedUser = currentUserService.updateUser(userUpdateDto, request);
-        uploadFilesAsyncService.uploadUserFilesAndUpdate(updatedUser, userFilesBufferDto);
+        currentUserService.updateUser(userUpdateDto, userFilesDto, request);
 
         return ResponseEntity.ok("User updated successfully. Avatar are loading...");
     }

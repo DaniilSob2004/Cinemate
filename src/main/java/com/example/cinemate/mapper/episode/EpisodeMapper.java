@@ -1,4 +1,4 @@
-package com.example.cinemate.mapper;
+package com.example.cinemate.mapper.episode;
 
 import com.example.cinemate.dto.episode.EpisodeDto;
 import com.example.cinemate.model.db.Content;

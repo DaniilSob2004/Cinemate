@@ -1,14 +1,17 @@
 package com.example.cinemate.service.business.common;
 
 import com.example.cinemate.dto.content.file.ContentFilesBufferDto;
+import com.example.cinemate.dto.episode.file.EpisodeFilesBufferDto;
 import com.example.cinemate.dto.genre.file.GenreFilesBufferDto;
 import com.example.cinemate.dto.user.file.UserFilesBufferDto;
 import com.example.cinemate.model.db.AppUser;
 import com.example.cinemate.model.db.Content;
+import com.example.cinemate.model.db.Episode;
 import com.example.cinemate.model.db.Genre;
 import com.example.cinemate.service.amazon.AmazonS3Service;
 import com.example.cinemate.service.business_db.appuserservice.AppUserService;
 import com.example.cinemate.service.business_db.contentservice.ContentService;
+import com.example.cinemate.service.business_db.episodeservice.EpisodeService;
 import com.example.cinemate.service.business_db.genreservice.GenreService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -31,12 +34,14 @@ public class UploadFilesAsyncService {
 
     private final AmazonS3Service amazonS3Service;
     private final ContentService contentService;
+    private final EpisodeService episodeService;
     private final GenreService genreService;
     private final AppUserService appUserService;
 
-    public UploadFilesAsyncService(AmazonS3Service amazonS3Service, ContentService contentService, GenreService genreService, AppUserService appUserService) {
+    public UploadFilesAsyncService(AmazonS3Service amazonS3Service, ContentService contentService, EpisodeService episodeService, GenreService genreService, AppUserService appUserService) {
         this.amazonS3Service = amazonS3Service;
         this.contentService = contentService;
+        this.episodeService = episodeService;
         this.genreService = genreService;
         this.appUserService = appUserService;
     }
@@ -62,6 +67,29 @@ public class UploadFilesAsyncService {
             content.setUpdatedAt(LocalDateTime.now());
             contentService.save(content);
             Logger.info("S3 files have been successfully uploaded and content has been updated: " + content.getId());
+        }
+    }
+
+    @Async
+    public void uploadEpisodeFilesAndUpdate(final Episode episode, final EpisodeFilesBufferDto episodeFilesBufferDto) {
+        boolean isUpdated = false;
+
+        // загружаем трейлер и видео в s3
+        if (episodeFilesBufferDto.getTrailer() != null) {
+            String trailerKey = amazonS3Service.uploadAndGenerateKey(episodeFilesBufferDto.getTrailer(), trailerRootPathPrefix);
+            episode.setTrailerUrl(trailerKey);
+            isUpdated = true;
+        }
+        if (episodeFilesBufferDto.getVideo() != null) {
+            String videoKey = amazonS3Service.uploadAndGenerateKey(episodeFilesBufferDto.getVideo(), trailerRootPathPrefix);
+            episode.setVideoUrl(videoKey);
+            isUpdated = true;
+        }
+
+        // если изменили
+        if (isUpdated) {
+            episodeService.save(episode);
+            Logger.info("S3 files have been successfully uploaded and episode has been updated: " + episode.getId());
         }
     }
 

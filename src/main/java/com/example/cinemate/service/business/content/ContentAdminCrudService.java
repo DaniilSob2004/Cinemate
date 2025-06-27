@@ -2,12 +2,13 @@ package com.example.cinemate.service.business.content;
 
 import com.example.cinemate.dto.common.PagedResponse;
 import com.example.cinemate.dto.content.*;
-import com.example.cinemate.dto.content.file.ContentFilesBufferDto;
+import com.example.cinemate.dto.content.file.ContentFilesDto;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.common.ContentNotFoundException;
 import com.example.cinemate.mapper.content.*;
 import com.example.cinemate.model.db.*;
 import com.example.cinemate.service.amazon.AmazonS3Service;
+import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business_db.actorservice.ActorService;
 import com.example.cinemate.service.business_db.contentactorservice.ContentActorService;
 import com.example.cinemate.service.business_db.contentgenreservice.ContentGenreService;
@@ -34,6 +35,7 @@ public class ContentAdminCrudService {
     @Value("${amazon_s3.poster_root_path_prefix}")
     private String posterRootPathPrefix;
 
+    private final UploadFilesAsyncService uploadFilesAsyncService;
     private final AmazonS3Service amazonS3Service;
     private final ContentService contentService;
     private final ContentTypeService contentTypeService;
@@ -44,10 +46,12 @@ public class ContentAdminCrudService {
     private final WarningService warningService;
     private final ContentWarningService contentWarningService;
     private final ContentMapper contentMapper;
+    private final ContentFileMapper contentFileMapper;
     private final ContentEnrichMapper contentEnrichMapper;
     private final CommonDataValidate commonDataValidate;
 
-    public ContentAdminCrudService(AmazonS3Service amazonS3Service, ContentService contentService, ContentTypeService contentTypeService, GenreService genreService, ContentGenreService contentGenreService, ActorService actorService, ContentActorService contentActorService, WarningService warningService, ContentWarningService contentWarningService, ContentMapper contentMapper, ContentEnrichMapper contentEnrichMapper, CommonDataValidate commonDataValidate) {
+    public ContentAdminCrudService(UploadFilesAsyncService uploadFilesAsyncService, AmazonS3Service amazonS3Service, ContentService contentService, ContentTypeService contentTypeService, GenreService genreService, ContentGenreService contentGenreService, ActorService actorService, ContentActorService contentActorService, WarningService warningService, ContentWarningService contentWarningService, ContentMapper contentMapper, ContentFileMapper contentFileMapper, ContentEnrichMapper contentEnrichMapper, CommonDataValidate commonDataValidate) {
+        this.uploadFilesAsyncService = uploadFilesAsyncService;
         this.amazonS3Service = amazonS3Service;
         this.contentService = contentService;
         this.contentTypeService = contentTypeService;
@@ -58,6 +62,7 @@ public class ContentAdminCrudService {
         this.warningService = warningService;
         this.contentWarningService = contentWarningService;
         this.contentMapper = contentMapper;
+        this.contentFileMapper = contentFileMapper;
         this.contentEnrichMapper = contentEnrichMapper;
         this.commonDataValidate = commonDataValidate;
     }
@@ -92,7 +97,7 @@ public class ContentAdminCrudService {
 
 
     @Transactional
-    public Content addInitial(final ContentFullAdminDto contentFullAdminDto, final ContentFilesBufferDto contentFilesBufferDto) {
+    public void add(final ContentFullAdminDto contentFullAdminDto, final ContentFilesDto contentFilesDto) {
         // есть ли такой контент
         contentService.findByName(contentFullAdminDto.getName().toLowerCase())
                 .ifPresent(content -> {
@@ -105,6 +110,7 @@ public class ContentAdminCrudService {
                 .orElseThrow(() -> new ContentNotFoundException("Content type '" + contentTypeName + "' not found"));
 
         // загружаем постер в s3
+        var contentFilesBufferDto = contentFileMapper.toContentFilesBufferDto(contentFilesDto);
         String posterKey = amazonS3Service.uploadAndGenerateKey(contentFilesBufferDto.getPoster(), posterRootPathPrefix);
 
         // сохранение контента
@@ -113,14 +119,15 @@ public class ContentAdminCrudService {
         contentFullAdminDto.setUpdatedAt(LocalDateTime.now());
         Content content = contentMapper.toContent(contentFullAdminDto);
         content.setContentType(contentType);
-        Content newContent = contentService.save(content);
+        Content savedContent = contentService.save(content);
 
         // добавление жанров, актеров, warnings
-        this.addContentGenres(newContent, contentFullAdminDto.getGenres());
-        this.addContentActors(newContent, contentFullAdminDto.getActors());
-        this.addContentWarnings(newContent, contentFullAdminDto.getWarnings());
+        this.addContentGenres(savedContent, contentFullAdminDto.getGenres());
+        this.addContentActors(savedContent, contentFullAdminDto.getActors());
+        this.addContentWarnings(savedContent, contentFullAdminDto.getWarnings());
 
-        return newContent;
+        // в отдельном потоке загружаем трейлер и видео
+        uploadFilesAsyncService.uploadContentFilesAndUpdate(savedContent, contentFilesBufferDto);
     }
 
     @Transactional

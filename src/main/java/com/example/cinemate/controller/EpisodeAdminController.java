@@ -2,6 +2,7 @@ package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.episode.EpisodeDto;
+import com.example.cinemate.dto.episode.file.EpisodeFilesDto;
 import com.example.cinemate.mapper.common.CommonMapper;
 import com.example.cinemate.service.business.episode.EpisodeCrudService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,10 +53,13 @@ public class EpisodeAdminController {
 
         // получение dto и проверка валидности
         var episodeDto = commonMapper.toDtoAndValidation(metadataStr, EpisodeDto.class);
+        var episodeFilesDto = new EpisodeFilesDto(trailer, video);
+        Logger.info("-------- Add episode for admin (" + episodeDto + ") " + " (" + episodeFilesDto + ") --------");
 
-        //Logger.info("-------- Add episode (" + episodeDto + ") --------");
-        //episodeCrudService.add(episodeDto);
-        return ResponseEntity.ok("Episode added successfully");
+        // сохраняем в БД и в отдельном потоке загружаем видео
+        episodeCrudService.add(episodeDto, episodeFilesDto);
+
+        return ResponseEntity.ok("Episode added successfully. Trailer and video are loading...");
     }
 
     @PutMapping(value = Endpoint.BY_ID)

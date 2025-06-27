@@ -1,18 +1,15 @@
 package com.example.cinemate.service.business.genre;
 
 import com.example.cinemate.dto.genre.*;
-import com.example.cinemate.dto.genre.file.GenreFilesBufferDto;
+import com.example.cinemate.dto.genre.file.GenreFilesDto;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
+import com.example.cinemate.mapper.genre.GenreFileMapper;
 import com.example.cinemate.mapper.genre.GenreMapper;
-import com.example.cinemate.model.db.Genre;
-import com.example.cinemate.service.amazon.AmazonS3Service;
 import com.example.cinemate.service.auth.jwt.AccessJwtTokenService;
+import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business_db.genreservice.GenreService;
 import com.example.cinemate.service.redis.GenresTestStorage;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.tinylog.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -21,21 +18,20 @@ import java.util.List;
 @Service
 public class GenreCrudService {
 
-    @Value("${amazon_s3.genre_root_path_prefix}")
-    private String genreRootPathPrefix;
-
-    private final AmazonS3Service amazonS3Service;
+    private final UploadFilesAsyncService uploadFilesAsyncService;
     private final GenreService genreService;
     private final GenresTestStorage genresTestStorage;
     private final AccessJwtTokenService accessJwtTokenService;
     private final GenreMapper genreMapper;
+    private final GenreFileMapper genreFileMapper;
 
-    public GenreCrudService(AmazonS3Service amazonS3Service, GenreService genreService, GenresTestStorage genresTestStorage, AccessJwtTokenService accessJwtTokenService, GenreMapper genreMapper) {
-        this.amazonS3Service = amazonS3Service;
+    public GenreCrudService(UploadFilesAsyncService uploadFilesAsyncService, GenreService genreService, GenresTestStorage genresTestStorage, AccessJwtTokenService accessJwtTokenService, GenreMapper genreMapper, GenreFileMapper genreFileMapper) {
+        this.uploadFilesAsyncService = uploadFilesAsyncService;
         this.genreService = genreService;
         this.genresTestStorage = genresTestStorage;
         this.accessJwtTokenService = accessJwtTokenService;
         this.genreMapper = genreMapper;
+        this.genreFileMapper = genreFileMapper;
     }
 
     public List<GenreDto> getAll() {
@@ -45,7 +41,7 @@ public class GenreCrudService {
     }
 
     @Transactional
-    public Genre add(final GenreDto genreDto) {
+    public void add(final GenreDto genreDto, final GenreFilesDto genreFilesDto) {
         genreDto.setName(genreDto.getName().toLowerCase());
 
         genreService.findByName(genreDto.getName())
@@ -53,7 +49,12 @@ public class GenreCrudService {
                     throw new ContentAlreadyExists("Genre '" + genreDto.getName() + "' already exists");
                 });
 
-        return genreService.save(genreMapper.toGenre(genreDto));
+        // сохраняем
+        var savedGenre = genreService.save(genreMapper.toGenre(genreDto));
+
+        // в отдельном потоке загружаем картинку
+        var genreFilesBufferDto = genreFileMapper.toGenreFilesBufferDto(genreFilesDto);
+        uploadFilesAsyncService.uploadGenreFilesAndUpdate(savedGenre, genreFilesBufferDto);
     }
 
     public void addGenresTest(final GenreRecTestDto genreRecTestDto, final HttpServletRequest request) {

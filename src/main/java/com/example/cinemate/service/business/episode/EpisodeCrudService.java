@@ -1,9 +1,12 @@
 package com.example.cinemate.service.business.episode;
 
 import com.example.cinemate.dto.episode.*;
+import com.example.cinemate.dto.episode.file.EpisodeFilesDto;
 import com.example.cinemate.exception.common.ContentAlreadyExists;
 import com.example.cinemate.exception.common.ContentNotFoundException;
-import com.example.cinemate.mapper.EpisodeMapper;
+import com.example.cinemate.mapper.episode.EpisodeFileMapper;
+import com.example.cinemate.mapper.episode.EpisodeMapper;
+import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business_db.contentservice.ContentService;
 import com.example.cinemate.service.business_db.episodeservice.EpisodeService;
 import org.springframework.cache.CacheManager;
@@ -21,15 +24,19 @@ import java.util.Optional;
 @CacheConfig(cacheNames = "episodes_dto")
 public class EpisodeCrudService {
 
+    private final UploadFilesAsyncService uploadFilesAsyncService;
     private final EpisodeService episodeService;
     private final ContentService contentService;
     private final EpisodeMapper episodeMapper;
+    private final EpisodeFileMapper episodeFileMapper;
     private final CacheManager cacheManager;
 
-    public EpisodeCrudService(EpisodeService episodeService, ContentService contentService, EpisodeMapper episodeMapper, CacheManager cacheManager) {
+    public EpisodeCrudService(UploadFilesAsyncService uploadFilesAsyncService, EpisodeService episodeService, ContentService contentService, EpisodeMapper episodeMapper, EpisodeFileMapper episodeFileMapper, CacheManager cacheManager) {
+        this.uploadFilesAsyncService = uploadFilesAsyncService;
         this.episodeService = episodeService;
         this.contentService = contentService;
         this.episodeMapper = episodeMapper;
+        this.episodeFileMapper = episodeFileMapper;
         this.cacheManager = cacheManager;
     }
 
@@ -42,7 +49,7 @@ public class EpisodeCrudService {
     }
 
     @CacheEvict(key = "#episodeDto.contentId")
-    public void add(final EpisodeDto episodeDto) {
+    public void add(final EpisodeDto episodeDto, final EpisodeFilesDto episodeFilesDto) {
         // есть ли такой контент
         contentService.findById(episodeDto.getContentId())
                 .orElseThrow(() -> new ContentAlreadyExists("Content with id '" + episodeDto.getContentId() + "' already exists"));
@@ -55,7 +62,12 @@ public class EpisodeCrudService {
         var newEpisode = episodeMapper.toEpisode(episodeDto);
         newEpisode.setCreatedAt(LocalDateTime.now());
 
-        episodeService.save(newEpisode);
+        // сохраняем
+        var savedEpisode = episodeService.save(newEpisode);
+
+        // в отдельном потоке загружаем видео
+        var episodeFilesBufferDto = episodeFileMapper.toEpisodeFilesBufferDto(episodeFilesDto);
+        uploadFilesAsyncService.uploadEpisodeFilesAndUpdate(savedEpisode, episodeFilesBufferDto);
     }
 
     @Transactional

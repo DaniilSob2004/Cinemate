@@ -5,8 +5,6 @@ import com.example.cinemate.dto.content.file.ContentFilesDto;
 import com.example.cinemate.dto.content.ContentFullAdminDto;
 import com.example.cinemate.dto.content.ContentSearchParamsDto;
 import com.example.cinemate.mapper.common.CommonMapper;
-import com.example.cinemate.mapper.content.ContentFileMapper;
-import com.example.cinemate.service.business.common.UploadFilesAsyncService;
 import com.example.cinemate.service.business.content.ContentAdminCrudService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,14 +26,10 @@ import java.io.IOException;
 public class ContentAdminController {
 
     private final ContentAdminCrudService contentAdminCrudService;
-    private final UploadFilesAsyncService uploadFilesAsyncService;
-    private final ContentFileMapper contentFileMapper;
     private final CommonMapper commonMapper;
 
-    public ContentAdminController(ContentAdminCrudService contentAdminCrudService, UploadFilesAsyncService uploadFilesAsyncService, ContentFileMapper contentFileMapper, CommonMapper commonMapper) {
+    public ContentAdminController(ContentAdminCrudService contentAdminCrudService, CommonMapper commonMapper) {
         this.contentAdminCrudService = contentAdminCrudService;
-        this.uploadFilesAsyncService = uploadFilesAsyncService;
-        this.contentFileMapper = contentFileMapper;
         this.commonMapper = commonMapper;
     }
 
@@ -78,15 +72,11 @@ public class ContentAdminController {
 
         // получение dto и проверка валидности
         var contentFullAdminDto = commonMapper.toDtoAndValidation(metadataStr, ContentFullAdminDto.class);
-
         var contentFilesDto = new ContentFilesDto(poster, trailer, video);
-        var contentFilesBufferDto = contentFileMapper.toContentFilesBufferDto(contentFilesDto);
-
         Logger.info("-------- Add content for admin (" + contentFullAdminDto + ") " + " (" + contentFilesDto + ") --------");
 
         // сохраняем в БД и в отдельном потоке загружаем трейлер видео
-        var savedContent = contentAdminCrudService.addInitial(contentFullAdminDto, contentFilesBufferDto);
-        uploadFilesAsyncService.uploadContentFilesAndUpdate(savedContent, contentFilesBufferDto);
+        contentAdminCrudService.add(contentFullAdminDto, contentFilesDto);
 
         return ResponseEntity.ok("Content added successfully. Videos are loading...");
     }
