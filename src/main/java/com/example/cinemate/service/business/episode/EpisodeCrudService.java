@@ -11,7 +11,6 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.tinylog.Logger;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -36,7 +35,6 @@ public class EpisodeCrudService {
 
     @Cacheable(key = "#contentId")
     public EpisodesWrapperDto getByContentId(final Integer contentId) {
-        Logger.info("GET EPISODES FOR CONTENT ID: " + contentId);
         var episodes = episodeService.getByContentId(contentId).stream()
                 .map(episodeMapper::toEpisodeDto)
                 .toList();

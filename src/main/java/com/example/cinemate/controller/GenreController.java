@@ -7,6 +7,10 @@ import com.example.cinemate.mapper.common.CommonMapper;
 import com.example.cinemate.mapper.genre.GenreFileMapper;
 import com.example.cinemate.service.business.genre.GenreCrudService;
 import com.example.cinemate.service.business.common.UploadFilesAsyncService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.GENRES)
+@SecurityRequirement(name = "JWT")
+@Tag(name = "Genre", description = "Genre management for contents and users test")
 public class GenreController {
 
     private final GenreCrudService genreCrudService;
@@ -34,6 +40,7 @@ public class GenreController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all genres", description = "Get all genres and return List(GenreDto)")
     public ResponseEntity<?> getAll() {
         List<GenreDto> genres = genreCrudService.getAll();
         Logger.info("Successfully retrieved " + genres.size() + " genres");
@@ -41,9 +48,17 @@ public class GenreController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Add genre", description = "Add genre with metadata and image")
     public ResponseEntity<?> add(
-            @RequestPart(value = "metadata") String metadataStr,
-            @RequestPart(value = "image") MultipartFile image
+            @RequestPart(value = "metadata")
+            @Parameter(description = "Genre metadata JSON (GenreDto) in string format: " + """
+                    {
+                        "name": "Horror",
+                        "description": "Any description",
+                        "tags": "#tag1,#tag2"
+                    }""")
+            String metadataStr,
+            @RequestPart(value = "image") @Parameter(description = "Image representing the genre") MultipartFile image
     ) throws IOException {
 
         // получение dto и проверка валидности
@@ -61,13 +76,15 @@ public class GenreController {
     }
 
     @PostMapping(value = Endpoint.BY_RECOMMENDATIONS_TEST)
-    public ResponseEntity<?> addGenresTest(@RequestBody GenreRecTestDto genreRecTestDto, HttpServletRequest request) {
+    @Operation(summary = "Set test user genres", description = "Set test genres to check the recommendations of content for the user")
+    public ResponseEntity<?> addGenresTest(@RequestBody GenreRecTestDto genreRecTestDto, HttpServletRequest request){
         Logger.info("-------- Add genre for user test (" + genreRecTestDto + ") --------");
         genreCrudService.addGenresTest(genreRecTestDto, request);
         return ResponseEntity.ok("Genres for user test added successfully");
     }
 
     @GetMapping(value = "get-genre-test")
+    @Operation(summary = "Get test user genres", description = "Get test genres to check the recommendations of content for the user")
     public ResponseEntity<?> getGenreTest(HttpServletRequest request) {
         return ResponseEntity.ok(genreCrudService.getGenreTest(request));
     }

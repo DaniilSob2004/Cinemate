@@ -50,9 +50,9 @@ public class Endpoint {
         return List.of(
                 API_V1 + AUTH + LOGIN,
                 API_V1 + AUTH + REGISTER,
-                API_V1 + PROVIDERS,
                 API_V1 + AUTH + FORGOT_PASSWORD,
                 API_V1 + AUTH + RESET_PASSWORD,
+                API_V1 + PROVIDERS,
                 API_V1 + PRIVACY_POLICY
         );
     }

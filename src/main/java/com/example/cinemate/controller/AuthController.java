@@ -7,6 +7,9 @@ import com.example.cinemate.service.auth.LogoutService;
 import com.example.cinemate.service.auth.RegisterService;
 import com.example.cinemate.service.auth.UpdateTokenService;
 import com.example.cinemate.service.business.user.UpdatePasswordService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -16,6 +19,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.AUTH)
+@Tag(name = "Authentication", description = "Handles user authentication, registration, token updates, logout, and password reset")
 public class AuthController {
 
     private final LoginService loginService;
@@ -33,6 +37,8 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.LOGIN)
+    @SecurityRequirement(name = "basicAuth")
+    @Operation(summary = "User login", description = "Authenticates user credentials and returns access and refresh tokens")
     public ResponseEntity<?> login(HttpServletRequest request) {
         ResponseAuthDto responseAuthDto = loginService.loginUser(request);  // аутентификация и генерация токенов
         Logger.info("User authenticated!");
@@ -40,6 +46,7 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.REGISTER)
+    @Operation(summary = "User registration", description = "Registers a new user and returns access and refresh tokens")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
         Logger.info("-------- User Register (" + registerRequestDto + ") --------");
         ResponseAuthDto responseAuthDto = registerService.registerUser(registerRequestDto);  // регистрация и генерация токена
@@ -48,6 +55,8 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.UPDATE_ACCESS_TOKEN)
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Update access token", description = "Generates a new access token using a valid refresh token")
     public ResponseEntity<?> updateAccessToken(@Valid @RequestBody UpdateAccessTokenDto updateAccessTokenDto, HttpServletRequest request) {
         Logger.info("-------- Update access token (" + updateAccessTokenDto + ") --------");
         String accessToken = updateTokenService.updateAccessToken(updateAccessTokenDto, request);
@@ -55,6 +64,8 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.LOGOUT)
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "Logout user", description = "Invalidates the current access/refresh token")
     public ResponseEntity<?> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto, HttpServletRequest request) {
         Logger.info("-------- Logout (" + logoutRequestDto + ") --------");
         logoutService.logoutUser(logoutRequestDto, request);
@@ -62,6 +73,7 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.FORGOT_PASSWORD)
+    @Operation(summary = "Forgot password", description = "Sends a password reset link to the user's email")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordDto forgotPasswordDto) {
         Logger.info("-------- Forgot password (" + forgotPasswordDto + ") --------");
         updatePasswordService.createPasswordResetToken(forgotPasswordDto.getEmail());
@@ -69,6 +81,7 @@ public class AuthController {
     }
 
     @PostMapping(value = Endpoint.RESET_PASSWORD)
+    @Operation(summary = "Reset password", description = "Resets the user's password using the reset token")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequestDto resetPasswordRequestDto) {
         Logger.info("-------- Reset password (" + resetPasswordRequestDto + ") --------");
         updatePasswordService.resetPassword(resetPasswordRequestDto);

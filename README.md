@@ -22,6 +22,12 @@
 
 -------------------------------------------------------
 
+ - SWAGGER
+ -
+ - ![Image](https://github.com/user-attachments/assets/bd6efc50-b032-419a-9348-f56d5f3efcfe)
+
+-------------------------------------------------------
+
  - Send email for url reset password
  -
  - ![Image](https://github.com/user-attachments/assets/012d8adc-2b6a-4751-a07b-1fe82f64e3ee)

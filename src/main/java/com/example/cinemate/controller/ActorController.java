@@ -3,6 +3,9 @@ package com.example.cinemate.controller;
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.actor.ActorDto;
 import com.example.cinemate.service.business.actor.ActorCrudService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
@@ -12,6 +15,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.ACTORS)
+@SecurityRequirement(name = "JWT")
+@Tag(name = "Actor Admin", description = "Actor management for admin")
 public class ActorController {
 
     private final ActorCrudService actorCrudService;
@@ -21,6 +26,7 @@ public class ActorController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all actors", description = "Get all actors and return List(ActorDto)")
     public ResponseEntity<?> getAll() {
         List<ActorDto> actors = actorCrudService.getAll();
         Logger.info("Successfully retrieved " + actors.size() + " actors");
@@ -28,6 +34,7 @@ public class ActorController {
     }
 
     @PostMapping
+    @Operation(summary = "Add actor", description = "Add actor by ActorDto")
     public ResponseEntity<?> add(@Valid @RequestBody ActorDto actorDto) {
         Logger.info("-------- Add actor (" + actorDto + ") --------");
         actorCrudService.add(actorDto);

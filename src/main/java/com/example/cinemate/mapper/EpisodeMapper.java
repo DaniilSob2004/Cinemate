@@ -3,6 +3,7 @@ package com.example.cinemate.mapper;
 import com.example.cinemate.dto.episode.EpisodeDto;
 import com.example.cinemate.model.db.Content;
 import com.example.cinemate.model.db.Episode;
+import com.example.cinemate.service.amazon.AmazonS3Service;
 import com.example.cinemate.utils.DateTimeUtil;
 import org.springframework.stereotype.Component;
 
@@ -13,9 +14,11 @@ import java.time.LocalDate;
 @Component
 public class EpisodeMapper {
 
+    private final AmazonS3Service amazonS3Service;
     private final EntityManager entityManager;
 
-    public EpisodeMapper(EntityManager entityManager) {
+    public EpisodeMapper(AmazonS3Service amazonS3Service, EntityManager entityManager) {
+        this.amazonS3Service = amazonS3Service;
         this.entityManager = entityManager;
     }
 
@@ -28,8 +31,8 @@ public class EpisodeMapper {
                 episode.getEpisodeNumber(),
                 episode.getDurationMin(),
                 episode.getDescription(),
-                episode.getTrailerUrl(),
-                episode.getVideoUrl(),
+                amazonS3Service.getCloudFrontUrl(episode.getTrailerUrl()),
+                amazonS3Service.getCloudFrontUrl(episode.getVideoUrl()),
                 DateTimeUtil.formatDate(episode.getReleaseDate())
         );
     }

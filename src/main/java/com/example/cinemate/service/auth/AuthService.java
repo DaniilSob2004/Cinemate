@@ -51,7 +51,7 @@ public class AuthService {
         Logger.info("(authorizationUserByToken) AppUserJwtDto: " + appUserJwtDto);
 
         // загружается информация о польз, чтобы установить его права доступа
-        UserDetails userDetails = userDetailsService.loadUserById(appUserJwtDto.getId());
+        UserDetails userDetails = userDetailsService.loadUserById(appUserJwtDto.getId(), appUserJwtDto.getRoles());
 
         if (this.addUserDetailsToCache(userDetails, appUserJwtDto.getProvider())) {
             this.authenticateUserWithoutPassword(userDetails);  // аутентификация пользователя без пароля
@@ -97,7 +97,7 @@ public class AuthService {
         if (authRequest.getPassword() == null) {  // если не нужно проверять пароль
             // загружает инфу (роли и данные) о польз.
             userDetails = authRequest.isId()
-                    ? userDetailsService.loadUserById(Integer.valueOf(authRequest.getUsernameOrId()))  // по id
+                    ? userDetailsService.loadUserById(Integer.valueOf(authRequest.getUsernameOrId()), null)  // по id
                     : userDetailsService.loadUserByUsername(authRequest.getUsernameOrId());  // по email
             this.authenticateUserWithoutPassword(userDetails);
         }

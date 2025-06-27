@@ -14,8 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 // фильтрация предотвращения аутентификации
 @Component
@@ -36,15 +34,9 @@ public class AuthPreventionFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        List<String> endpoints = List.of(
-                Endpoint.API_V1 + Endpoint.AUTH + Endpoint.LOGIN,
-                Endpoint.API_V1 + Endpoint.AUTH + Endpoint.REGISTER,
-                Endpoint.API_V1 + Endpoint.AUTH + Endpoint.FORGOT_PASSWORD,
-                Endpoint.API_V1 + Endpoint.AUTH + Endpoint.RESET_PASSWORD
-        );
 
         // если запрос на один из указанных 'endpoints'
-        if (endpoints.contains(path)) {
+        if (Endpoint.getEndpointForAllUsers().contains(path)) {
             // есть токен в заголовке и он валидный, то отправкляем ошибку
             String token = jwtTokenService.getValidateTokenFromHeader(request).orElse(null);
             if (token != null) {

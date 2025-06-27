@@ -46,11 +46,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // проверка активирован ли пользователь (иначе UserInactiveException)
         userDataValidate.validateIsActiveUser(user);
 
-        return this.createUserDetails(user);
+        return this.createUserDetails(user, null);
     }
 
     @Transactional
-    public UserDetails loadUserById(Integer id) {
+    public UserDetails loadUserById(final Integer id, final List<String> roles) {
         // находим пользователя в кэше
         return userDetailsCacheService.getUserDetails(id.toString())
                 .map(user -> {
@@ -65,7 +65,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     // проверка активирован ли пользователь (иначе UserInactiveException)
                     userDataValidate.validateIsActiveUser(user);
 
-                    return createUserDetails(user);
+                    return createUserDetails(user, roles);
                 });
     }
 
@@ -73,9 +73,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userDetailsCacheService.addToCache(id.toString(), userDetails);
     }
 
-    private UserDetails createUserDetails(final AppUser user) {
+    private UserDetails createUserDetails(final AppUser user, final List<String> roles) {
         // установка ролей для данного пользователя
-        List<GrantedAuthority> grantList = this.getRolesForUser(user.getId());
+        List<GrantedAuthority> grantList = (roles == null)
+                ? this.getRolesForUser(user.getId())
+                : grantedAuthorityMapper.toGrantedAuthorities(roles);
 
         // возвращаем объект внутреннего Spring UserDetails
         return userDetailsMapper.toCustomUserDetails(user, grantList);
