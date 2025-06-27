@@ -18,6 +18,7 @@ import java.util.Optional;
 public class FileWorkUtil {
 
     public static Optional<TempContentFile> downloadImageAsTempFile(final String imageUrl) {
+        int statusOk = 200;
         try {
             URL url = new URL(imageUrl);
             var connection = (HttpURLConnection) url.openConnection();
@@ -25,7 +26,7 @@ public class FileWorkUtil {
             connection.connect();
 
             int status = connection.getResponseCode();
-            if (status != 200) {
+            if (status != statusOk) {
                 return Optional.empty();
             }
 

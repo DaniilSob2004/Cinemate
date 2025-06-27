@@ -28,6 +28,12 @@
 
 -------------------------------------------------------
 
+ - UNIT TESTS
+ -
+ - ![Image](https://github.com/user-attachments/assets/a7f4ce5f-4c61-4d2e-8717-79d967c6c22d)
+
+-------------------------------------------------------
+
  - Send email for url reset password
  -
  - ![Image](https://github.com/user-attachments/assets/012d8adc-2b6a-4751-a07b-1fe82f64e3ee)

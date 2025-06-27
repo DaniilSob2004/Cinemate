@@ -32,6 +32,9 @@ public class StringUtil {
         if (str == null || str.isEmpty()) {
             return str;
         }
+        if (symbol == null || symbol.isEmpty()) {
+            return symbol;
+        }
         return symbol + str;
     }
 
@@ -46,4 +49,3 @@ public class StringUtil {
         return URLEncoder.encode(str, StandardCharsets.UTF_8);
     }
 }
-
