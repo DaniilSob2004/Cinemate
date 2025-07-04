@@ -56,6 +56,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.cors();
+
         // для всех пользователей
         for (String endpoint : Endpoint.getEndpointForAllUsers()) {
             http.authorizeRequests().mvcMatchers(endpoint).permitAll();

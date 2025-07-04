@@ -69,13 +69,11 @@ public class Endpoint {
     static public List<String> getEndpointForAuthUsers() {
         return List.of(
                 API_V1 + USER + ME,
-                API_V1 + AUTH + UPDATE_ACCESS_TOKEN,
                 API_V1 + CONTENTS,
                 API_V1 + CONTENTS + BY_RECOMMENDATIONS,
                 API_V1 + CONTENT_VIEWS + ME,
                 API_V1 + WISHLISTS + ME,
-                API_V1 + GENRES + BY_RECOMMENDATIONS_TEST,
-                API_V1 + AUTH + LOGOUT
+                API_V1 + GENRES + BY_RECOMMENDATIONS_TEST
         );
     }
 
@@ -97,7 +95,8 @@ public class Endpoint {
 
     static public List<String> getEndpointForAuthUsersAndAdmin() {
         return List.of(
-
+                API_V1 + AUTH + UPDATE_ACCESS_TOKEN,
+                API_V1 + AUTH + LOGOUT
         );
     }
 }
