@@ -3,6 +3,14 @@
 
 -------------------------------------------------------
 
+ - SWAGGER
+ -
+ - ![Image](https://github.com/user-attachments/assets/af7349da-c949-4f04-9242-cf16b6d5d8c4)
+ - ![Image](https://github.com/user-attachments/assets/01f949e6-5757-498b-b950-e34bfadd79a7)
+ - ![Image](https://github.com/user-attachments/assets/68521b8b-8ecc-423e-a390-16dafa6746d8)
+
+-------------------------------------------------------
+
  - Redis for:
     - data from db: Role, UserRole, AuthProvider, UserProvider, Actor, Genre, Warning, ContentActor, ContentGenre, ContentWarning
     - access/refresh token
@@ -22,9 +30,9 @@
 
 -------------------------------------------------------
 
- - SWAGGER
- -
- - ![Image](https://github.com/user-attachments/assets/bd6efc50-b032-419a-9348-f56d5f3efcfe)
+ - AMAZON S3 STORAGE
+ - 
+ - ![Image](https://github.com/user-attachments/assets/0ea02c42-3a42-4f2f-ab1d-4e9452e562cf)
 
 -------------------------------------------------------
 
@@ -49,17 +57,6 @@
  - 
  - ![Image](https://github.com/user-attachments/assets/fa2b3f64-df33-4e6e-b13b-a0b1e17af7fb)
 -------------------------------------------------------
- --------------- (Endpoints) ---------------
- - login / register / logout / update_access_token / forgot_password / reset_password
- - get_current_user / get_user_by_id / update_current_user / update_user_by_id / add_user / delete_user_by_id
- - get_users (page, size, sortBy, isAsc, searchStr), get_all_roles / get_all_providers / get_all_content_types
- - add_content_type / get_all_warnings / add_warning / get_all_actors / add_actor / get_all_genres / add_genre
- - add_content / update_content / delete_content / get_contents (page, size, sortBy, isAsc, filters)
- - get_contents_by_recommends / get_content_by_id / get_random_contents / get_contents_by_genre / get_contents_by_type
- - get_episodes_by_content_id / add_episode / delete_episode / update_episode / 
- - get_user_wishlist / get_Userr_view_histories /
- - set_genres_user_test_rec / 
- - 
  -------------------- Admin User --------------------
  - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
  - ![Image](https://github.com/user-attachments/assets/1cc6d172-a20b-47fe-ac35-470bcdd58d2b)
