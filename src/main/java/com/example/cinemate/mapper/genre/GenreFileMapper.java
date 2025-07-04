@@ -16,7 +16,6 @@ public class GenreFileMapper {
         this.tempContentFileMapper = tempContentFileMapper;
     }
 
-    // преобразования MultipartFile в GenreFilesBufferDto (TempContentFile)
     public GenreFilesBufferDto toGenreFilesBufferDto(final GenreFilesDto genreFilesDto) {
         try {
             return new GenreFilesBufferDto(

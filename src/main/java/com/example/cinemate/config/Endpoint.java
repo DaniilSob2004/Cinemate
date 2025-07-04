@@ -29,15 +29,16 @@ public class Endpoint {
     public static final String REGISTER = "/register";
     public static final String FORGOT_PASSWORD = "/forgot-password";
     public static final String RESET_PASSWORD = "/reset-password";
+    public static final String RANDOM = "/random";
+    public static final String BY_GENRE = "/genre";
+    public static final String BY_CONTENT_TYPE = "/type";
     public static final String PRIVACY_POLICY = "/privacy-policy";
+    public static final String ALL = "/all";
 
     // auth users
     public static final String ME = "/me";
     public static final String UPDATE_ACCESS_TOKEN = "/update-access-token";
-    public static final String RANDOM = "/random";
-    public static final String BY_GENRE = "/genre";
     public static final String BY_RECOMMENDATIONS_TEST = "/rec-test";
-    public static final String BY_CONTENT_TYPE = "/type";
     public static final String BY_RECOMMENDATIONS = "/recommendations";
     public static final String BY_CONTENT_ID = "/{contentId}";
     public static final String LOGOUT = "/logout";
@@ -53,6 +54,14 @@ public class Endpoint {
                 API_V1 + AUTH + FORGOT_PASSWORD,
                 API_V1 + AUTH + RESET_PASSWORD,
                 API_V1 + PROVIDERS,
+                API_V1 + CONTENTS + RANDOM,
+                API_V1 + CONTENTS + BY_GENRE,
+                API_V1 + CONTENTS + BY_CONTENT_TYPE,
+                API_V1 + GENRES + ALL,
+                API_V1 + CONTENT_TYPES + ALL,
+                API_V1 + WARNINGS + ALL,
+                API_V1 + ACTORS + ALL,
+                API_V1 + EPISODES + BY_CONTENT_ID,
                 API_V1 + PRIVACY_POLICY
         );
     }
@@ -62,9 +71,6 @@ public class Endpoint {
                 API_V1 + USER + ME,
                 API_V1 + AUTH + UPDATE_ACCESS_TOKEN,
                 API_V1 + CONTENTS,
-                API_V1 + CONTENTS + RANDOM,
-                API_V1 + CONTENTS + BY_GENRE,
-                API_V1 + CONTENTS + BY_CONTENT_TYPE,
                 API_V1 + CONTENTS + BY_RECOMMENDATIONS,
                 API_V1 + CONTENT_VIEWS + ME,
                 API_V1 + WISHLISTS + ME,
@@ -91,7 +97,7 @@ public class Endpoint {
 
     static public List<String> getEndpointForAuthUsersAndAdmin() {
         return List.of(
-                API_V1 + EPISODES + BY_CONTENT_ID
+
         );
     }
 }

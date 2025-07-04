@@ -9,7 +9,6 @@ import java.io.IOException;
 @Component
 public class TempContentFileMapper {
 
-    // преобразования MultipartFile в TempContentFile
     public TempContentFile toTempContentFile(final MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             return null;

@@ -58,7 +58,7 @@ public class UpdatePasswordService {
 
         Logger.info("Reset password token created for user: {} - {}", email, token);
 
-        // отправка письма на эту почту с ссылкой
+        // отправка токена на почту для сброса пароля
         String resetLink = resetPasswordFrontUrl + token;
         EmailContent emailContent = emailContentBuilder.resetPasswordEmail(resetLink);
         var emailContext = new EmailContext(email, emailContent.getSubject(), emailContent.getMessage());

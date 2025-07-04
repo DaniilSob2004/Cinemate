@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.CONTENT_TYPES)
-@SecurityRequirement(name = "JWT")
 @Tag(name = "ContentType Admin", description = "ContentType management for admin")
 public class ContentTypeController {
 
@@ -25,7 +24,7 @@ public class ContentTypeController {
         this.contentTypeCrudService = contentTypeCrudService;
     }
 
-    @GetMapping
+    @GetMapping(value = Endpoint.ALL)
     @Operation(summary = "Get all contentTypes", description = "Get all contentTypes and return List(ContentTypeDto)")
     public ResponseEntity<?> getAll() {
         List<ContentTypeDto> contentTypes = contentTypeCrudService.getAll();
@@ -34,6 +33,7 @@ public class ContentTypeController {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "Add contentType", description = "Add contentType by ContentTypeDto")
     public ResponseEntity<?> add(@Valid @RequestBody ContentTypeDto contentTypeDto) {
         Logger.info("-------- Add ContentType (" + contentTypeDto + ") --------");

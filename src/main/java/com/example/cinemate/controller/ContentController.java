@@ -15,7 +15,6 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.CONTENTS)
-@SecurityRequirement(name = "JWT")
 @Tag(name = "Content", description = "Operations related to managing contents")
 public class ContentController {
 
@@ -26,8 +25,12 @@ public class ContentController {
     }
 
     @GetMapping(value = Endpoint.BY_RECOMMENDATIONS)
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "Get contents by rec", description = "Get contents by user rec and return PageResponse(ContentDto)")
-    public ResponseEntity<?> getByRecommendations(@Valid @ModelAttribute ContentRecSearchParamsDto contentRecSearchParamsDto, HttpServletRequest request) {
+    public ResponseEntity<?> getByRecommendations(
+            @Valid @ModelAttribute ContentRecSearchParamsDto contentRecSearchParamsDto,
+            HttpServletRequest request
+    ) {
         Logger.info("-------- Get rec content (" + contentRecSearchParamsDto + ") --------");
         return ResponseEntity.ok(contentCrudService.getByRecommend(contentRecSearchParamsDto, request));
     }

@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.ACTORS)
-@SecurityRequirement(name = "JWT")
 @Tag(name = "Actor Admin", description = "Actor management for admin")
 public class ActorController {
 
@@ -25,7 +24,7 @@ public class ActorController {
         this.actorCrudService = actorCrudService;
     }
 
-    @GetMapping
+    @GetMapping(value = Endpoint.ALL)
     @Operation(summary = "Get all actors", description = "Get all actors and return List(ActorDto)")
     public ResponseEntity<?> getAll() {
         List<ActorDto> actors = actorCrudService.getAll();
@@ -34,6 +33,7 @@ public class ActorController {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "Add actor", description = "Add actor by ActorDto")
     public ResponseEntity<?> add(@Valid @RequestBody ActorDto actorDto) {
         Logger.info("-------- Add actor (" + actorDto + ") --------");

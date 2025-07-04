@@ -26,9 +26,8 @@ public class OAuthListener {
 
     @EventListener
     public void handleOAuthEvent(@NonNull final StartOAuthEvent event) {
-        OAuth2User oauthUser = event.getOauthUser();  // получаем данные авторизации google
+        OAuth2User oauthUser = event.getOauthUser();  // данные авторизации google
         if (oauthUser != null) {
-            // вход/регистрация
             OAuthService authService = authFactory.getAuthService(event.getProvider());  // получение сервиса по названию провайдера
             var authResponseDto = authService.processAuth(oauthUser, event.getAccessToken());  // запуск авторизации
 

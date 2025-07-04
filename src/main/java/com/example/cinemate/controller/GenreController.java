@@ -21,7 +21,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.GENRES)
-@SecurityRequirement(name = "JWT")
 @Tag(name = "Genre", description = "Genre management for contents and users test")
 public class GenreController {
 
@@ -33,7 +32,7 @@ public class GenreController {
         this.commonMapper = commonMapper;
     }
 
-    @GetMapping
+    @GetMapping(value = Endpoint.ALL)
     @Operation(summary = "Get all genres", description = "Get all genres and return List(GenreDto)")
     public ResponseEntity<?> getAll() {
         List<GenreDto> genres = genreCrudService.getAll();
@@ -42,6 +41,7 @@ public class GenreController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "Add genre", description = "Add genre with metadata and image")
     public ResponseEntity<?> add(
             @RequestPart(value = "metadata")
@@ -67,6 +67,7 @@ public class GenreController {
     }
 
     @PostMapping(value = Endpoint.BY_RECOMMENDATIONS_TEST)
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "Set test user genres", description = "Set test genres to check the recommendations of content for the user")
     public ResponseEntity<?> addGenresTest(@RequestBody GenreRecTestDto genreRecTestDto, HttpServletRequest request){
         Logger.info("-------- Add genre for user test (" + genreRecTestDto + ") --------");
@@ -75,6 +76,7 @@ public class GenreController {
     }
 
     @GetMapping(value = "get-genre-test")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "Get test user genres", description = "Get test genres to check the recommendations of content for the user")
     public ResponseEntity<?> getGenreTest(HttpServletRequest request) {
         return ResponseEntity.ok(genreCrudService.getGenreTest(request));

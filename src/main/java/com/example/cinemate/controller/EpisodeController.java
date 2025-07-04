@@ -4,7 +4,6 @@ import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.service.business.episode.EpisodeCrudService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import org.tinylog.Logger;
 
 @RestController
 @RequestMapping(value = Endpoint.API_V1 + Endpoint.EPISODES)
-@SecurityRequirement(name = "JWT")
 @Tag(name = "Episode", description = "Operations related to managing content episodes")
 public class EpisodeController {
 

@@ -19,7 +19,6 @@ public class JwtTokenUtil {
         this.jwtSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));  // получение ключа
     }
 
-    // Генерация токена
     public String generateToken(final Map<String, Object> claims, final String subject, final long expirationTimeMin) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -30,7 +29,6 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    // Проверка токена
     public boolean validateToken(final String token) {
         if (token == null || token.isEmpty()) {
             return false;
@@ -54,7 +52,6 @@ public class JwtTokenUtil {
         }
     }
 
-    // Извлечение всех claims
     public Claims getClaims(final String token) {
         Jws<Claims> jws = Jwts.parser()
                 .setSigningKey(this.jwtSecretKey)
@@ -75,13 +72,11 @@ public class JwtTokenUtil {
         }
     }
 
-    // Получение даты истечения токена
     public Date getExpirationDateFromToken(final String token) {
         Claims claims = getClaims(token);
         return claims.getExpiration();
     }
 
-    // Проверка истечения срока токена
     private boolean isTokenExpired(final String token) {
         return getClaims(token).getExpiration().before(new Date());
     }

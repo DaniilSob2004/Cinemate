@@ -49,7 +49,6 @@ public class GenreCrudService {
                     throw new ContentAlreadyExists("Genre '" + genreDto.getName() + "' already exists");
                 });
 
-        // сохраняем
         var savedGenre = genreService.save(genreMapper.toGenre(genreDto));
 
         // в отдельном потоке загружаем картинку
