@@ -5,6 +5,8 @@
 
  - SWAGGER
  -
+ - /swagger-ui/index.html#/
+ -
  - ![Image](https://github.com/user-attachments/assets/af7349da-c949-4f04-9242-cf16b6d5d8c4)
  - ![Image](https://github.com/user-attachments/assets/01f949e6-5757-498b-b950-e34bfadd79a7)
  - ![Image](https://github.com/user-attachments/assets/68521b8b-8ecc-423e-a390-16dafa6746d8)
@@ -58,12 +60,12 @@
  - ![Image](https://github.com/user-attachments/assets/fa2b3f64-df33-4e6e-b13b-a0b1e17af7fb)
 -------------------------------------------------------
  -------------------- Admin User --------------------
- - ![Image](https://github.com/user-attachments/assets/1dd4dbf2-6e91-4afe-942a-5fd137b427e2)
- - ![Image](https://github.com/user-attachments/assets/1cc6d172-a20b-47fe-ac35-470bcdd58d2b)
- - ![Image](https://github.com/user-attachments/assets/fd19c429-dd48-4910-99a9-985bad2820e2)
- - ![Image](https://github.com/user-attachments/assets/c70f1b7c-9bf5-473a-91e2-722ebba619cb)
- - ![Image](https://github.com/user-attachments/assets/6634965a-ca90-4e5b-a242-fed5547dcc7e)
- - ![Image](https://github.com/user-attachments/assets/3d975973-108f-4965-a158-2c8bd09485ac)
+ - <img width="1026" height="702" alt="Image" src="https://github.com/user-attachments/assets/44d6c5bf-303d-4236-aef4-b6a9de65b899" />
+ - <img width="1028" height="526" alt="Image" src="https://github.com/user-attachments/assets/a7b44a58-3dbf-4db2-adc7-44af5ba4b0bb" />
+ - <img width="1030" height="444" alt="Image" src="https://github.com/user-attachments/assets/95650ce4-5400-4b0c-8323-f4fd71fec5df" />
+ - <img width="1034" height="432" alt="Image" src="https://github.com/user-attachments/assets/5099c198-4ca1-4f08-a1c9-03f766cd23f2" />
+ - <img width="1030" height="253" alt="Image" src="https://github.com/user-attachments/assets/7a8f17e1-db70-49ce-af9f-9ab3a5881f13" />
+ - <img width="1031" height="298" alt="Image" src="https://github.com/user-attachments/assets/d11b6e0d-cebb-4deb-8bb3-8c06d0b9215a" />
  -------------------- Auth --------------------
  - ![Image](https://github.com/user-attachments/assets/b6621fdc-aad5-4f17-82e2-c40628bf69de)
  - ![Image](https://github.com/user-attachments/assets/694be405-b618-4295-9a1d-1c977028f304)
