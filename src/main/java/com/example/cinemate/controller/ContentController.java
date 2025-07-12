@@ -36,7 +36,7 @@ public class ContentController {
     }
 
     @GetMapping(value = Endpoint.RANDOM)
-    @Operation(summary = "Get contents by random", description = "Get contents by random and return List(ContentRandomRequestDto)")
+    @Operation(summary = "Get contents by random", description = "Get contents by random and return List(ContentDto)")
     public ResponseEntity<?> getRandom(@Valid @ModelAttribute ContentRandomRequestDto contentRandomRequestDto) {
         Logger.info("-------- Get random content (" + contentRandomRequestDto + ") --------");
         return ResponseEntity.ok(contentCrudService.getRandom(contentRandomRequestDto));

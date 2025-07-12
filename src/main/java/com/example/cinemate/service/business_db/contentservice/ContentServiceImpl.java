@@ -58,6 +58,11 @@ public class ContentServiceImpl implements ContentService {
 
 
     @Override
+    public boolean existsById(Integer id) {
+        return contentRepository.existsById(id);
+    }
+
+    @Override
     public long getTotalContents() {
         return contentRepository.countContentsByIsActiveIsTrue();
     }

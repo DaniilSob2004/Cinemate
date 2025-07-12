@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface AppUserRepository extends PagingAndSortingRepository<AppUser, Integer>, JpaSpecificationExecutor<AppUser> {
     boolean existsAppUserByEmail(String email);
+    boolean existsAppUsersById(Integer id);
     Optional<AppUser> findAppUserById(Integer id);
     Optional<AppUser> findAppUserByEmail(String email);
     Optional<AppUser> findByEmailAndIsActiveTrue(String email);

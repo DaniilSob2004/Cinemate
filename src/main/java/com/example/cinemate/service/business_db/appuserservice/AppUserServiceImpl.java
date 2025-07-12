@@ -84,6 +84,11 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
+    public boolean existsById(Integer id) {
+        return appUserRepository.existsAppUsersById(id);
+    }
+
+    @Override
     public Optional<AppUser> findByIdWithoutIsActive(Integer id) {
         return appUserRepository.findAppUserById(id);
     }

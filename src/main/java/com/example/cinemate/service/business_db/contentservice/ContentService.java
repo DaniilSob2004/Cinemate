@@ -16,6 +16,7 @@ public interface ContentService {
     List<Content> findAll();
     void deleteAll();
 
+    boolean existsById(Integer id);
     long getTotalContents();
     Page<Content> getContents(ContentSearchParamsDto contentSearchParamsDto);
     Page<Content> getRecommendedContents(ContentRecSearchParamsDto contentSearchParamsDto);

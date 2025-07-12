@@ -14,6 +14,7 @@ public interface WishListService {
     List<WishList> findAll();
     void deleteAll();
 
+    boolean existsByUserIdAndContentId(Integer userId, Integer contentId);
     Page<WishList> getWishlists(WishlistParamsDto wishlistParamsDto);
     List<WishList> findByUserId(Integer userId);
 }

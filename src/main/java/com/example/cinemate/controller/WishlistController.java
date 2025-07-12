@@ -1,6 +1,7 @@
 package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
+import com.example.cinemate.dto.wishlist.WishListAddDto;
 import com.example.cinemate.dto.wishlist.WishlistParamsDto;
 import com.example.cinemate.service.business.wishlist.WishlistCrudService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,5 +31,13 @@ public class WishlistController {
     public ResponseEntity<?> getByUserId(@Valid @ModelAttribute WishlistParamsDto wishlistParamsDto, HttpServletRequest request) {
         Logger.info("-------- Get wishlists by current user (" + wishlistParamsDto + ") --------");
         return ResponseEntity.ok(wishlistCrudService.getByUserId(wishlistParamsDto, request));
+    }
+
+    @PostMapping
+    @Operation(summary = "Add wishlist", description = "Add a new wishlist for user")
+    public ResponseEntity<?> add(@Valid @RequestBody WishListAddDto wishListAddDto, HttpServletRequest request) {
+        Logger.info("-------- Add wishlist for user (" + wishListAddDto + ") --------");
+        wishlistCrudService.add(wishListAddDto, request);
+        return ResponseEntity.ok("Wishlist added successfully...");
     }
 }

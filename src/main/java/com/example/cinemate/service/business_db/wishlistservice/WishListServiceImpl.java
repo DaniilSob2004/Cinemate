@@ -54,6 +54,11 @@ public class WishListServiceImpl implements WishListService {
 
 
     @Override
+    public boolean existsByUserIdAndContentId(Integer userId, Integer contentId) {
+        return wishListRepository.existsWishListByUserIdAndContentId(userId, contentId);
+    }
+
+    @Override
     public Page<WishList> getWishlists(WishlistParamsDto wishlistParamsDto) {
         Pageable pageable = PaginationUtil.getPageable(wishlistParamsDto);
         Specification<WishList> specWishlist = Specification.where(this.searchSpecification(wishlistParamsDto));

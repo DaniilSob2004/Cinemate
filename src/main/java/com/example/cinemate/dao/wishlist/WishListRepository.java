@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface WishListRepository extends PagingAndSortingRepository<WishList, Integer>, JpaSpecificationExecutor<WishList> {
+    boolean existsWishListByUserIdAndContentId(Integer userId, Integer contentId);
     List<WishList> findWishListsByUserId(Integer userId);
 }

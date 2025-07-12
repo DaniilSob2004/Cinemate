@@ -17,6 +17,7 @@ public interface AppUserService {
 
     Page<AppUser> getUsers(UserSearchParamsDto userSearchParamsDto);
     boolean existsByEmail(String email);
+    boolean existsById(Integer id);
     Optional<AppUser> findByIdWithoutIsActive(Integer id);
     Optional<AppUser> findByEmailWithoutIsActive(String email);
     Optional<AppUser> findByEmail(String email);
