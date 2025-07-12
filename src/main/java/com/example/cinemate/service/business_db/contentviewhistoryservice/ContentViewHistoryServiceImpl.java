@@ -54,6 +54,11 @@ public class ContentViewHistoryServiceImpl implements ContentViewHistoryService 
 
 
     @Override
+    public boolean existsByUserIdAndContentId(Integer userId, Integer contentId) {
+        return contentViewHistoryRepository.existsContentViewHistoriesByUserIdAndContentId(userId, contentId);
+    }
+
+    @Override
     public Page<ContentViewHistory> getContentViewHistories(ContentHistoryParamsDto contentHistoryParamsDto) {
         Pageable pageable = PaginationUtil.getPageable(contentHistoryParamsDto);
         Specification<ContentViewHistory> specContentHistory = Specification.where(this.searchSpecification(contentHistoryParamsDto));

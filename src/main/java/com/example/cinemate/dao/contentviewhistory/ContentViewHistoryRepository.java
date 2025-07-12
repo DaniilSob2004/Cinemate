@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ContentViewHistoryRepository extends PagingAndSortingRepository<ContentViewHistory, Integer>, JpaSpecificationExecutor<ContentViewHistory> {
+    boolean existsContentViewHistoriesByUserIdAndContentId(Integer userId, Integer contentId);
     List<ContentViewHistory> findContentViewHistoryByUserId(int userId);
 }

@@ -14,6 +14,7 @@ public interface ContentViewHistoryService {
     List<ContentViewHistory> findAll();
     void deleteAll();
 
+    boolean existsByUserIdAndContentId(Integer userId, Integer contentId);
     Page<ContentViewHistory> getContentViewHistories(ContentHistoryParamsDto contentHistoryParamsDto);
     List<ContentViewHistory> findByUserId(int userId);
 }

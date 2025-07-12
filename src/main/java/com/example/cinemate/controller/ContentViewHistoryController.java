@@ -2,6 +2,7 @@ package com.example.cinemate.controller;
 
 import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.contentviewhistory.ContentHistoryParamsDto;
+import com.example.cinemate.dto.contentviewhistory.ContentViewAddDto;
 import com.example.cinemate.service.business.contentviewhistory.ContentViewHistoryCrudService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,5 +31,13 @@ public class ContentViewHistoryController {
     public ResponseEntity<?> getByUserId(@Valid @ModelAttribute ContentHistoryParamsDto contentHistoryParamsDto, HttpServletRequest request) {
         Logger.info("-------- Get ContentViewHistory (" + contentHistoryParamsDto + ") --------");
         return ResponseEntity.ok(contentViewHistoryCrudService.getByUserId(contentHistoryParamsDto, request));
+    }
+
+    @PostMapping
+    @Operation(summary = "Add content view", description = "Add a new content view for user")
+    public ResponseEntity<?> add(@Valid @RequestBody ContentViewAddDto contentViewAddDto, HttpServletRequest request) {
+        Logger.info("-------- Add contentView for user (" + contentViewAddDto + ") --------");
+        contentViewHistoryCrudService.add(contentViewAddDto, request);
+        return ResponseEntity.ok("ContentView added successfully...");
     }
 }

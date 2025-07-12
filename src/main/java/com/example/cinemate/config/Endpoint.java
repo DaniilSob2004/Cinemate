@@ -78,7 +78,7 @@ public class Endpoint {
                 API_V1 + USER + ME,
                 API_V1 + CONTENTS,
                 API_V1 + CONTENTS + BY_RECOMMENDATIONS,
-                API_V1 + CONTENT_VIEWS + ME,
+                API_V1 + CONTENT_VIEWS,
                 API_V1 + WISHLISTS,
                 API_V1 + GENRES + BY_RECOMMENDATIONS_TEST
         );
