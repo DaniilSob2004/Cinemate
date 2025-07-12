@@ -51,6 +51,14 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
+cloud:
+  aws:
+    credentials:
+      access-key: "*************************"
+      secret-key: "*************************"
+    region:
+      static: eu-north-1
+
 frontend:
   url: "http://cinemate.com:3000"
 

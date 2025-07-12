@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
         info = @Info(
                 title = "Cinemate API",
                 description = "API cinemate ITSTEP",
-                version = "1.0.0",
+                version = "1.0.1",
                 contact = @Contact(
                         name = "Soboliev Daniil",
                         email = "soboliev.danik@gmail.com",

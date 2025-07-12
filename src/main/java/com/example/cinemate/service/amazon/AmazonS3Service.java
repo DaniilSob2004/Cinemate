@@ -4,7 +4,8 @@ import com.example.cinemate.dto.common.TempContentFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tinylog.Logger;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -26,14 +27,21 @@ public class AmazonS3Service {
     @Value("${amazon_s3.dns_cloudfront_url}")
     private String dnsCloudFrontUrl;
 
+    @Value("${cloud.aws.credentials.secret-key}")
+    private String secretKey;
+
+    @Value("${cloud.aws.credentials.access-key}")
+    private String accessKey;
+
     private S3Client s3Client;
 
     @PostConstruct
     public void init() {
         // клиент позволяет выполнять действия с S3
+        var awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);
         this.s3Client = S3Client.builder()
                 .region(Region.EU_NORTH_1)
-                .credentialsProvider(ProfileCredentialsProvider.create(credentialProfile))
+                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
                 .build();
 
         Logger.info("Initialized Amazon S3 Client");
