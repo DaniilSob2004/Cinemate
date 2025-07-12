@@ -7,9 +7,10 @@
  -
  - /swagger-ui/index.html#/
  -
- - ![Image](https://github.com/user-attachments/assets/af7349da-c949-4f04-9242-cf16b6d5d8c4)
- - ![Image](https://github.com/user-attachments/assets/01f949e6-5757-498b-b950-e34bfadd79a7)
- - ![Image](https://github.com/user-attachments/assets/68521b8b-8ecc-423e-a390-16dafa6746d8)
+ - ![Image](https://github.com/user-attachments/assets/dafa7fdf-49d5-4bcb-9034-e235f4b8c7eb)
+ - ![Image](https://github.com/user-attachments/assets/fb07c27f-4113-4203-8e25-8e2b4ee62d1a)
+ - ![Image](https://github.com/user-attachments/assets/5dd247e2-de09-4b11-80c1-0e931e2455a9)
+ - ![Image](https://github.com/user-attachments/assets/0fa88434-9ad4-43a8-a600-6176e0d20f04)
 
 -------------------------------------------------------
 
