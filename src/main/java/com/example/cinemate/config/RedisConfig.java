@@ -1,5 +1,6 @@
 package com.example.cinemate.config;
 
+import com.example.cinemate.dto.auth.ResponseAuthDto;
 import com.example.cinemate.dto.auth.UserDetailsDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -74,6 +75,12 @@ public class RedisConfig {
         return createRedisConnectionFactory(4);
     }
 
+    // фабрика соединения для success_auth_provider_token (БД 5)
+    @Bean
+    public RedisConnectionFactory redisSuccessAuthProviderTokenConnectionFactory() {
+        return createRedisConnectionFactory(5);
+    }
+
 
     // (для кэширования результатов методов) (БД 0) Spring будет использ. для управления кэшированием данных с использ. Redis
     @Bean
@@ -133,6 +140,16 @@ public class RedisConfig {
         template.setConnectionFactory(redisGenresTestConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(List.class));
+        return template;
+    }
+
+    // для работы с success_auth_provider_token для отправки токенов на фронт (БД 5)
+    @Bean
+    public RedisTemplate<String, ResponseAuthDto> redisSuccessAuthProviderTokenTemplate(RedisConnectionFactory redisSuccessAuthProviderTokenConnectionFactory) {
+        RedisTemplate<String, ResponseAuthDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisSuccessAuthProviderTokenConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(ResponseAuthDto.class));
         return template;
     }
 

@@ -51,6 +51,9 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
+frontend:
+  url: "http://cinemate.com:3000"
+
 security:
   secret_key: "********************"
   access_token_expiration_time: 10  # 10 min
@@ -75,13 +78,12 @@ redis_data:
   reset_token_key_prefix: "reset_token::"
   user_provider_key_prefix: "user_provider::"
   genres_test_key_prefix: "genres_test_user_id"
+  oauth_success_token_key_prefix: "oauth_success_token"
   user_details_expiration_time: 3600  # 3600 60 min
   reset_token_expiration_time: 600  # 600 10 min
   genres_test_expiration_time: 24  # 24 hours
+  oauth_success_token_expiration_time: 1  # 1 1 min
   base_redis_expiration_time: 3600  # 3600 60 min
-
-email_data:
-  reset_password_front_url: "https://myfrontend.com/reset-password?token="
 
 admin_data:
   password: $2a$10$e.lC9uZMHSaOBHjgRFMUJen3TBJLrroMIcxpeBQKB6j8dZbDsBIYG

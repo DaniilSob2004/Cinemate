@@ -1,12 +1,13 @@
 package com.example.cinemate.handling.auth;
 
+import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.error.ErrorResponseDto;
 import com.example.cinemate.event.StartOAuthEvent;
 import com.example.cinemate.exception.auth.*;
-import com.example.cinemate.utils.SendResponseUtil;
 import com.example.cinemate.utils.StringUtil;
 import com.example.cinemate.validate.user.UserDataValidate;
 import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.HttpStatus;
@@ -28,14 +29,15 @@ import java.io.IOException;
 @Component
 public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler, ApplicationEventPublisherAware {
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     private final OAuth2AuthorizedClientService authorizedClientService;
-    private final SendResponseUtil sendResponseUtil;
     private final UserDataValidate userDataValidate;
     private ApplicationEventPublisher eventPublisher;
 
-    public OAuth2LoginAuthenticationSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, SendResponseUtil sendResponseUtil, UserDataValidate userDataValidate) {
+    public OAuth2LoginAuthenticationSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, UserDataValidate userDataValidate) {
         this.authorizedClientService = authorizedClientService;
-        this.sendResponseUtil = sendResponseUtil;
         this.userDataValidate = userDataValidate;
     }
 
@@ -88,8 +90,8 @@ public class OAuth2LoginAuthenticationSuccessHandler implements AuthenticationSu
             errorResponse = new ErrorResponseDto("Something went wrong", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
-        // отправляем json ответ с ошибкой
-        sendResponseUtil.sendError(response, errorResponse);
+        // редиректим на фронт с error сообщением
+        response.sendRedirect(frontendUrl + Endpoint.OAUTH_SUCCESS_ERROR + errorResponse.getMessage());
     }
 
     @Override

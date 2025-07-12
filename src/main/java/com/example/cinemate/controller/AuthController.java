@@ -6,6 +6,7 @@ import com.example.cinemate.service.auth.LoginService;
 import com.example.cinemate.service.auth.LogoutService;
 import com.example.cinemate.service.auth.RegisterService;
 import com.example.cinemate.service.auth.UpdateTokenService;
+import com.example.cinemate.service.auth.external.OauthTokensService;
 import com.example.cinemate.service.business.user.UpdatePasswordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,13 +27,15 @@ public class AuthController {
     private final RegisterService registerService;
     private final UpdateTokenService updateTokenService;
     private final UpdatePasswordService updatePasswordService;
+    private final OauthTokensService oauthTokensService;
     private final LogoutService logoutService;
 
-    public AuthController(LoginService loginService, RegisterService registerService, UpdateTokenService updateTokenService, UpdatePasswordService updatePasswordService, LogoutService logoutService) {
+    public AuthController(LoginService loginService, RegisterService registerService, UpdateTokenService updateTokenService, UpdatePasswordService updatePasswordService, OauthTokensService oauthTokensService, LogoutService logoutService) {
         this.loginService = loginService;
         this.registerService = registerService;
         this.updateTokenService = updateTokenService;
         this.updatePasswordService = updatePasswordService;
+        this.oauthTokensService = oauthTokensService;
         this.logoutService = logoutService;
     }
 
@@ -86,5 +89,12 @@ public class AuthController {
         Logger.info("-------- Reset password (" + resetPasswordRequestDto + ") --------");
         updatePasswordService.resetPassword(resetPasswordRequestDto);
         return ResponseEntity.ok("Reset password successful");
+    }
+
+    @GetMapping(Endpoint.TOKENS)
+    @Operation(summary = "Get oauth tokens", description = "Get access and refresh token after oauth authorization")
+    public ResponseEntity<ResponseAuthDto> getOauthTokens(@Valid OauthStateDto oauthStateDto) {
+        Logger.info("Get oauth tokens: " + oauthStateDto);
+        return ResponseEntity.ok(oauthTokensService.getTokensByState(oauthStateDto));
     }
 }

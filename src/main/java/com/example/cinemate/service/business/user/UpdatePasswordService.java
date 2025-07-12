@@ -1,5 +1,6 @@
 package com.example.cinemate.service.business.user;
 
+import com.example.cinemate.config.Endpoint;
 import com.example.cinemate.dto.auth.ResetPasswordRequestDto;
 import com.example.cinemate.exception.auth.UserNotFoundException;
 import com.example.cinemate.exception.common.BadRequestException;
@@ -22,8 +23,8 @@ import java.time.LocalDateTime;
 @Service
 public class UpdatePasswordService {
 
-    @Value("${email_data.reset_password_front_url}")
-    private String resetPasswordFrontUrl;
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     private final AppUserService appUserService;
     private final EmailService emailService;
@@ -59,7 +60,7 @@ public class UpdatePasswordService {
         Logger.info("Reset password token created for user: {} - {}", email, token);
 
         // отправка токена на почту для сброса пароля
-        String resetLink = resetPasswordFrontUrl + token;
+        String resetLink = frontendUrl + Endpoint.FRONT_RESET_PASSWORD + token;
         EmailContent emailContent = emailContentBuilder.resetPasswordEmail(resetLink);
         var emailContext = new EmailContext(email, emailContent.getSubject(), emailContent.getMessage());
         emailService.sendEmail(emailContext);

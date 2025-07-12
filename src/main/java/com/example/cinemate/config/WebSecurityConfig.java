@@ -58,28 +58,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors();
 
-        // для всех пользователей
-        for (String endpoint : Endpoint.getEndpointForAllUsers()) {
-            http.authorizeRequests().mvcMatchers(endpoint).permitAll();
-        }
-
-        // для авторизованных пользователей
-        for (String endpoint : Endpoint.getEndpointForAuthUsers()) {
-            http.authorizeRequests().mvcMatchers(endpoint)
-                    .access(String.format("hasAnyRole('%s')", userRole));
-        }
-
-        // для админов
-        for (String endpoint : Endpoint.getEndpointForAdmin()) {
-            http.authorizeRequests().mvcMatchers(endpoint)
-                    .access(String.format("hasAnyRole('%s')", adminRole));
-        }
-
-        // для авторизованных пользователей и админов
-        for (String endpoint : Endpoint.getEndpointForAuthUsersAndAdmin()) {
-            http.authorizeRequests().mvcMatchers(endpoint)
-                    .access(String.format("hasAnyRole('%s','%s')", userRole, adminRole));
-        }
+        http.authorizeRequests(authorize -> {
+            for (String endpoint : Endpoint.getEndpointForAllUsers()) {
+                authorize.mvcMatchers(endpoint).permitAll();
+            }
+            for (String endpoint : Endpoint.getEndpointForAuthUsers()) {
+                authorize.mvcMatchers(endpoint).access(String.format("hasAnyRole('%s')", userRole));
+            }
+            for (String endpoint : Endpoint.getEndpointForAdmin()) {
+                authorize.mvcMatchers(endpoint).access(String.format("hasAnyRole('%s')", adminRole));
+            }
+            for (String endpoint : Endpoint.getEndpointForAuthUsersAndAdmin()) {
+                authorize.mvcMatchers(endpoint).access(String.format("hasAnyRole('%s','%s')", userRole, adminRole));
+            }
+        });
 
         http
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // без сессии (только JWT)

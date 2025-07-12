@@ -9,6 +9,11 @@ public class Endpoint {
     // prefix
     public static final String ADMIN = "/admin";
 
+    // frontend
+    public static final String OAUTH_SUCCESS_TOKENS = "/oauth-success?state=";
+    public static final String OAUTH_SUCCESS_ERROR = "/oauth-success?error=";
+    public static final String FRONT_RESET_PASSWORD = "/reset-password?token=";
+
     // root
     public static final String AUTH = "/auth";
     public static final String USER = "/user";
@@ -29,6 +34,7 @@ public class Endpoint {
     public static final String REGISTER = "/register";
     public static final String FORGOT_PASSWORD = "/forgot-password";
     public static final String RESET_PASSWORD = "/reset-password";
+    public static final String TOKENS = "/tokens";
     public static final String RANDOM = "/random";
     public static final String BY_GENRE = "/genre";
     public static final String BY_CONTENT_TYPE = "/type";
@@ -53,6 +59,7 @@ public class Endpoint {
                 API_V1 + AUTH + REGISTER,
                 API_V1 + AUTH + FORGOT_PASSWORD,
                 API_V1 + AUTH + RESET_PASSWORD,
+                API_V1 + AUTH + TOKENS,
                 API_V1 + PROVIDERS,
                 API_V1 + CONTENTS + RANDOM,
                 API_V1 + CONTENTS + BY_GENRE,

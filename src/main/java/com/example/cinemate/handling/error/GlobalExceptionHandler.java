@@ -146,6 +146,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // обработка исключения типа NotFoundException (404)
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException ex) {
+        Logger.warn(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponseDto(ex.getMessage(), HttpStatus.NOT_FOUND.value())
+        );
+    }
 
     // обработка исключения по валидации данных типа MethodArgumentNotValidException / (@RequestBody)
     @ExceptionHandler(MethodArgumentNotValidException.class)
